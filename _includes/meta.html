@@ -3,6 +3,11 @@
 {% else %}
 {% capture title %}{{ site.title }}{% endcapture %}
 {% endif %}
+{% if page.url %}
+{% capture url_path %}{{ site.url }}{{ page.url }}{% endcapture %}
+{% else %}
+{% capture url_path %}{{ site.url }}{% endcapture %}
+{% endif %}
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="author" content="{{ site.author.name }}">
@@ -16,7 +21,7 @@
 <meta name="twitter:description" content="{{ site.description }}">
 <meta name="twitter:image" content="{{ site.logo }}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="{{ site.url }}">
+<meta property="og:url" content="{{ url_path }}">
 <meta property="og:title" content="{{ title }}">
 <meta property="og:description" content="{{ site.description }}">
 <meta property="og:image" content="{{ site.logo }}">
