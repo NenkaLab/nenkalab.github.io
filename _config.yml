@@ -1,0 +1,35 @@
+title: NenkaLab
+description: Nyaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+url: https://nenkalab.github.io
+assets: https://nenkalab.github.io/assets
+logo: https://nenkalab.github.io/assets/image/logo.png
+keywords: ["Nenka"]
+timezone: Asia/Seoul
+permalink: pretty
+encoding: utf-8
+incremental: true # Test
+
+author:
+  disqus:
+  email:
+  github: NenkaLab # required
+  google_analytics:
+  name: NenkaLab # required
+  telegram: "@nenka_lab"
+  discord: "Nenka Lab#9485"
+
+paginate: 5
+paginate_path: "/page/:num/"
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+kramdown:
+  input: GFM
+
+sass:
+  style: compressed
