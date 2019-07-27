@@ -24,10 +24,16 @@ AppbarLayout {
 }
 
 CenterLayout {
+  &.text-align {
+    text-align: center;
+    & > * {
+      display: inline-block;
+    }
+  }
   &.position {
     position: absolute;
     left: 50%;
-    right: 50%;
+    margin-left: -50%;
   }
   &.margin {
     margin: 0 auto;
@@ -35,13 +41,13 @@ CenterLayout {
 }
 
 ScrollView {
-  display: block;
+  display: inline-block;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 HorizontalScrollView {
-  display: block;
+  display: inline-block;
   overflow-y: hidden;
   overflow-x: auto;
 }
