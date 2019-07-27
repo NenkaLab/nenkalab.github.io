@@ -25,8 +25,15 @@ AppbarLayout {
 
 ScrollView {
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 HorizontalScrollView {
+  overflow-y: hidden;
   overflow-x: auto;
+}
+
+.test {
+  width: 200px;
+  height: 200px;
 }
