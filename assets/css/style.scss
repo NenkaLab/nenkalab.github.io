@@ -19,11 +19,7 @@ body, main {
   overflow: hidden;
 }
 
-AppbarLayout {
-  display: block;
-}
-
-CenterLayout {
+.center {
   &.text-align {
     text-align: center;
     & > * {
@@ -40,19 +36,24 @@ CenterLayout {
   }
 }
 
-ScrollView {
+.inline-block {
   display: inline-block;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
-HorizontalScrollView {
-  display: inline-block;
-  overflow-y: hidden;
-  overflow-x: auto;
+.card {
+  box-shadow: 0px 0px 10px -3px rgba(0, 0, 0, 0.63);
 }
 
 .test {
   width: 300px;
   height: 300px;
+  border-radius: 16px;
+  margin: 4px;
+}
+
+.test {
+  width: 300px;
+  height: 300px;
+  border-radius: 16px;
+  margin: 4px;
 }
