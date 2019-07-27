@@ -24,11 +24,13 @@ AppbarLayout {
 }
 
 ScrollView {
+  display: block;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 HorizontalScrollView {
+  display: block;
   overflow-y: hidden;
   overflow-x: auto;
 }
