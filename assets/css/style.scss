@@ -23,6 +23,12 @@ AppbarLayout {
   display: block;
 }
 
+CenterLayout {
+  position: absolute;
+  left: 50%;
+  margin-left: -50px;
+}
+
 ScrollView {
   display: block;
   overflow-y: auto;
