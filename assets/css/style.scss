@@ -15,10 +15,18 @@ html, body, main {
   margin: 0 0;
 }
 
-.test {
-  width: 200px;
+body, main {
+  overflow: hidden;
+}
 
-  & > h1 {
-    font-size: 2em;
-  }
+AppbarLayout {
+  display: block;
+}
+
+ScrollView {
+  overflow-y: auto;
+}
+
+HorizontalScrollView {
+  overflow-x: auto;
 }
