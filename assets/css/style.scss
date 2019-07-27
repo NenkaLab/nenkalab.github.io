@@ -24,9 +24,14 @@ AppbarLayout {
 }
 
 CenterLayout {
-  position: absolute;
-  left: 50%;
-  margin-left: -50px;
+  &.position {
+    position: absolute;
+    left: 50%;
+    right: 50%;
+  }
+  &.margin {
+    margin: 0 auto;
+  }
 }
 
 ScrollView {
