@@ -77,6 +77,10 @@
 	}
 </style>
 
+<svelte:head>
+	<base href="/" />
+</svelte:head>
+
 <div class="app-base-color">
 	<ParaglideJS {i18n}>
 		<div>
