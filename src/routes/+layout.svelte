@@ -1,4 +1,6 @@
 <script lang="ts">
+	export const prerender = true;
+	export const ssr = true;
 	import { i18n } from '$lib/i18n';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
@@ -58,8 +60,6 @@
 	});
 
 	import '../../node_modules/material-symbols/index.scss';
-
-	export const prerender = true;
 </script>
 
 <!-- svelte-ignore css_unused_selector -->
