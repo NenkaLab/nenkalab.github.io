@@ -24,9 +24,7 @@ const config = {
 
 		appDir: 'src',
 
-		paths: {
-			base: '/nenkalab.github.io',
-		},
+		router: { type: 'hash' }
 	},
 };
 
