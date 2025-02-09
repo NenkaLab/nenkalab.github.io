@@ -20,8 +20,10 @@ const config = {
 			pages: 'build',
 			assets: 'build',
 			fallback: 'index.html'
-		})
-	}
+		}),
+
+		appDir: 'src'
+	},
 };
 
 export default config;
