@@ -22,7 +22,11 @@ const config = {
 			fallback: 'index.html'
 		}),
 
-		appDir: 'src'
+		appDir: 'src',
+
+		paths: {
+			base: '/nenkalab.github.io',
+		},
 	},
 };
 
