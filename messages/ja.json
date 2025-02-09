@@ -1,4 +1,39 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from ja!"
+	"title_default" : "ユーティリティ",
+	"title_named" : "ユーティリティ | {name}",
+
+	"nav_menu_btn" : "メニューを開く",
+	"nav_home" : "ホーム",
+	"nav_utils" : "ユーティリティ",
+	"nav_settings" : "設定",
+	"nav_license" : "ライセンス",
+
+	"error_go_back": "戻る",
+	"error_go_home": "ホームへ ",
+
+	"home_welcome": "いらっしゃいませ",
+	"home_welcome_msg": "ユーティリティへようこそ。",
+	"home_what_can": "何ができますか？",
+	"home_what_can_msg": "左側のメニューから「Utils」を選択し、必要な機能を使用してください。",
+	"home_why_create": "なぜ作ったのですか？",
+	"home_why_create_msg": "インターネットをしていると、時々面倒なことがありますが、サイトを探すのが面倒だったので作りました。",
+	"home_why_create_msg_small": "ウェブ開発の練習",
+	"home_can_add_function": "機能追加は可能ですか？",
+	"home_can_add_function_msg": "Issueにお問い合わせいただければ可能ですが、開発者が面倒くさくてやらない可能性があります。",
+	"home_contect": "お問い合わせ",
+	"home_email": "メールアドレス",
+	"home_telegram": "Telegram",
+	"home_steam": "Steam",
+	"home_discord": "Discord",
+
+	"license_message": "ライセンスおよび著作権に関する通知",
+	"license_ellipsis": "その他、リポジトリに含まれるすべての依存関係、ライブラリ、ファイルなど。",
+
+	"settings_theme_title": "テーマ",
+	"settings_theme_system": "システム ",
+	"settings_theme_light": "ライト ",
+	"settings_theme_dark": "ダーク ",
+
+	"settings_language_title": "言語"
 }

@@ -1,4 +1,39 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from cn!"
+	"title_default" : "实用工具",
+	"title_named" : "实用工具 | {name}",
+
+	"nav_menu_btn" : "打开菜单",
+	"nav_home" : "主页",
+	"nav_utils" : "实用程序",
+	"nav_settings" : "设置",
+	"nav_license" : "执照",
+
+	"error_go_back": "返回",
+	"error_go_home": "返回主页",
+
+	"home_welcome": "欢迎",
+	"home_welcome_msg": "欢迎使用实用工具。",
+	"home_what_can": "我能做什么？",
+	"home_what_can_msg": "从左侧菜单中选择“Utils”，然后使用所需的功能。",
+	"home_why_create": "你为什么创建它？",
+	"home_why_create_msg": "我在上网时，有时会遇到一些烦人的事情，我创建这个是因为我懒得找网站。",
+	"home_why_create_msg_small": "Web 开发练习",
+	"home_can_add_function": "我可以添加功能吗？",
+	"home_can_add_function_msg": "如果你在 Issue 中留下询问，你可以这样做，但是开发人员可能太懒了，不会去做。",
+	"home_contect": "联系我们",
+	"home_email": "电子邮件",
+	"home_telegram": "Telegram",
+	"home_steam": "Steam",
+	"home_discord": "Discord",
+
+	"license_message": "许可和版权声明",
+	"license_ellipsis": "以及存储库中包含的所有依赖项、库、文件等。",
+
+	"settings_theme_title": "主题",
+	"settings_theme_system": "系统",
+	"settings_theme_light": "浅色",
+	"settings_theme_dark": "深色",
+
+	"settings_language_title": "语言"
 }

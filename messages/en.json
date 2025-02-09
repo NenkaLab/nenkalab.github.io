@@ -1,4 +1,39 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from en!"
+	"title_default" : "Utils",
+	"title_named" : "Utils | {name}",
+	
+	"nav_menu_btn" : "Open menu",
+	"nav_home" : "Home",
+	"nav_utils" : "Utils",
+	"nav_settings" : "Settings",
+	"nav_license" : "License",
+
+	"error_go_back": "Go Back",
+	"error_go_home": "Go Home",
+
+	"home_welcome": "Welcome",
+	"home_welcome_msg": "Welcome to Utility.",
+	"home_what_can": "What can I do?",
+	"home_what_can_msg": "Select 'Utils' from the menu on the left and use the desired function.",
+	"home_why_create": "Why did you create it?",
+	"home_why_create_msg": "When I'm on the internet, there are times when things are annoying, and I created this because I was too lazy to find a site.",
+	"home_why_create_msg_small": "Web development practice",
+	"home_can_add_function": "Can I add a function?",
+	"home_can_add_function_msg": "You can if you leave an inquiry in Issue, but the developer may be too lazy to do it.",
+	"home_contect": "Contact Us",
+	"home_email": "Email",
+	"home_telegram": "Telegram",
+	"home_steam": "Steam",
+	"home_discord": "Discord",
+	
+	"license_message": "License and Copyright Notice",
+	"license_ellipsis": "...and all dependencies, libraries, files, etc. included in the repository.",
+
+	"settings_theme_title": "Theme",
+	"settings_theme_system": "System",
+	"settings_theme_light": "Light",
+	"settings_theme_dark": "Dark",
+
+	"settings_language_title": "Language"
 }

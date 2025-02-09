@@ -7,6 +7,22 @@ declare global {
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
+
+		interface Title {
+			title: string | null | undefined | unknown;
+		}
+
+		interface Menu {
+			isOpen: boolean | null | undefined | unknown;
+		}
+	}
+
+	interface Window {
+		navigation: Navigation;
+	}
+
+	interface Navigation {
+		canGoBack: boolean;
 	}
 }
 

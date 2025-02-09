@@ -1,4 +1,39 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from ko!"
+	"title_default" : "유틸리티",
+	"title_named" : "유틸리티 | {name}",
+
+	"nav_menu_btn" : "메뉴 열기",
+	"nav_home" : "홈",
+	"nav_utils" : "유틸리티",
+	"nav_settings" : "설정",
+	"nav_license" : "라이선스",
+
+	"error_go_back": "뒤로가기",
+	"error_go_home": "홈으로 가기",
+
+	"home_welcome": "환영합니다",
+	"home_welcome_msg": "유틸리티에 오신 것을 환영합니다.",
+	"home_what_can": "무엇을 할 수 있나요?",
+	"home_what_can_msg": "왼쪽의 메뉴에서 Utils를 선택 후 원하는 기능을 사용하면 됩니다.",
+	"home_why_create": "왜 만들었나요?",
+	"home_why_create_msg": "인터넷 하다 보면 가끔 귀찮은 것들이 있을 때 사이트 찾기 귀찮아서 만들었습니다.",
+	"home_why_create_msg_small": "웹 개발 연습",
+	"home_can_add_function": "기능 추가가 가능한가요?",
+	"home_can_add_function_msg": "Issue에 문의를 남기면 가능은 하지만 개발자가 귀찮아서 안 할 수 있습니다.",
+	"home_contect": "문의의하기",
+	"home_email": "이메일",
+	"home_telegram": "텔레그램",
+	"home_steam": "스팀",
+	"home_discord": "디스코드",
+
+	"license_message": "라이선스 및 저작권 고지",
+	"license_ellipsis": "...등 리포지토리에 포함된 모든 종속성, 라이브러리, 파일들.",
+
+	"settings_theme_title": "테마",
+	"settings_theme_system": "시스템",
+	"settings_theme_light": "라이트",
+	"settings_theme_dark": "다크",
+
+	"settings_language_title": "언어"
 }
