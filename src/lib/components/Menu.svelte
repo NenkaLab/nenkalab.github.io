@@ -32,6 +32,7 @@
         if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
             appSideMenu.classList.add('anim');
             appOverlayDim.classList.add('anim');
+            appSideMenu.classList.remove('open');
             appOverlayDim.style.opacity = '0';
             setTimeout(() => {
                 if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
