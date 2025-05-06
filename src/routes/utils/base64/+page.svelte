@@ -4,6 +4,7 @@
     import MultiEncodingBase64 from "$lib/base64";
     import type { EncodingOptions, EncodingResult } from "$lib/base64";
     import * as m from '$lib/paraglide/messages.js';
+	import { fade } from "svelte/transition";
 
     const base64 = new MultiEncodingBase64();
 
@@ -61,6 +62,7 @@
 
 
     let tab: MdTabs;
+    let currentTab: number = 0;
 
     let encodePage: HTMLElement;
     let encodeInput: MdOutlinedTextField;
@@ -94,13 +96,14 @@
 
 
     function changeTab(event: any) {
-        if (event.target.activeTabIndex == 0) {
-            encodePage.classList.remove('hide');
-            decodePage.classList.add('hide');
-        } else {
-            encodePage.classList.add('hide');
-            decodePage.classList.remove('hide');
-        }
+        currentTab = tab.activeTabIndex;
+        // if (tab.activeTabIndex == 0) {
+        //     encodePage.classList.remove('hide');
+        //     decodePage.classList.add('hide');
+        // } else {
+        //     encodePage.classList.add('hide');
+        //     decodePage.classList.remove('hide');
+        // }
     }
 
     onMount(() => {
@@ -125,6 +128,7 @@
     flex-wrap: nowrap;
     gap: 8px;
     margin-top: 0px;
+    width: 100%;
 
     .back {
         padding: 8px;
@@ -162,6 +166,9 @@ md-tabs {
     border-radius: 100px;
     border: 2px solid var(--md-sys-color-outline-variant);
 
+    max-width: 320px;
+    width: 100%;
+
     md-divider {
         display: none;
 
@@ -171,127 +178,144 @@ md-tabs {
     }
 }
 
+#content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
 .hide {
     display: none;
 }
 
 </style>
 
-<h1 class="b-title">
-    <button class="back" onclick="{back}">
-        <md-ripple></md-ripple>
-        <span class="material-symbols-rounded" translate="no">arrow_back</span>
-    </button>
-    Base64
-</h1>
+<div id="content">
 
-<md-tabs id="b-tabs" bind:this={tab}>
-    <md-primary-tab active>Encode</md-primary-tab>
-    <md-primary-tab>Decode</md-primary-tab>
-</md-tabs>
+    <h1 class="b-title">
+        <button class="back" onclick="{back}">
+            <md-ripple></md-ripple>
+            <span class="material-symbols-rounded" translate="no">arrow_back</span>
+        </button>
+        Base64
+    </h1>
 
-<section id="encode" bind:this={encodePage}>
-    <div class="options">
-        <div class="encoding item">
-            <span class="text">{m.utils_base64_encoding()}</span>
-            <md-outlined-select 
-                required 
-                id="encode-encoding-select" 
-                bind:this={encodeEncoding}
-                onchange="{b64EncodeUnicode}">
-                {#each base64.getSupportedEncodings() as supported}
-                    {#if encodeCurEncoding == supported}
-                        <md-select-option selected value="{supported}">
-                            <div slot="headline">{supported.toUpperCase()}</div>
-                        </md-select-option>
-                    {:else}
-                        <md-select-option value="{supported}">
-                            <div slot="headline">{supported.toUpperCase()}</div>
-                        </md-select-option>
-                    {/if}
-                {/each}
-            </md-outlined-select>
+    <md-tabs id="b-tabs" bind:this={tab}>
+        <md-primary-tab active>Encode</md-primary-tab>
+        <md-primary-tab>Decode</md-primary-tab>
+    </md-tabs>
+
+    {#if currentTab == 0}
+
+    <section id="encode" bind:this={encodePage} transition:fade={{duration: 200, delay: currentTab == 0 ? 200 : 0}}>
+        <div class="options">
+            <div class="encoding item">
+                <span class="text">{m.utils_base64_encoding()}</span>
+                <md-outlined-select 
+                    required 
+                    id="encode-encoding-select" 
+                    bind:this={encodeEncoding}
+                    onchange="{b64EncodeUnicode}">
+                    {#each base64.getSupportedEncodings() as supported}
+                        {#if encodeCurEncoding == supported}
+                            <md-select-option selected value="{supported}">
+                                <div slot="headline">{supported.toUpperCase()}</div>
+                            </md-select-option>
+                        {:else}
+                            <md-select-option value="{supported}">
+                                <div slot="headline">{supported.toUpperCase()}</div>
+                            </md-select-option>
+                        {/if}
+                    {/each}
+                </md-outlined-select>
+            </div>
+            <div class="password item">
+                <span class="text">{m.utils_base64_password()}</span>
+                <md-outlined-text-field
+                    id="encode-password-input"
+                    label="{m.utils_base64_enter_password()}"
+                    type="password"
+                    bind:this={encodePassword}
+                    oninput="{b64EncodeUnicode}">
+                </md-outlined-text-field>
+            </div>
         </div>
-        <div class="password item">
-            <span class="text">{m.utils_base64_password()}</span>
+        <div class="io">
             <md-outlined-text-field
-                id="encode-password-input"
-                label="{m.utils_base64_enter_password()}"
-                type="password"
-                bind:this={encodePassword}
+                id="encode-input"
+                label="{m.utils_base64_encode_input()}"
+                type="textarea"
+                style="width: 300px;height: 200px;"
+                bind:this={encodeInput}
                 oninput="{b64EncodeUnicode}">
             </md-outlined-text-field>
-        </div>
-    </div>
-    <div class="io">
-        <md-outlined-text-field
-            id="encode-input"
-            label="{m.utils_base64_encode_input()}"
-            type="textarea"
-            style="width: 300px;height: 200px;"
-            bind:this={encodeInput}
-            oninput="{b64EncodeUnicode}">
-        </md-outlined-text-field>
-        <md-outlined-text-field
-            id="encode-output"
-            label="{m.utils_base64_encode_output()}"
-            type="textarea"
-            style="width: 300px;height: 200px;"
-            bind:this={encodeOutput}>
-        </md-outlined-text-field>
-    </div>
-</section>
-
-<section id="decode" class="hide" bind:this={decodePage}>
-
-    <div class="options">
-        <div class="encoding item">
-            <span class="text">{m.utils_base64_encoding()}</span>
-            <md-outlined-select 
-                required
-                id="decode-encoding-select"
-                bind:this={decodeEncoding}
-                onchange="{b64DecodeUnicode}">
-                {#each base64.getSupportedEncodings() as supported}
-                    {#if decodeCurEncoding == supported}
-                        <md-select-option selected value="{supported}">
-                            <div slot="headline">{supported.toUpperCase()}</div>
-                        </md-select-option>
-                    {:else}
-                        <md-select-option value="{supported}">
-                            <div slot="headline">{supported.toUpperCase()}</div>
-                        </md-select-option>
-                    {/if}
-                {/each}
-            </md-outlined-select>
-        </div>
-        <div class="password item">
-            <span class="text">{m.utils_base64_password()}</span>
             <md-outlined-text-field
-                id="encode-password-input"
-                label="{m.utils_base64_enter_password()}"
-                type="password"
-                bind:this={decodePassword}
-                oninput="{b64DecodeUnicode}">
+                id="encode-output"
+                label="{m.utils_base64_encode_output()}"
+                type="textarea"
+                style="width: 300px;height: 200px;"
+                bind:this={encodeOutput}>
             </md-outlined-text-field>
         </div>
-    </div>
+    </section>
 
-    <div class="io">
-        <md-outlined-text-field
-            id="decode-input"
-            label="Base64 를 입력하세요"
-            type="textarea"
-            style="width: 300px;height: 200px;"
-            bind:this={decodeInput}
-            oninput="{b64DecodeUnicode}">
-        </md-outlined-text-field>
-        <md-outlined-text-field
-            id="decode-output"
-            label="출력"
-            type="textarea"
-            style="width: 300px;height: 200px;"
-            bind:this={decodeOutput}>
-        </md-outlined-text-field>
-    </div>
-</section>
+    {:else}
+
+    <section id="decode" bind:this={decodePage} transition:fade={{duration: 200, delay: currentTab == 0 ? 0 : 200}}>
+
+        <div class="options">
+            <div class="encoding item">
+                <span class="text">{m.utils_base64_encoding()}</span>
+                <md-outlined-select 
+                    required
+                    id="decode-encoding-select"
+                    bind:this={decodeEncoding}
+                    onchange="{b64DecodeUnicode}">
+                    {#each base64.getSupportedEncodings() as supported}
+                        {#if decodeCurEncoding == supported}
+                            <md-select-option selected value="{supported}">
+                                <div slot="headline">{supported.toUpperCase()}</div>
+                            </md-select-option>
+                        {:else}
+                            <md-select-option value="{supported}">
+                                <div slot="headline">{supported.toUpperCase()}</div>
+                            </md-select-option>
+                        {/if}
+                    {/each}
+                </md-outlined-select>
+            </div>
+            <div class="password item">
+                <span class="text">{m.utils_base64_password()}</span>
+                <md-outlined-text-field
+                    id="encode-password-input"
+                    label="{m.utils_base64_enter_password()}"
+                    type="password"
+                    bind:this={decodePassword}
+                    oninput="{b64DecodeUnicode}">
+                </md-outlined-text-field>
+            </div>
+        </div>
+
+        <div class="io">
+            <md-outlined-text-field
+                id="decode-input"
+                label="{m.utils_base64_decode_input()}"
+                type="textarea"
+                style="width: 300px;height: 200px;"
+                bind:this={decodeInput}
+                oninput="{b64DecodeUnicode}">
+            </md-outlined-text-field>
+            <md-outlined-text-field
+                id="decode-output"
+                label="{m.utils_base64_decode_output()}"
+                type="textarea"
+                style="width: 300px;height: 200px;"
+                bind:this={decodeOutput}>
+            </md-outlined-text-field>
+        </div>
+    </section>
+
+    {/if}
+
+</div>
