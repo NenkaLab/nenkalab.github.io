@@ -17,7 +17,7 @@
     width: 100%;
     border-radius: $round;
     padding: $round;
-    margin: 0px 16px 16px 16px;
+    // margin: 0px 16px 16px 16px;
     overflow: auto;
 
     @media only screen and (max-width: 689px) {

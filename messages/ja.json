@@ -35,5 +35,14 @@
 	"settings_theme_light": "ライト ",
 	"settings_theme_dark": "ダーク ",
 
-	"settings_language_title": "言語"
+	"settings_language_title": "言語",
+
+	"utils_base64_encoding": "エンコーディング",
+	"utils_base64_password": "パスワード",
+	"utils_base64_enter_password": "パスワードを入力してください（空白 = 使用しない）",
+	"utils_base64_encode_input": "テキストを入力してください",
+	"utils_base64_encode_output": "Base64が出力されます",
+	"utils_base64_decode_input": "Base64を入力してください",
+	"utils_base64_decode_output": "結果が出力されます"
+	
 }

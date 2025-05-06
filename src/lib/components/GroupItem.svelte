@@ -3,6 +3,7 @@ export let href: string;
 export let image: string | undefined = undefined;
 export let title: string;
 export let message: string;
+export let classText: string = '';
 
 </script>
 
@@ -42,10 +43,16 @@ export let message: string;
         }
 
     }
+
+    &.disable {
+        filter: brightness(0.6);
+        user-select: none;
+        pointer-events: none;
+    }
 }
 </style>
 
-<a class="group-list-item" href="{href}">
+<a class="group-list-item {classText}" href="{href}">
     <md-ripple></md-ripple>
     <div class="content">
         {#if image != undefined}

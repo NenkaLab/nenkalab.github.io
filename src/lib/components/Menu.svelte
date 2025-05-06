@@ -12,20 +12,12 @@
     let appMenuToggle: Element | null;
     let appOverlayDim: Element | null;
 
-    let isDragging = false;
-    let shiftX = 0;
-    let captureId: number | null = null;
-
-    function mapValue(x: number) {
-        return (x + 250) / 500;
-    }
-
     function menuOpen() {
         if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
             appSideMenu.classList.add('anim');
+            appSideMenu.classList.add('open');
             appOverlayDim.classList.add('anim');
             appOverlayDim.classList.add('active');
-            appSideMenu.style.left = '0px';
             appOverlayDim.style.opacity = '.5';
             setTimeout(() => {
                 if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
@@ -40,7 +32,6 @@
         if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
             appSideMenu.classList.add('anim');
             appOverlayDim.classList.add('anim');
-            appSideMenu.style.left = '-250px';
             appOverlayDim.style.opacity = '0';
             setTimeout(() => {
                 if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
@@ -56,85 +47,16 @@
         }
     }
 
-    /* 나중에 더 배우고
-    function pointerDown(event: any) {
-
-        if (!event.isPrimary) return true;
-
-        event.preventDefault();
-        if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
-            if (event.target.hasPointerCapture(event.pointerId)) {
-                event.target.releasePointerCapture(event.pointerId);
-            }
-            isDragging = true;
-            shiftX = event.clientX - appSideMenu.getBoundingClientRect().left;
-            appSideMenu.setPointerCapture(event.pointerId);
-            appOverlayDim.classList.add('active');
-            captureId = event.pointerId;
-        }
-    }
-
-    function pointerMove(event: any) {
-        if (isDragging) {
-            if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
-                let newLeft = event.clientX - shiftX;
-
-                if (newLeft > 0) newLeft = 0;
-                if (newLeft < -250) newLeft = -250;
-
-                appSideMenu.style.left = newLeft + 'px';
-                appOverlayDim.style.opacity = mapValue(newLeft) + '';
-            }
-        }
-    }
-
-    function pointerUp(event: any) {
-        isDragging = false;
-        if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
-            if (captureId) {
-                appSideMenu.releasePointerCapture(captureId);
-                captureId = null;
-            }
-            let newLeft = appSideMenu.getBoundingClientRect().left;
-            if (newLeft < -125) {
-                menuClose();
-            } else {
-                menuOpen();
-            }
-        }
-    }
-
-    const noDrag = () => false;
-    */
-
     onMount(()=> {
         if (!browser) return;
         appMenuToggle = document.querySelector('#app-header > .menu_btn');
-        
+
         appMenuToggle?.addEventListener('click', menuOpen);
         appOverlayDim?.addEventListener('click', menuClose);
-
-        /*
-        appSideMenu?.addEventListener('pointerdown', pointerDown);
-
-        appSideMenu?.addEventListener('dragstart', noDrag);
-
-        window.addEventListener('pointermove', pointerMove);
-        window.addEventListener('pointerup', pointerUp);
-        */
 
         return () => {
             appMenuToggle?.removeEventListener('click', menuOpen);
             appOverlayDim?.removeEventListener('click', menuClose);
-
-            /*
-            appSideMenu?.removeEventListener('pointerdown', pointerDown);
-
-            appSideMenu?.removeEventListener('dragstart', noDrag);
-
-            window.removeEventListener('pointermove', pointerMove);
-            window.removeEventListener('pointerup', pointerUp);
-            */
         }
     });
 </script>
@@ -177,7 +99,7 @@
 
             .title {
                 display: block;
-                padding: 16px 24px;    
+                padding: 16px 24px;
                 font-variation-settings: 'wght' 600;
                 font-size: 1.3em;
                 text-decoration: none;
@@ -202,8 +124,9 @@
         top: 0px;
         left: 0px;
         bottom: 0px;
-        left: -250px;
+        left: 0px;
         z-index: 99;
+        transform: translateX(-100%);
 
         background-color: var(--md-sys-color-surface-variant);
         color: var(--md-sys-color-on-surface-variant);
@@ -222,7 +145,11 @@
         
 
         &.anim {
-            transition: left 130ms ease-in-out;
+            transition: transform 130ms ease-in-out;
+        }
+
+        &.open {
+            transform: translateX(0px);
         }
     }
 

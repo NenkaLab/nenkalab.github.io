@@ -35,5 +35,13 @@
 	"settings_theme_light": "Light",
 	"settings_theme_dark": "Dark",
 
-	"settings_language_title": "Language"
+	"settings_language_title": "Language",
+
+	"utils_base64_encoding": "Encoding",
+	"utils_base64_password": "Password",
+	"utils_base64_enter_password": "Please enter password (blank = not used)",
+	"utils_base64_encode_input": "Please enter text",
+	"utils_base64_encode_output": "Base64 will be output",
+	"utils_base64_decode_input": "Please enter Base64",
+	"utils_base64_decode_output": "Results will be output"
 }

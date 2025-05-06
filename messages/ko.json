@@ -35,5 +35,13 @@
 	"settings_theme_light": "라이트",
 	"settings_theme_dark": "다크",
 
-	"settings_language_title": "언어"
+	"settings_language_title": "언어",
+
+	"utils_base64_encoding": "인코딩",
+	"utils_base64_password": "비밀번호",
+	"utils_base64_enter_password": "비밀번호를 입력해주세요 (빈칸 = 사용안함)",
+	"utils_base64_encode_input": "텍스트를 입력해주세요",
+	"utils_base64_encode_output": "Base64가 출력됩니다",
+	"utils_base64_decode_input": "Base64를 입력해주세요",
+	"utils_base64_decode_output": "결과가 출력됩니다"
 }

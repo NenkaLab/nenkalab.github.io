@@ -7,6 +7,7 @@ let developerUrl = 'https://github.com/NenkaLab';
 a {
     color: currentColor;
 }
+
 p.box {
     display: flex;
     flex-direction: row;
@@ -109,16 +110,3 @@ p.box {
         </figure>
     </a>
 </div>
-
-<br><br><br>
-<h3>마리</h3>
-<iframe style="
-display: block;
-max-width: 480px;
-width: 100%;
-aspect-ratio: 16/9;
-" src="https://www.youtube-nocookie.com/embed/BVB9NLUtRfM?si=PJqkuBBnMO9aqK11" 
-title="YouTube video player" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-<img src="https://i.pximg.net/img-original/img/2023/08/17/06/29/31/110903726_p0.png" alt="">

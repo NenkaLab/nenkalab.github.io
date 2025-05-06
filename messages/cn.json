@@ -35,5 +35,13 @@
 	"settings_theme_light": "浅色",
 	"settings_theme_dark": "深色",
 
-	"settings_language_title": "语言"
+	"settings_language_title": "语言",
+
+	"utils_base64_encoding": "编码",
+	"utils_base64_password": "密码",
+	"utils_base64_enter_password": "请输入密码（空白 = 不使用）",
+	"utils_base64_encode_input": "请输入文本",
+	"utils_base64_encode_output": "Base64将被输出",
+	"utils_base64_decode_input": "请输入Base64",
+	"utils_base64_decode_output": "结果将被输出"
 }
