@@ -1,0 +1,1 @@
+import{t as e,a as o}from"../chunks/DLbA3YP6.js";import"../chunks/C345bNWV.js";import{h as r}from"../chunks/DnG5Pal_.js";var m=e('<meta http-equiv="refresh" content="0; url=/home">');function s(p){r(t=>{var a=m();o(t,a)})}export{s as component};

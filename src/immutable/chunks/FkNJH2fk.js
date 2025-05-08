@@ -1,0 +1,1 @@
+import{a3 as t,a4 as u,Z as o,a5 as c,a1 as e}from"./DyqlP-h2.js";function l(n){o===null&&t(),c&&o.l!==null?s(o).m.push(n):u(()=>{const a=e(n);if(typeof a=="function")return a})}function i(n){o===null&&t(),l(()=>()=>e(n))}function s(n){var a=n.l;return a.u??(a.u={a:[],b:[],m:[]})}export{i as a,l as o};
