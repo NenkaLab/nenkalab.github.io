@@ -16,6 +16,8 @@
     let urlInput!: MdOutlinedTextField;
     let loadBtn!: MdFilledButton;
 
+    let infoText!: HTMLParagraphElement;
+
     let editorElement!: HTMLDivElement;
 	let editor!: monaco.editor.IStandaloneCodeEditor;
 	let model!: monaco.editor.ITextModel;
@@ -30,7 +32,7 @@
 		editor.setModel(model);
 	}
 
-    async function fetchUrl(url: string) {
+    async function fetchUrl(url: string, depth: number = 0) {
         try {
             const wfs = new axios.Axios();
             const response = await wfs.get(url, {
@@ -52,15 +54,22 @@
                 status: response.status,
                 headers: response.headers,
                 data: response.data,
+                bypass: depth != 0
             };
         } catch (error: Error | any) {
-            // 네트워크 오류 등 발생해도 오류 대신 결과 반환
-            return {
-                status: 0,
-                headers: {},
-                data: null,
-                error: error.toString()
-            };
+            if (depth == 0) {
+                // cors bypass
+                return await fetchUrl(`https://cors.zabocho.dev/${url}`, 1);
+            } else {
+                // 네트워크 오류 등 발생해도 오류 대신 결과 반환
+                return {
+                    status: 0,
+                    headers: {},
+                    data: null,
+                    error: error.toString(),
+                    bypass: false
+                };
+            }
         }
     }
 
@@ -104,6 +113,12 @@
             } else {
                 alert(`status : ${result.status}\nerror : ${result.error}`);
             }
+            infoText.innerHTML = `
+            ststus : ${result.status} <br>
+            headers : ${JSON.stringify(result.headers)}<br>
+            error : ${result.error} <br>
+            cors bypass : ${result.bypass}
+            `;
         });
 	});
 
@@ -125,6 +140,11 @@
     align-items: center;
     gap: 16px;
     height: -webkit-fill-available;
+}
+
+#info {
+    width: 100%;
+    text-align: center;
 }
 
 #source {
@@ -175,6 +195,6 @@
     <md-filled-button bind:this={loadBtn}>
         Fetch
     </md-filled-button>
-
+    <p id="info" bind:this={infoText}></p>
     <div id="source" bind:this={editorElement}></div>
 </div>
