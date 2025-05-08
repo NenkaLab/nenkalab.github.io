@@ -20,6 +20,7 @@ export default defineConfig({
                 'events',
                 'path',
                 'process',
+                'https'
             ],
             globals: {
                 Buffer: true,
