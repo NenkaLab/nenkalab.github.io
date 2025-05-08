@@ -38,11 +38,7 @@
                 if (appSideMenu instanceof HTMLElement && appOverlayDim instanceof HTMLElement) {
                     appSideMenu.classList.add('anim');
                     appOverlayDim.classList.add('anim');
-                    let left = appSideMenu.getBoundingClientRect().left;
-
-                    if (left <= -250) {
-                        appOverlayDim.classList.remove('active');
-                    }
+                    appOverlayDim.classList.remove('active');
                 }
             }, 130);
         }
