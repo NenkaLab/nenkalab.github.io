@@ -13,6 +13,9 @@ author:
 
 # Build settings
 markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
 permalink: /article/:title/
 
 # Pagination
@@ -45,11 +48,12 @@ plugins:
 # Giscus settings (댓글 설정)
 giscus:
   repo: "NenkaLab/nenkalab.github.io"
-  repo_id: ""  # https://giscus.app 에서 발급받으세요
+  repo_id: "MDEwOlJlcG9zaXRvcnkxOTg4MDExNzQ="  # https://giscus.app 에서 발급받으세요
   category: "General"
-  category_id: ""  # https://giscus.app 에서 발급받으세요
+  category_id: "DIC_kwDOC9l3Fs4Cw0VV"  # https://giscus.app 에서 발급받으세요
   mapping: "pathname"
   reactions_enabled: "1"
   emit_metadata: "0"
-  input_position: "bottom"
+  input_position: "top"
+  strict: "1"
   lang: "ko"
