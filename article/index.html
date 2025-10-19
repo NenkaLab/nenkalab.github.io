@@ -1,0 +1,96 @@
+---
+layout: default
+---
+
+<div class="max-w-5xl mx-auto px-4 py-12">
+    
+    <!-- 페이지 헤더 -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">📝 모든 글</h1>
+        <p class="text-gray-600 dark:text-gray-400">총 {{ site.posts.size }}개의 글</p>
+    </div>
+
+    <!-- 글 목록 -->
+    {% if paginator.posts.size > 0 %}
+    <div class="space-y-4 mb-12">
+        {% for post in paginator.posts %}
+        <article class="card border border-gray-300 dark:border-gray-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 group hover:-translate-y-1 animate-element">
+            <a href="{{ post.url | relative_url }}" class="block">
+                <h2 class="text-2xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                    {{ post.title }}
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">
+                    {{ post.excerpt | strip_html | truncate: 200 }}
+                </p>
+                <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-500">
+                    <time datetime="{{ post.date | date_to_xmlschema }}">
+                        {{ post.date | date: "%Y년 %m월 %d일" }}
+                    </time>
+                    {% if post.categories %}
+                    <span>·</span>
+                    <div class="flex gap-2">
+                        {% for category in post.categories %}
+                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">{{ category }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </a>
+        </article>
+        {% endfor %}
+    </div>
+
+    <!-- 페이지네이션 -->
+    {% if paginator.total_pages > 1 %}
+    <nav class="flex justify-center items-center gap-2">
+        {% if paginator.previous_page %}
+        <a href="{{ paginator.previous_page_path | relative_url }}" 
+           class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105">
+            ← 이전
+        </a>
+        {% else %}
+        <span class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed">
+            ← 이전
+        </span>
+        {% endif %}
+
+        <div class="flex gap-2">
+            {% for page in (1..paginator.total_pages) %}
+                {% if page == paginator.page %}
+                <span class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold shadow-md">
+                    {{ page }}
+                </span>
+                {% elsif page == 1 %}
+                <a href="{{ '/article' | relative_url }}" 
+                   class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
+                    {{ page }}
+                </a>
+                {% else %}
+                <a href="{{ site.paginate_path | relative_url | replace: ':num', page }}" 
+                   class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
+                    {{ page }}
+                </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if paginator.next_page %}
+        <a href="{{ paginator.next_page_path | relative_url }}" 
+           class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105">
+            다음 →
+        </a>
+        {% else %}
+        <span class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed">
+            다음 →
+        </span>
+        {% endif %}
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-12 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
+        <p class="text-gray-500 dark:text-gray-400">아직 작성된 글이 없습니다.</p>
+    </div>
+    {% endif %}
+    
+</div>

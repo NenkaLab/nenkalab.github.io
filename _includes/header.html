@@ -1,0 +1,72 @@
+<header class="border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-5xl mx-auto px-4 py-6">
+        <nav class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- 뒤로가기 버튼 (이전 페이지가 있을 때만 표시) -->
+                <button id="back-button" 
+                        onclick="window.history.back()" 
+                        class="hidden items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        aria-label="뒤로가기">
+                    <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">arrow_back</span>
+                </button>
+                
+                <!-- 로고 -->
+                <a href="{{ site.baseurl }}/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <img src="{{ site.author.image }}" alt="{{ site.author.name }}" class="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600">
+                    <span class="text-xl font-bold">{{ site.title }}</span>
+                </a>
+            </div>
+            
+            <!-- 네비게이션 링크 -->
+            <div id="nav-links" class="flex items-center gap-6">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </nav>
+    </div>
+</header>
+
+<script>
+    // 뒤로가기 버튼 표시 로직
+    (function() {
+        const backButton = document.getElementById('back-button');
+        
+        // 이전 페이지가 있는지 확인
+        // history.length > 1이면 이전 페이지 존재
+        if (window.history.length > 1) {
+            backButton.classList.remove('hidden');
+            backButton.classList.add('flex');
+        }
+    })();
+    
+    // LINKS 배열 설정 (비어있으면 표시하지 않음)
+    const LINKS = [
+        // 예시:
+        // { favicon: '🐙', title: 'GitHub', url: 'https://github.com/NenkaLab' },
+        // { favicon: '✉️', title: 'Email', url: 'mailto:your@email.com' },
+        // { favicon: '🐦', title: 'Twitter', url: 'https://twitter.com/yourname' },
+    ];
+    
+    // 링크가 있으면 표시
+    if (LINKS && LINKS.length > 0) {
+        const navLinks = document.getElementById('nav-links');
+        
+        LINKS.forEach(link => {
+            const a = document.createElement('a');
+            a.href = link.url;
+            a.className = 'flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors';
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            
+            const favicon = document.createElement('span');
+            favicon.textContent = link.favicon;
+            
+            const title = document.createElement('span');
+            title.textContent = link.title;
+            title.className = 'hidden sm:inline';
+            
+            a.appendChild(favicon);
+            a.appendChild(title);
+            navLinks.appendChild(a);
+        });
+    }
+</script>

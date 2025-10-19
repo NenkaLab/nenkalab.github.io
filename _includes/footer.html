@@ -1,0 +1,146 @@
+<footer class="border-t border-gray-200 dark:border-gray-700 mt-16">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+                © {{ 'now' | date: "%Y" }} {{ site.title }} · Built with Jekyll & Tailwind CSS
+            </p>
+            
+            <!-- 테마 스위처 -->
+            <div class="relative">
+                <button id="theme-toggle" 
+                        class="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
+                    <span id="theme-icon" class="material-symbols-outlined text-lg">light_mode</span>
+                    <span id="theme-text" class="text-gray-700 dark:text-gray-300">라이트</span>
+                    <span class="material-symbols-outlined text-lg text-gray-500">expand_more</span>
+                </button>
+                
+                <!-- 드롭다운 메뉴 -->
+                <div id="theme-menu" 
+                     class="hidden absolute bottom-full mb-2 right-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg min-w-[140px] z-10">
+                    <button data-theme="light" 
+                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+                        <span class="material-symbols-outlined text-lg">light_mode</span>
+                        <span class="text-gray-700 dark:text-gray-300">라이트</span>
+                    </button>
+                    <button data-theme="dark" 
+                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+                        <span class="material-symbols-outlined text-lg">dark_mode</span>
+                        <span class="text-gray-700 dark:text-gray-300">다크</span>
+                    </button>
+                    <button data-theme="system" 
+                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left rounded-b-md">
+                        <span class="material-symbols-outlined text-lg">contrast</span>
+                        <span class="text-gray-700 dark:text-gray-300">시스템</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+(function() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeMenu = document.getElementById('theme-menu');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeText = document.getElementById('theme-text');
+    const themeButtons = document.querySelectorAll('[data-theme]');
+    
+    const themes = {
+        light: { icon: 'light_mode', text: '라이트' },
+        dark: { icon: 'dark_mode', text: '다크' },
+        system: { icon: 'contrast', text: '시스템' }
+    };
+    
+    // 현재 테마 가져오기
+    function getCurrentTheme() {
+        return localStorage.getItem('theme') || 'system';
+    }
+    
+    // 시스템 다크모드 감지
+    function getSystemTheme() {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    // 실제 적용될 테마 (system이면 시스템 설정 따름)
+    function getEffectiveTheme(theme) {
+        return theme === 'system' ? getSystemTheme() : theme;
+    }
+    
+    // 테마 적용
+    function applyTheme(theme) {
+        const effectiveTheme = getEffectiveTheme(theme);
+        
+        if (effectiveTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        // UI 업데이트
+        themeIcon.textContent = themes[theme].icon;
+        themeText.textContent = themes[theme].text;
+        
+        // localStorage에 저장
+        localStorage.setItem('theme', theme);
+        
+        // Giscus 테마 변경
+        updateGiscusTheme(effectiveTheme);
+    }
+    
+    // Giscus 테마 변경
+    function updateGiscusTheme(theme) {
+        const giscusFrame = document.querySelector('iframe.giscus-frame');
+        if (giscusFrame) {
+            const customThemeUrl = '{{ site.url }}{{ site.baseurl }}/assets/css/giscus-theme.css';
+            giscusFrame.contentWindow.postMessage(
+                { 
+                    giscus: { 
+                        setConfig: { 
+                            theme: customThemeUrl + (theme === 'dark' ? '#dark' : '')
+                        } 
+                    } 
+                },
+                'https://giscus.app'
+            );
+        }
+        
+        // storage 이벤트 발생시켜 다른 탭에도 알림
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: 'theme',
+            newValue: theme
+        }));
+    }
+    
+    // 드롭다운 토글
+    themeToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        themeMenu.classList.toggle('hidden');
+    });
+    
+    // 테마 선택
+    themeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const theme = button.dataset.theme;
+            applyTheme(theme);
+            themeMenu.classList.add('hidden');
+        });
+    });
+    
+    // 외부 클릭 시 드롭다운 닫기
+    document.addEventListener('click', () => {
+        themeMenu.classList.add('hidden');
+    });
+    
+    // 시스템 테마 변경 감지
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        const currentTheme = getCurrentTheme();
+        if (currentTheme === 'system') {
+            applyTheme('system');
+        }
+    });
+    
+    // 초기 테마 적용
+    applyTheme(getCurrentTheme());
+})();
+</script>

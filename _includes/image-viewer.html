@@ -1,0 +1,208 @@
+<!-- 이미지 뷰어 모달 -->
+<div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden items-center justify-center">
+    <!-- 닫기 버튼 -->
+    <button id="viewer-close" 
+            class="absolute top-4 right-4 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10"
+            aria-label="닫기">
+        <span class="material-symbols-outlined text-white text-3xl">close</span>
+    </button>
+    
+    <!-- 이전 버튼 -->
+    <button id="viewer-prev" 
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10"
+            aria-label="이전 이미지">
+        <span class="material-symbols-outlined text-white text-3xl">chevron_left</span>
+    </button>
+    
+    <!-- 이미지 컨테이너 -->
+    <div class="relative w-full h-full flex items-center justify-center p-16">
+        <img id="viewer-image" 
+             src="" 
+             alt="" 
+             class="max-w-full max-h-full object-contain"
+             style="user-select: none;">
+    </div>
+    
+    <!-- 다음 버튼 -->
+    <button id="viewer-next" 
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10"
+            aria-label="다음 이미지">
+        <span class="material-symbols-outlined text-white text-3xl">chevron_right</span>
+    </button>
+    
+    <!-- 이미지 카운터 -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-50 px-4 py-2 rounded-full">
+        <span id="viewer-counter" class="text-white text-sm"></span>
+    </div>
+</div>
+
+<script>
+(function() {
+    const viewer = document.getElementById('image-viewer');
+    const viewerImage = document.getElementById('viewer-image');
+    const viewerCounter = document.getElementById('viewer-counter');
+    const closeBtn = document.getElementById('viewer-close');
+    const prevBtn = document.getElementById('viewer-prev');
+    const nextBtn = document.getElementById('viewer-next');
+    
+    let images = [];
+    let currentIndex = 0;
+    let startX = 0;
+    let isDragging = false;
+    
+    // 글 내의 모든 이미지 찾기
+    function initImageViewer() {
+        const articleImages = document.querySelectorAll('.prose img');
+        
+        if (articleImages.length === 0) return;
+        
+        images = Array.from(articleImages);
+        
+        // 각 이미지에 클릭 이벤트 추가
+        images.forEach((img, index) => {
+            img.style.cursor = 'pointer';
+            img.addEventListener('click', () => {
+                openViewer(index);
+            });
+        });
+    }
+    
+    // 뷰어 열기
+    function openViewer(index) {
+        currentIndex = index;
+        updateViewer();
+        viewer.classList.remove('hidden');
+        viewer.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // 뷰어 닫기
+    function closeViewer() {
+        viewer.classList.remove('flex');
+        viewer.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+    
+    // 뷰어 업데이트
+    function updateViewer() {
+        if (images.length === 0) return;
+        
+        const img = images[currentIndex];
+        viewerImage.src = img.src;
+        viewerImage.alt = img.alt || '';
+        viewerCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+        
+        // 버튼 표시/숨김
+        prevBtn.style.display = currentIndex > 0 ? 'flex' : 'none';
+        nextBtn.style.display = currentIndex < images.length - 1 ? 'flex' : 'none';
+    }
+    
+    // 이전 이미지
+    function showPrev() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateViewer();
+        }
+    }
+    
+    // 다음 이미지
+    function showNext() {
+        if (currentIndex < images.length - 1) {
+            currentIndex++;
+            updateViewer();
+        }
+    }
+    
+    // 이벤트 리스너
+    closeBtn.addEventListener('click', closeViewer);
+    prevBtn.addEventListener('click', showPrev);
+    nextBtn.addEventListener('click', showNext);
+    
+    // 배경 클릭 시 닫기
+    viewer.addEventListener('click', (e) => {
+        if (e.target === viewer) {
+            closeViewer();
+        }
+    });
+    
+    // ESC 키로 닫기
+    document.addEventListener('keydown', (e) => {
+        if (!viewer.classList.contains('hidden')) {
+            if (e.key === 'Escape') {
+                closeViewer();
+            } else if (e.key === 'ArrowLeft') {
+                showPrev();
+            } else if (e.key === 'ArrowRight') {
+                showNext();
+            }
+        }
+    });
+    
+    // 터치/마우스 스와이프
+    viewerImage.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+    });
+    
+    viewerImage.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+        e.preventDefault();
+    });
+    
+    viewerImage.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+    });
+    
+    viewerImage.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+    });
+    
+    viewerImage.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        
+        const endX = e.changedTouches[0].clientX;
+        const diff = startX - endX;
+        
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+                showNext();
+            } else {
+                showPrev();
+            }
+        }
+        
+        isDragging = false;
+    });
+    
+    viewerImage.addEventListener('mouseup', (e) => {
+        if (!isDragging) return;
+        
+        const endX = e.clientX;
+        const diff = startX - endX;
+        
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+                showNext();
+            } else {
+                showPrev();
+            }
+        }
+        
+        isDragging = false;
+    });
+    
+    viewerImage.addEventListener('mouseleave', () => {
+        isDragging = false;
+    });
+    
+    // 페이지 로드 시 초기화
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initImageViewer);
+    } else {
+        initImageViewer();
+    }
+})();
+</script>

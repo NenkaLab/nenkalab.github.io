@@ -1,0 +1,55 @@
+# Site settings
+title: Zabocho
+description: Zabocho(NenkaLab)의 블로그 입니다
+url: "https://zabocho.dev"
+baseurl: ""
+github_url: "https://github.com/NenkaLab"
+
+# Author
+author:
+  name: NenkaLab
+  bio: Hello, World!
+  image: https://github.com/NenkaLab.png
+
+# Build settings
+markdown: kramdown
+permalink: /article/:title/
+
+# Pagination
+paginate: 10
+paginate_path: "/article/page:num/"
+
+# Related posts
+lsi: false
+related_posts_limit: 4
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /article/:title/
+
+# Exclude from build
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Plugins
+plugins:
+  - jekyll-paginate
+  - jekyll-seo-tag
+
+# Giscus settings (댓글 설정)
+giscus:
+  repo: "NenkaLab/nenkalab.github.io"
+  repo_id: ""  # https://giscus.app 에서 발급받으세요
+  category: "General"
+  category_id: ""  # https://giscus.app 에서 발급받으세요
+  mapping: "pathname"
+  reactions_enabled: "1"
+  emit_metadata: "0"
+  input_position: "bottom"
+  lang: "ko"

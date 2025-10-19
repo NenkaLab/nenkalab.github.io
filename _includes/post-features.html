@@ -1,0 +1,177 @@
+<!-- Progress Bar -->
+<div id="progress-bar"></div>
+
+<!-- 플로팅 버튼들 (우하단) -->
+<div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+    <!-- 상단으로 -->
+    <button id="scroll-to-top" 
+            class="hidden w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 items-center justify-center group"
+            aria-label="맨 위로">
+        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">arrow_upward</span>
+    </button>
+    
+    <!-- 댓글로 -->
+    <button id="scroll-to-comments" 
+            class="hidden w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 items-center justify-center group"
+            aria-label="댓글로">
+        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">chat_bubble</span>
+    </button>
+    
+    <!-- 하단으로 -->
+    <button id="scroll-to-bottom" 
+            class="w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 flex items-center justify-center group"
+            aria-label="맨 아래로">
+        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">arrow_downward</span>
+    </button>
+</div>
+
+<!-- 목차 (TOC - 넓은 화면에서만) -->
+<aside id="toc" class="hidden xl:block fixed top-24 right-8 w-64 max-h-[calc(100vh-12rem)] overflow-y-auto">
+    <nav class="sticky top-24 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+        <h3 class="text-sm font-bold mb-3 text-gray-900 dark:text-gray-100">목차</h3>
+        <ul id="toc-list" class="space-y-2 text-sm">
+            <!-- JavaScript로 동적 생성 -->
+        </ul>
+    </nav>
+</aside>
+
+<script>
+(function() {
+    // ============ Progress Bar ============
+    const progressBar = document.getElementById('progress-bar');
+    
+    function updateProgressBar() {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight - windowHeight;
+        const scrolled = window.scrollY;
+        const progress = (scrolled / documentHeight) * 100;
+        
+        progressBar.style.width = progress + '%';
+    }
+    
+    window.addEventListener('scroll', updateProgressBar);
+    updateProgressBar();
+    
+    // ============ 플로팅 버튼 ============
+    const scrollToTop = document.getElementById('scroll-to-top');
+    const scrollToComments = document.getElementById('scroll-to-comments');
+    const scrollToBottom = document.getElementById('scroll-to-bottom');
+    
+    function updateFloatingButtons() {
+        const scrolled = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        // 상단으로 버튼 (200px 이상 스크롤 시 표시)
+        if (scrolled > 200) {
+            scrollToTop.classList.remove('hidden');
+            scrollToTop.classList.add('flex');
+        } else {
+            scrollToTop.classList.add('hidden');
+            scrollToTop.classList.remove('flex');
+        }
+        
+        // 댓글로 버튼 (댓글 섹션이 있고, 아직 도달 안했을 때)
+        const commentsSection = document.querySelector('.giscus');
+        if (commentsSection) {
+            const commentsTop = commentsSection.getBoundingClientRect().top + scrolled;
+            if (scrolled < commentsTop - windowHeight) {
+                scrollToComments.classList.remove('hidden');
+                scrollToComments.classList.add('flex');
+            } else {
+                scrollToComments.classList.add('hidden');
+                scrollToComments.classList.remove('flex');
+            }
+        }
+    }
+    
+    window.addEventListener('scroll', updateFloatingButtons);
+    updateFloatingButtons();
+    
+    // 버튼 클릭 이벤트
+    scrollToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    scrollToBottom.addEventListener('click', () => {
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    });
+    
+    scrollToComments.addEventListener('click', () => {
+        const commentsSection = document.querySelector('.giscus');
+        if (commentsSection) {
+            commentsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+    
+    // ============ 목차 (TOC) ============
+    const article = document.querySelector('.prose');
+    const tocList = document.getElementById('toc-list');
+    const tocAside = document.getElementById('toc');
+    
+    if (article && tocList) {
+        const headings = article.querySelectorAll('h1, h2, h3');
+        
+        if (headings.length > 0) {
+            // 각 제목에 ID 추가 및 목차 생성
+            headings.forEach((heading, index) => {
+                const id = heading.id || `heading-${index}`;
+                heading.id = id;
+                
+                const level = parseInt(heading.tagName.charAt(1));
+                const li = document.createElement('li');
+                li.className = level === 1 ? 'font-semibold' : (level === 2 ? 'ml-3' : 'ml-6');
+                
+                const a = document.createElement('a');
+                a.href = `#${id}`;
+                a.textContent = heading.textContent;
+                a.className = 'block py-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors toc-link';
+                a.dataset.target = id;
+                
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    heading.scrollIntoView({ behavior: 'smooth' });
+                    history.pushState(null, '', `#${id}`);
+                });
+                
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+            
+            tocAside.classList.remove('hidden');
+            
+            // IntersectionObserver로 현재 위치 감지
+            const observerOptions = {
+                rootMargin: '-80px 0px -80% 0px',
+                threshold: 0
+            };
+            
+            let activeId = null;
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        activeId = entry.target.id;
+                        updateActiveToc();
+                    }
+                });
+            }, observerOptions);
+            
+            headings.forEach(heading => observer.observe(heading));
+            
+            function updateActiveToc() {
+                const links = document.querySelectorAll('.toc-link');
+                links.forEach(link => {
+                    if (link.dataset.target === activeId) {
+                        link.classList.add('font-bold', 'text-blue-600', 'dark:text-blue-400');
+                        link.classList.remove('text-gray-600', 'dark:text-gray-400');
+                    } else {
+                        link.classList.remove('font-bold', 'text-blue-600', 'dark:text-blue-400');
+                        link.classList.add('text-gray-600', 'dark:text-gray-400');
+                    }
+                });
+            }
+        }
+    }
+})();
+</script>
