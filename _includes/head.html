@@ -65,7 +65,12 @@
         
         /* 마크다운 스타일 */
         .prose {
-            max-width: 65ch;
+            /* max-width: 65ch; */
+            overflow-wrap: break-word;
+            word-break: keep-all;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            hyphens: auto;
         }
         
         .prose p {
