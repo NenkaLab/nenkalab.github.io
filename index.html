@@ -17,6 +17,20 @@ layout: default
                 <p class="text-gray-600 dark:text-gray-400 break-words">{{ site.author.bio }}</p>
             </div>
         </div>
+        <div class="flex items-center gap-4">
+            {% if site.author.email %}
+            <a href="mailto:{{ site.author.email }}" 
+               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
+                <span class="material-symbols-outlined text-lg">email</span>
+                <span class="text-gray-700 dark:text-gray-300">Email</span>
+            </a>
+            {% endif %}
+            <a href="{{ site.github_url }}" target="_blank" rel="noopener noreferrer" 
+               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
+                <span class="material-symbols-outlined text-lg">code</span>
+                <span class="text-gray-700 dark:text-gray-300">GitHub</span>
+            </a>
+        </div>
     </div>
 
     <!-- Recent Articles -->
@@ -67,6 +81,11 @@ layout: default
             <p class="text-gray-500 dark:text-gray-400">아직 작성된 글이 없습니다.</p>
         </div>
         {% endif %}
+    </div>
+
+    <!-- 네비게이션 링크 -->
+    <div id="nav-links" class="mb-8">
+        <h2 class="text-2xl font-bold mb-6">📚 Recent Articles</h2>
     </div>
     
 </div>
