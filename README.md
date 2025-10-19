@@ -1,5 +1,3 @@
-<link rel="icon" href="https://github.com/NenkaLab.png" type="image/png">
-
 # Hello
 
-Build
+<img src="https://github.com/NenkaLab.png" alt="Profile Image" width="42px">
