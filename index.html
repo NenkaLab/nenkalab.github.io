@@ -84,8 +84,26 @@ layout: default
     </div>
 
     <!-- 네비게이션 링크 -->
+    {% if site.urls %}
     <div id="nav-links" class="mb-8">
-        <h2 class="text-2xl font-bold mb-6">📚 Recent Articles</h2>
+        <h2 class="text-2xl font-bold mb-6">🔗 Links</h2>
+
+        <div class="flex items-center gap-4">
+
+            {% for url in site.urls %}
+            <a href="{{ url.url }}" target="_blank" rel="noopener noreferrer"
+               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
+                {% if url.favicon %}
+                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.favicon }}" alt="{{ url.label }} 아이콘" />
+                {% else %}
+                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.url }}" alt="{{ url.label }} 아이콘" />
+                {% endif %}
+                <span class="text-gray-700 dark:text-gray-300">{{ url.label }}</span>
+            </a>
+            {% endfor %}
+
+        </div>
     </div>
-    
+    {% endif %}
+
 </div>
