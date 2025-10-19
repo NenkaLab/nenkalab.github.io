@@ -6,126 +6,352 @@ layout: default
     
     <!-- 페이지 헤더 -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-2">🔍 검색</h1>
-        <p class="text-gray-600 dark:text-gray-400 hidden">총 <span id="article_count">0</span>개의 글</p>
+        <h1 class="text-3xl font-bold mb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined text-3xl">search</span>
+            검색
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400" id="search-count">전체 글에서 검색하세요</p>
     </div>
 
-    <form class="max-w-lg mx-auto">
-        <div class="flex">
-            <label for="search-dropdown" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
-            <button id="dropdown-button" data-dropdown-toggle="dropdown" class="shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">
-                Search Type
+    <!-- 검색 UI -->
+    <div class="mb-8 space-y-4">
+        <!-- 검색바 -->
+        <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+            <input 
+                type="text" 
+                id="search-input"
+                placeholder="검색어를 입력하세요..."
+                class="w-full pl-12 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors"
+            >
+        </div>
+        
+        <!-- 필터 버튼들 -->
+        <div class="flex flex-wrap gap-2">
+            <button data-filter="all" class="filter-btn active px-4 py-2 rounded-lg border-2 transition-all duration-200">
+                전체
             </button>
-            <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
-                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
-                    <li>
-                        <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">All</button>
-                    </li>
-                    <li>
-                        <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Title</button>
-                    </li>
-                    <li>
-                        <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Date</button>
-                    </li>
-                    <li>
-                        <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Categories</button>
-                    </li>
-                    <li>
-                        <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Tags</button>
-                    </li>
-                </ul>
-            </div>
-            <div class="relative w-full">
-                <input type="search" id="search-dropdown" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Search Mockups, Logos, Design Templates..." required />
-                <button type="submit" class="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 flex items-center gap-2 ">
-                    <span class="material-symbols-outlined text-lg"><search></search></span>
-                    <span class="sr-only">Search</span>
-                </button>
-            </div>
+            <button data-filter="title" class="filter-btn px-4 py-2 rounded-lg border-2 transition-all duration-200">
+                제목
+            </button>
+            <button data-filter="date" class="filter-btn px-4 py-2 rounded-lg border-2 transition-all duration-200">
+                날짜
+            </button>
+            <button data-filter="category" class="filter-btn px-4 py-2 rounded-lg border-2 transition-all duration-200">
+                카테고리
+            </button>
+            <button data-filter="tag" class="filter-btn px-4 py-2 rounded-lg border-2 transition-all duration-200">
+                태그
+            </button>
         </div>
-    </form>
-
-    <!-- 글 목록 
-    {% if paginator.posts.size > 0 %}
-    <div class="space-y-4 mb-12">
-        {% for post in paginator.posts %}
-        <article class="card border border-gray-300 dark:border-gray-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 group hover:-translate-y-1 animate-element">
-            <a href="{{ post.url | relative_url }}" class="block">777777777
-                <h2 class="text-2xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-                    {{ post.title }}
-                </h2>
-                <p class="text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">
-                    {{ post.excerpt | strip_html | truncate: 200 }}
-                </p>
-                <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-500">
-                    <time datetime="{{ post.date | date_to_xmlschema }}">
-                        {{ post.date | date: "%Y년 %m월 %d일" }}
-                    </time>
-                    {% if post.categories %}
-                    <span>·</span>
-                    <div class="flex gap-2">
-                        {% for category in post.categories %}
-                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">{{ category }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-            </a>
-        </article>
-        {% endfor %}
     </div>
 
-    <-- 페이지네이션
-    {% if paginator.total_pages > 1 %}
-    <nav class="flex justify-center items-center gap-2">
-        {% if paginator.previous_page %}
-        <a href="{{ paginator.previous_page_path | relative_url }}" 
-           class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105">
-            ← 이전
-        </a>
-        {% else %}
-        <span class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed">
-            ← 이전
-        </span>
-        {% endif %}
+    <!-- 로딩 -->
+    <div id="loading" class="hidden text-center py-12">
+        <div class="inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 text-gray-600 dark:text-gray-400">검색 중...</p>
+    </div>
 
-        <div class="flex gap-2">
-            {% for page in (1..paginator.total_pages) %}
-                {% if page == paginator.page %}
-                <span class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold shadow-md">
-                    {{ page }}
-                </span>
-                {% elsif page == 1 %}
-                <a href="{{ '/article' | relative_url }}" 
-                   class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
-                    {{ page }}
-                </a>
-                {% else %}
-                <a href="{{ site.paginate_path | relative_url | replace: ':num', page }}" 
-                   class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
-                    {{ page }}
-                </a>
-                {% endif %}
-            {% endfor %}
-        </div>
+    <!-- 검색 결과 -->
+    <div id="search-results" class="space-y-4 mb-12">
+        <!-- JavaScript로 동적 생성 -->
+    </div>
 
-        {% if paginator.next_page %}
-        <a href="{{ paginator.next_page_path | relative_url }}" 
-           class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105">
-            다음 →
-        </a>
-        {% else %}
-        <span class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed">
-            다음 →
-        </span>
-        {% endif %}
+    <!-- 결과 없음 -->
+    <div id="no-results" class="hidden text-center py-12 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+        <span class="material-symbols-outlined text-6xl text-gray-400 mb-4">search_off</span>
+        <p class="text-gray-500 dark:text-gray-400">검색 결과가 없습니다.</p>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <nav id="pagination" class="hidden flex justify-center items-center gap-2 mt-8">
+        <!-- JavaScript로 동적 생성 -->
     </nav>
-    {% endif %}
-
-    {% else %}
-    <div class="text-center py-12 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
-        <p class="text-gray-500 dark:text-gray-400">아직 작성된 글이 없습니다.</p>
-    </div>
-    {% endif %}
-    -->
+    
 </div>
+
+<style>
+    .filter-btn {
+        border-color: #e5e7eb;
+        color: #6b7280;
+    }
+    
+    .dark .filter-btn {
+        border-color: #4b5563;
+        color: #9ca3af;
+    }
+    
+    .filter-btn.active {
+        border-color: #3b82f6;
+        background-color: #3b82f6;
+        color: white;
+    }
+    
+    .dark .filter-btn.active {
+        border-color: #60a5fa;
+        background-color: #60a5fa;
+    }
+    
+    .filter-btn:hover:not(.active) {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+    }
+    
+    .dark .filter-btn:hover:not(.active) {
+        border-color: #60a5fa;
+        background-color: #1e3a8a;
+    }
+</style>
+
+<script>
+(function() {
+    let allPosts = [];
+    let filteredPosts = [];
+    let currentFilter = 'all';
+    let currentPage = 1;
+    const postsPerPage = 10;
+    
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    const searchCount = document.getElementById('search-count');
+    const loading = document.getElementById('loading');
+    const noResults = document.getElementById('no-results');
+    const pagination = document.getElementById('pagination');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    // API에서 데이터 로드
+    async function loadPosts() {
+        loading.classList.remove('hidden');
+        searchResults.innerHTML = '';
+        noResults.classList.add('hidden');
+        
+        try {
+            const response = await fetch('/api/search.json');
+            allPosts = await response.json();
+            filteredPosts = [...allPosts];
+            
+            searchCount.textContent = `전체 ${allPosts.length}개의 글`;
+            displayResults();
+        } catch (error) {
+            console.error('Failed to load posts:', error);
+            searchCount.textContent = '글을 불러오는데 실패했습니다';
+        } finally {
+            loading.classList.add('hidden');
+        }
+    }
+    
+    // 검색 함수
+    function search(query) {
+        const lowerQuery = query.toLowerCase().trim();
+        
+        if (!lowerQuery) {
+            filteredPosts = [...allPosts];
+            currentPage = 1;
+            displayResults();
+            return;
+        }
+        
+        filteredPosts = allPosts.filter(post => {
+            switch(currentFilter) {
+                case 'title':
+                    return post.title.toLowerCase().includes(lowerQuery);
+                
+                case 'date':
+                    return post.date.includes(lowerQuery);
+                
+                case 'category':
+                    return post.categories.some(cat => 
+                        cat.toLowerCase().includes(lowerQuery)
+                    );
+                
+                case 'tag':
+                    return post.tags.some(tag => 
+                        tag.toLowerCase().includes(lowerQuery)
+                    );
+                
+                case 'all':
+                default:
+                    return post.title.toLowerCase().includes(lowerQuery) ||
+                           post.date.includes(lowerQuery) ||
+                           post.categories.some(cat => cat.toLowerCase().includes(lowerQuery)) ||
+                           post.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+            }
+        });
+        
+        currentPage = 1;
+        displayResults();
+    }
+    
+    // 결과 표시
+    function displayResults() {
+        searchResults.innerHTML = '';
+        
+        const totalResults = filteredPosts.length;
+        searchCount.textContent = `${totalResults}개의 검색 결과`;
+        
+        if (totalResults === 0) {
+            noResults.classList.remove('hidden');
+            pagination.classList.add('hidden');
+            return;
+        }
+        
+        noResults.classList.add('hidden');
+        
+        // 페이지네이션 계산
+        const totalPages = Math.ceil(totalResults / postsPerPage);
+        const startIdx = (currentPage - 1) * postsPerPage;
+        const endIdx = startIdx + postsPerPage;
+        const postsToShow = filteredPosts.slice(startIdx, endIdx);
+        
+        // 결과 렌더링
+        postsToShow.forEach(post => {
+            const article = document.createElement('article');
+            article.className = 'card border border-gray-300 dark:border-gray-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 group hover:-translate-y-1 animate-element';
+            
+            const date = new Date(post.date);
+            const formattedDate = `${date.getFullYear()}년 ${String(date.getMonth() + 1).padStart(2, '0')}월 ${String(date.getDate()).padStart(2, '0')}일`;
+            
+            article.innerHTML = `
+                <a href="${post.url}" class="block">
+                    <h2 class="text-2xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                        ${highlightText(post.title, searchInput.value)}
+                    </h2>
+                    <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-500 mb-3">
+                        <time>${formattedDate}</time>
+                        ${post.categories.length > 0 ? `
+                            <span>·</span>
+                            <div class="flex gap-2">
+                                ${post.categories.map(cat => 
+                                    `<span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs">${highlightText(cat, searchInput.value)}</span>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                        ${post.tags.length > 0 ? `
+                            <span>·</span>
+                            <div class="flex gap-2">
+                                ${post.tags.slice(0, 3).map(tag => 
+                                    `<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs">#${highlightText(tag, searchInput.value)}</span>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </a>
+            `;
+            
+            searchResults.appendChild(article);
+        });
+        
+        // 페이지네이션 렌더링
+        renderPagination(totalPages);
+    }
+    
+    // 검색어 하이라이트
+    function highlightText(text, query) {
+        if (!query.trim()) return text;
+        
+        const regex = new RegExp(`(${query.trim()})`, 'gi');
+        return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-700">$1</mark>');
+    }
+    
+    // 페이지네이션 렌더링
+    function renderPagination(totalPages) {
+        if (totalPages <= 1) {
+            pagination.classList.add('hidden');
+            return;
+        }
+        
+        pagination.classList.remove('hidden');
+        pagination.innerHTML = '';
+        
+        // 이전 버튼
+        const prevBtn = document.createElement('button');
+        prevBtn.className = currentPage === 1 
+            ? 'px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed'
+            : 'px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105';
+        prevBtn.textContent = '← 이전';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayResults();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+        pagination.appendChild(prevBtn);
+        
+        // 페이지 번호들
+        const pageNumbers = document.createElement('div');
+        pageNumbers.className = 'flex gap-2';
+        
+        const maxVisible = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+        
+        if (endPage - startPage + 1 < maxVisible) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = i === currentPage
+                ? 'px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold shadow-md'
+                : 'px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105';
+            pageBtn.textContent = i;
+            pageBtn.onclick = () => {
+                currentPage = i;
+                displayResults();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+            pageNumbers.appendChild(pageBtn);
+        }
+        
+        pagination.appendChild(pageNumbers);
+        
+        // 다음 버튼
+        const nextBtn = document.createElement('button');
+        nextBtn.className = currentPage === totalPages
+            ? 'px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed'
+            : 'px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105';
+        nextBtn.textContent = '다음 →';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayResults();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+        pagination.appendChild(nextBtn);
+    }
+    
+    // 디바운스 함수
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // 이벤트 리스너
+    searchInput.addEventListener('input', debounce((e) => {
+        search(e.target.value);
+    }, 300));
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            search(searchInput.value);
+        });
+    });
+    
+    // 초기 로드
+    loadPosts();
+})();
+</script>
