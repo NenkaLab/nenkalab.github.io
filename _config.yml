@@ -48,23 +48,23 @@ plugins:
   - jekyll-seo-tag
 
 urls:
-  - github:
-      label: "GitHub"
-      url: "https://github.com/NenkaLab"
-  - twitter:
-      label: "Twitter"
-      url: "https://twitter.com/zabocho"
-  - discord:
-      label: "Discord"
-      url: "https://discord.zabocho.dev"
-      favicon: "https://discord.com/"
-  - steam:
-      label: "Steam"
-      url: "https://steam.zabocho.dev"
-      favicon: "https://steamcommunity.com/"
-  - email:
-      label: "Email"
-      url: "mailto:mail@zabocho.dev"
+  - key: "github"
+    label: "GitHub"
+    link: "https://github.com/NenkaLab"
+  - key: "twitter"
+    label: "Twitter"
+    link: "https://twitter.com/zabocho"
+  - key: "discord"
+    label: "Discord"
+    link: "https://discord.zabocho.dev"
+    favicon: "https://discord.com"
+  - key: "steam"
+    label: "Steam"
+    link: "https://steam.zabocho.dev"
+    favicon: "https://steamcommunity.com/"
+  - key: "email"
+    label: "Email"
+    link: "mailto:mail@zabocho.dev"
 
 # Giscus settings (댓글 설정)
 giscus:
