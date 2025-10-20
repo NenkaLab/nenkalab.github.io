@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zabocho | Zabocho</title>
+    <title>Zabocho</title>
     <meta name="description" content="Zabocho(NenkaLab)의 블로그 입니다">
     
     <!-- 다크모드 초기화 스크립트 (FOUC 방지) -->
@@ -236,7 +236,7 @@
 <title>Zabocho | Zabocho(NenkaLab)의 블로그 입니다</title>
 <meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="Zabocho" />
-<meta name="author" content="Zabocho" />
+<meta name="author" content="NenkaLab" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Zabocho(NenkaLab)의 블로그 입니다" />
 <meta property="og:description" content="Zabocho(NenkaLab)의 블로그 입니다" />
@@ -247,7 +247,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Zabocho" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Zabocho"},"description":"Zabocho(NenkaLab)의 블로그 입니다","headline":"Zabocho","url":"https://zabocho.dev/article/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"NenkaLab"},"description":"Zabocho(NenkaLab)의 블로그 입니다","headline":"Zabocho","url":"https://zabocho.dev/article/"}</script>
 <!-- End Jekyll SEO tag -->
 
     
@@ -271,7 +271,7 @@
                 <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <img id="profile-image" 
                          src="https://github.com/NenkaLab.png" 
-                         alt="Zabocho" 
+                         alt="NenkaLab" 
                          class="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out">
                     <span class="text-xl font-bold transition-all duration-300 ease-in-out">Zabocho</span>
                 </a>
@@ -356,15 +356,46 @@
     
     <!-- 페이지 헤더 -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-2">🔧 유틸</h1>
-        <p class="text-gray-600 dark:text-gray-400">총 개의 글</p>
+        <h1 class="text-3xl font-bold mb-2">📝 모든 글</h1>
+        <p class="text-gray-600 dark:text-gray-400">총 1개의 글</p>
     </div>
 
     <!-- 글 목록 -->
     
-    <div class="text-center py-12 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
-        <p class="text-gray-500 dark:text-gray-400">아직 작성된 글이 없습니다.</p>
+    <div class="space-y-4 mb-12">
+        
+        <article class="card border border-gray-300 dark:border-gray-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 group hover:-translate-y-1 animate-element">
+            <a href="/article/example-post/" class="block">
+                <h2 class="text-2xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                    Jekyll 블로그 시작하기
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">
+                    환영합니다!
+
+                </p>
+                <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-500">
+                    <time datetime="2025-01-01T03:00:00+00:00">
+                        2025년 01월 01일
+                    </time>
+                    
+                    <span>·</span>
+                    <div class="flex gap-2">
+                        
+                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">Jekyll</span>
+                        
+                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">Tutorial</span>
+                        
+                    </div>
+                    
+                </div>
+            </a>
+        </article>
+        
     </div>
+
+    <!-- 페이지네이션 -->
+    
+
     
     
 </div>
