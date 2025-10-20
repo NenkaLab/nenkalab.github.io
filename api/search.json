@@ -1,3 +1,11 @@
 [
   
+  {
+    "title": "Jekyll 블로그 시작하기",
+    "categories": ["Jekyll","Tutorial"],
+    "tags": ["블로그","정적사이트","GitHub Pages"],
+    "url": "/article/example-post/",
+    "date": "2025-01-01 03:00:00 +0000"
+  }
+  
 ]
