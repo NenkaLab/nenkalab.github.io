@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zabocho</title>
-    <meta name="description" content="Zabocho(NenkaLab)의 블로그 입니다">
+    <title>Base64 인코딩 | Zabocho</title>
+    <meta name="description" content="Base 64 Test">
     
     <!-- 다크모드 초기화 스크립트 (FOUC 방지) -->
     <script>
@@ -233,21 +233,22 @@
     
     <!-- SEO -->
     <!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Zabocho | Zabocho(NenkaLab)의 블로그 입니다</title>
+<title>Base64 인코딩 | Zabocho</title>
 <meta name="generator" content="Jekyll v4.4.1" />
-<meta property="og:title" content="Zabocho" />
+<meta property="og:title" content="Base64 인코딩" />
 <meta name="author" content="Zabocho" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Zabocho(NenkaLab)의 블로그 입니다" />
-<meta property="og:description" content="Zabocho(NenkaLab)의 블로그 입니다" />
-<link rel="canonical" href="https://zabocho.dev/" />
-<meta property="og:url" content="https://zabocho.dev/" />
+<meta name="description" content="Base 64 Test" />
+<meta property="og:description" content="Base 64 Test" />
+<link rel="canonical" href="https://zabocho.dev/utils/base64/" />
+<meta property="og:url" content="https://zabocho.dev/utils/base64/" />
 <meta property="og:site_name" content="Zabocho" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-10-20T03:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Zabocho" />
+<meta property="twitter:title" content="Base64 인코딩" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Zabocho"},"description":"Zabocho(NenkaLab)의 블로그 입니다","headline":"Zabocho","name":"Zabocho","url":"https://zabocho.dev/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Zabocho"},"dateModified":"2025-10-20T03:00:00+00:00","datePublished":"2025-10-20T03:00:00+00:00","description":"Base 64 Test","headline":"Base64 인코딩","mainEntityOfPage":{"@type":"WebPage","@id":"https://zabocho.dev/utils/base64/"},"url":"https://zabocho.dev/utils/base64/"}</script>
 <!-- End Jekyll SEO tag -->
 
     
@@ -352,102 +353,482 @@
 </script>
     
     <main class="min-h-screen">
-        <div class="max-w-5xl mx-auto px-4 py-12">
+        <!-- Progress Bar -->
+<div id="progress-bar"></div>
+
+<!-- 플로팅 버튼들 (우하단) -->
+<div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+    <!-- 상단으로 -->
+    <button id="scroll-to-top" 
+            class="hidden w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 items-center justify-center group"
+            aria-label="맨 위로">
+        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">arrow_upward</span>
+    </button>
     
-    <!-- 프로필 섹션 -->
-    <div class="mb-12">
-        <div class="flex items-center gap-4 mb-6">
-            <a href="https://github.com/NenkaLab" target="_blank" rel="noopener noreferrer">
-                <img src="https://github.com/NenkaLab.png" alt="Zabocho" class="w-20 h-20 rounded-full border border-gray-300 dark:border-gray-600 flex-shrink-0 hover:scale-110 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300">
-            </a>
-            <div class="min-w-0 flex-1">
-                <a href="https://github.com/NenkaLab" target="_blank" rel="noopener noreferrer" class="inline-block">
-                    <h1 class="text-3xl font-bold break-words hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Zabocho</h1>
-                </a>
-                <p class="text-gray-600 dark:text-gray-400 break-words">Hello, World!</p>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            
-            <a href="mailto:mail@zabocho.dev" 
-               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                <span class="material-symbols-outlined text-lg">email</span>
-                <span class="text-gray-700 dark:text-gray-300">Email</span>
-            </a>
-            
-            <a href="https://github.com/NenkaLab" target="_blank" rel="noopener noreferrer" 
-               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                <span class="material-symbols-outlined text-lg">code</span>
-                <span class="text-gray-700 dark:text-gray-300">GitHub</span>
-            </a>
-        </div>
-    </div>
-
-    <!-- Recent Articles -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-6">📚 Recent Articles</h2>
-        
-        
-        <div class="text-center py-12 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
-            <p class="text-gray-500 dark:text-gray-400">아직 작성된 글이 없습니다.</p>
-        </div>
-        
-    </div>
-
-    <!-- 네비게이션 링크 -->
+    <!-- 댓글로 -->
+    <button id="scroll-to-comments" 
+            class="hidden w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 items-center justify-center group"
+            aria-label="댓글로">
+        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">chat_bubble</span>
+    </button>
     
-    <div id="nav-links" class="mb-8">
-        <h2 class="text-2xl font-bold mb-6">🔗 Links</h2>
-
-        <div class="flex flex-wrap items-center gap-4">
-
-            
-            <a href="https://github.com/NenkaLab" target="_blank" rel="noopener noreferrer"
-               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                
-                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://github.com/NenkaLab" alt="GitHub 아이콘" />
-                
-                <span class="text-gray-700 dark:text-gray-300">GitHub</span>
-            </a>
-            
-            <a href="https://twitter.com/zabocho" target="_blank" rel="noopener noreferrer"
-               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                
-                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://twitter.com/zabocho" alt="Twitter 아이콘" />
-                
-                <span class="text-gray-700 dark:text-gray-300">Twitter</span>
-            </a>
-            
-            <a href="https://discord.zabocho.dev" target="_blank" rel="noopener noreferrer"
-               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                
-                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://discord.com" alt="Discord 아이콘" />
-                
-                <span class="text-gray-700 dark:text-gray-300">Discord</span>
-            </a>
-            
-            <a href="https://steam.zabocho.dev" target="_blank" rel="noopener noreferrer"
-               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                
-                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://steamcommunity.com/" alt="Steam 아이콘" />
-                
-                <span class="text-gray-700 dark:text-gray-300">Steam</span>
-            </a>
-            
-            <a href="mailto:mail@zabocho.dev" target="_blank" rel="noopener noreferrer"
-               class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                
-                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=mailto:mail@zabocho.dev" alt="Email 아이콘" />
-                
-                <span class="text-gray-700 dark:text-gray-300">Email</span>
-            </a>
-            
-
-        </div>
-    </div>
-    
-
+    <!-- 하단으로 -->
+    <button id="scroll-to-bottom" 
+            class="w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 flex items-center justify-center group"
+            aria-label="맨 아래로">
+        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">arrow_downward</span>
+    </button>
 </div>
+
+<!-- 목차 (TOC - 넓은 화면에서만) -->
+<aside id="toc" class="hidden xl:block fixed top-24 right-8 w-64 max-h-[calc(100vh-12rem)] overflow-y-auto">
+    <nav class="sticky top-24 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+        <h3 class="text-sm font-bold mb-3 text-gray-900 dark:text-gray-100">목차</h3>
+        <ul id="toc-list" class="space-y-2 text-sm">
+            <!-- JavaScript로 동적 생성 -->
+        </ul>
+    </nav>
+</aside>
+
+<script>
+(function() {
+    // ============ Progress Bar ============
+    const progressBar = document.getElementById('progress-bar');
+    
+    function updateProgressBar() {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight - windowHeight;
+        const scrolled = window.scrollY;
+        const progress = (scrolled / documentHeight) * 100;
+        
+        progressBar.style.width = progress + '%';
+    }
+    
+    window.addEventListener('scroll', updateProgressBar);
+    updateProgressBar();
+    
+    // ============ 플로팅 버튼 ============
+    const scrollToTop = document.getElementById('scroll-to-top');
+    const scrollToComments = document.getElementById('scroll-to-comments');
+    const scrollToBottom = document.getElementById('scroll-to-bottom');
+    
+    function updateFloatingButtons() {
+        const scrolled = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        // 상단으로 버튼 (200px 이상 스크롤 시 표시)
+        if (scrolled > 200) {
+            scrollToTop.classList.remove('hidden');
+            scrollToTop.classList.add('flex');
+        } else {
+            scrollToTop.classList.add('hidden');
+            scrollToTop.classList.remove('flex');
+        }
+        
+        // 댓글로 버튼 (댓글 섹션이 있고, 아직 도달 안했을 때)
+        const commentsSection = document.querySelector('.giscus');
+        if (commentsSection) {
+            const commentsTop = commentsSection.getBoundingClientRect().top + scrolled;
+            if (scrolled < commentsTop - windowHeight) {
+                scrollToComments.classList.remove('hidden');
+                scrollToComments.classList.add('flex');
+            } else {
+                scrollToComments.classList.add('hidden');
+                scrollToComments.classList.remove('flex');
+            }
+        }
+    }
+    
+    window.addEventListener('scroll', updateFloatingButtons);
+    updateFloatingButtons();
+    
+    // 버튼 클릭 이벤트
+    scrollToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    scrollToBottom.addEventListener('click', () => {
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    });
+    
+    scrollToComments.addEventListener('click', () => {
+        const commentsSection = document.querySelector('.giscus');
+        if (commentsSection) {
+            commentsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+    
+    // ============ 목차 (TOC) ============
+    const article = document.querySelector('.prose');
+    const tocList = document.getElementById('toc-list');
+    const tocAside = document.getElementById('toc');
+    
+    if (article && tocList) {
+        const headings = article.querySelectorAll('h1, h2, h3');
+        
+        if (headings.length > 0) {
+            // 각 제목에 ID 추가 및 목차 생성
+            headings.forEach((heading, index) => {
+                const id = heading.id || `heading-${index}`;
+                heading.id = id;
+                
+                const level = parseInt(heading.tagName.charAt(1));
+                const li = document.createElement('li');
+                li.className = level === 1 ? 'font-semibold' : (level === 2 ? 'ml-3' : 'ml-6');
+                
+                const a = document.createElement('a');
+                a.href = `#${id}`;
+                a.textContent = heading.textContent;
+                a.className = 'block py-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors toc-link';
+                a.dataset.target = id;
+                
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    heading.scrollIntoView({ behavior: 'smooth' });
+                    history.pushState(null, '', `#${id}`);
+                });
+                
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+            
+            tocAside.classList.remove('hidden');
+            
+            // IntersectionObserver로 현재 위치 감지
+            const observerOptions = {
+                rootMargin: '-80px 0px -80% 0px',
+                threshold: 0
+            };
+            
+            let activeId = null;
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        activeId = entry.target.id;
+                        updateActiveToc();
+                    }
+                });
+            }, observerOptions);
+            
+            headings.forEach(heading => observer.observe(heading));
+            
+            function updateActiveToc() {
+                const links = document.querySelectorAll('.toc-link');
+                links.forEach(link => {
+                    if (link.dataset.target === activeId) {
+                        link.classList.add('font-bold', 'text-blue-600', 'dark:text-blue-400');
+                        link.classList.remove('text-gray-600', 'dark:text-gray-400');
+                    } else {
+                        link.classList.remove('font-bold', 'text-blue-600', 'dark:text-blue-400');
+                        link.classList.add('text-gray-600', 'dark:text-gray-400');
+                    }
+                });
+            }
+        }
+    }
+})();
+</script>
+<article class="max-w-5xl mx-auto px-4 py-12 animate-fade-in-up">
+    <!-- 글 헤더 -->
+    <header class="mb-8">
+        <h1 class="text-4xl font-bold mb-4 break-words">Base64 인코딩</h1>
+        <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+            <time datetime="2025-10-20T03:00:00+00:00">
+                2025년 10월 20일
+            </time>
+            
+            <!-- 읽는 시간 -->
+            <span>·</span>
+            <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">schedule</span>
+                
+                
+                  1분
+                
+            </span>
+            
+            
+            <span>·</span>
+            <div class="flex gap-2">
+                
+                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">home</span>
+                
+                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">runner</span>
+                
+                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">work</span>
+                
+                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">nenkalab.github.io</span>
+                
+                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">Base64</span>
+                
+                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">Encode</span>
+                
+                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">Decode</span>
+                
+            </div>
+            
+            
+            
+            <span>·</span>
+            <div class="flex gap-2">
+                
+                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">#유틸</span>
+                
+            </div>
+            
+        </div>
+    </header>
+    
+    <!-- 글 내용 -->
+    <div class="prose prose-lg">
+        <h1 id="base-64-test">Base 64 Test</h1>
+
+    </div>
+    
+    <!-- 이전글/다음글 네비게이션 -->
+    <nav class="mt-12 pt-8 border-t border-gray-200">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 이전글 -->
+            
+            <div></div>
+            
+            
+            <!-- 다음글 -->
+            
+        </div>
+    </nav>
+    
+    <!-- 댓글 (Giscus) -->
+    <div class="mt-16">
+        <script src="https://giscus.app/client.js"
+                data-repo="NenkaLab/nenkalab.github.io"
+                data-repo-id="MDEwOlJlcG9zaXRvcnkxOTg4MDExNzQ="
+                data-category="General"
+                data-category-id="DIC_kwDOC9l3Fs4Cw0VV"
+                data-mapping="pathname"
+                data-strict="1"
+                data-reactions-enabled="1"
+                data-emit-metadata="0"
+                data-input-position="top"
+                data-theme=""
+                data-lang="ko"
+                data-loading="lazy"
+                crossorigin="anonymous"
+                async>
+        </script>
+    </div>
+</article>
+
+<!-- 이미지 뷰어 모달 -->
+<div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden items-center justify-center">
+    <!-- 닫기 버튼 -->
+    <button id="viewer-close" 
+            class="absolute top-4 right-4 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10"
+            aria-label="닫기">
+        <span class="material-symbols-outlined text-white text-3xl">close</span>
+    </button>
+    
+    <!-- 이전 버튼 -->
+    <button id="viewer-prev" 
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10"
+            aria-label="이전 이미지">
+        <span class="material-symbols-outlined text-white text-3xl">chevron_left</span>
+    </button>
+    
+    <!-- 이미지 컨테이너 -->
+    <div class="relative w-full h-full flex items-center justify-center p-16">
+        <img id="viewer-image" 
+             src="" 
+             alt="" 
+             class="max-w-full max-h-full object-contain"
+             style="user-select: none;">
+    </div>
+    
+    <!-- 다음 버튼 -->
+    <button id="viewer-next" 
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10"
+            aria-label="다음 이미지">
+        <span class="material-symbols-outlined text-white text-3xl">chevron_right</span>
+    </button>
+    
+    <!-- 이미지 카운터 -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-50 px-4 py-2 rounded-full">
+        <span id="viewer-counter" class="text-white text-sm"></span>
+    </div>
+</div>
+
+<script>
+(function() {
+    const viewer = document.getElementById('image-viewer');
+    const viewerImage = document.getElementById('viewer-image');
+    const viewerCounter = document.getElementById('viewer-counter');
+    const closeBtn = document.getElementById('viewer-close');
+    const prevBtn = document.getElementById('viewer-prev');
+    const nextBtn = document.getElementById('viewer-next');
+    
+    let images = [];
+    let currentIndex = 0;
+    let startX = 0;
+    let isDragging = false;
+    
+    // 글 내의 모든 이미지 찾기
+    function initImageViewer() {
+        const articleImages = document.querySelectorAll('.prose img');
+        
+        if (articleImages.length === 0) return;
+        
+        images = Array.from(articleImages);
+        
+        // 각 이미지에 클릭 이벤트 추가
+        images.forEach((img, index) => {
+            img.style.cursor = 'pointer';
+            img.addEventListener('click', () => {
+                openViewer(index);
+            });
+        });
+    }
+    
+    // 뷰어 열기
+    function openViewer(index) {
+        currentIndex = index;
+        updateViewer();
+        viewer.classList.remove('hidden');
+        viewer.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // 뷰어 닫기
+    function closeViewer() {
+        viewer.classList.remove('flex');
+        viewer.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+    
+    // 뷰어 업데이트
+    function updateViewer() {
+        if (images.length === 0) return;
+        
+        const img = images[currentIndex];
+        viewerImage.src = img.src;
+        viewerImage.alt = img.alt || '';
+        viewerCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+        
+        // 버튼 표시/숨김
+        prevBtn.style.display = currentIndex > 0 ? 'flex' : 'none';
+        nextBtn.style.display = currentIndex < images.length - 1 ? 'flex' : 'none';
+    }
+    
+    // 이전 이미지
+    function showPrev() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateViewer();
+        }
+    }
+    
+    // 다음 이미지
+    function showNext() {
+        if (currentIndex < images.length - 1) {
+            currentIndex++;
+            updateViewer();
+        }
+    }
+    
+    // 이벤트 리스너
+    closeBtn.addEventListener('click', closeViewer);
+    prevBtn.addEventListener('click', showPrev);
+    nextBtn.addEventListener('click', showNext);
+    
+    // 배경 클릭 시 닫기
+    viewer.addEventListener('click', (e) => {
+        if (e.target === viewer) {
+            closeViewer();
+        }
+    });
+    
+    // ESC 키로 닫기
+    document.addEventListener('keydown', (e) => {
+        if (!viewer.classList.contains('hidden')) {
+            if (e.key === 'Escape') {
+                closeViewer();
+            } else if (e.key === 'ArrowLeft') {
+                showPrev();
+            } else if (e.key === 'ArrowRight') {
+                showNext();
+            }
+        }
+    });
+    
+    // 터치/마우스 스와이프
+    viewerImage.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+    });
+    
+    viewerImage.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        isDragging = true;
+        e.preventDefault();
+    });
+    
+    viewerImage.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+    });
+    
+    viewerImage.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+    });
+    
+    viewerImage.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        
+        const endX = e.changedTouches[0].clientX;
+        const diff = startX - endX;
+        
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+                showNext();
+            } else {
+                showPrev();
+            }
+        }
+        
+        isDragging = false;
+    });
+    
+    viewerImage.addEventListener('mouseup', (e) => {
+        if (!isDragging) return;
+        
+        const endX = e.clientX;
+        const diff = startX - endX;
+        
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+                showNext();
+            } else {
+                showPrev();
+            }
+        }
+        
+        isDragging = false;
+    });
+    
+    viewerImage.addEventListener('mouseleave', () => {
+        isDragging = false;
+    });
+    
+    // 페이지 로드 시 초기화
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initImageViewer);
+    } else {
+        initImageViewer();
+    }
+})();
+</script>
     </main>
     
     <footer class="border-t border-gray-200 dark:border-gray-700 mt-16">

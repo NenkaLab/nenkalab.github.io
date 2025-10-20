@@ -1,0 +1,148 @@
+/* Giscus 커스텀 테마 - 사이트 UI와 동일하게 */
+
+main {
+  --color-prettylights-syntax-comment: #6b7280;
+  --color-prettylights-syntax-constant: #3b82f6;
+  --color-prettylights-syntax-entity: #8b5cf6;
+  --color-prettylights-syntax-storage-modifier-import: #111827;
+  --color-prettylights-syntax-entity-tag: #10b981;
+  --color-prettylights-syntax-keyword: #ec4899;
+  --color-prettylights-syntax-string: #f59e0b;
+  --color-prettylights-syntax-variable: #ef4444;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #ef4444;
+  --color-prettylights-syntax-invalid-illegal-text: #ffffff;
+  --color-prettylights-syntax-invalid-illegal-bg: #ef4444;
+  --color-prettylights-syntax-carriage-return-text: #ffffff;
+  --color-prettylights-syntax-carriage-return-bg: #ef4444;
+  --color-prettylights-syntax-string-regexp: #10b981;
+  --color-prettylights-syntax-markup-list: #f59e0b;
+  --color-prettylights-syntax-markup-heading: #3b82f6;
+  --color-prettylights-syntax-markup-italic: #111827;
+  --color-prettylights-syntax-markup-bold: #111827;
+  --color-prettylights-syntax-markup-deleted-text: #ef4444;
+  --color-prettylights-syntax-markup-deleted-bg: #fee2e2;
+  --color-prettylights-syntax-markup-inserted-text: #10b981;
+  --color-prettylights-syntax-markup-inserted-bg: #d1fae5;
+  --color-prettylights-syntax-markup-changed-text: #f59e0b;
+  --color-prettylights-syntax-markup-changed-bg: #fef3c7;
+  --color-prettylights-syntax-markup-ignored-text: #9ca3af;
+  --color-prettylights-syntax-markup-ignored-bg: #3b82f6;
+  --color-prettylights-syntax-meta-diff-range: #8b5cf6;
+  --color-prettylights-syntax-brackethighlighter-angle: #6b7280;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #9ca3af;
+  --color-prettylights-syntax-constant-other-reference-link: #3b82f6;
+  
+  /* 라이트 모드 */
+  --color-canvas-default: #ffffff;
+  --color-canvas-subtle: #f9fafb;
+  --color-border-default: #e5e7eb;
+  --color-border-muted: #f3f4f6;
+  
+  --color-neutral-muted: #f3f4f6;
+  
+  --color-accent-fg: #3b82f6;
+  --color-accent-emphasis: #2563eb;
+  --color-accent-muted: #dbeafe;
+  --color-accent-subtle: #eff6ff;
+  
+  --color-success-fg: #10b981;
+  --color-success-emphasis: #059669;
+  --color-success-muted: #d1fae5;
+  --color-success-subtle: #ecfdf5;
+  
+  --color-attention-fg: #f59e0b;
+  --color-attention-emphasis: #d97706;
+  --color-attention-muted: #fef3c7;
+  --color-attention-subtle: #fffbeb;
+  
+  --color-danger-fg: #ef4444;
+  --color-danger-emphasis: #dc2626;
+  --color-danger-muted: #fee2e2;
+  --color-danger-subtle: #fef2f2;
+  
+  --color-fg-default: #111827;
+  --color-fg-muted: #6b7280;
+  --color-fg-subtle: #9ca3af;
+  --color-fg-on-emphasis: #ffffff;
+}
+
+/* 다크 모드 */
+main.dark,
+main[data-theme='dark'] {
+  --color-prettylights-syntax-comment: #9ca3af;
+  --color-prettylights-syntax-constant: #60a5fa;
+  --color-prettylights-syntax-entity: #a78bfa;
+  --color-prettylights-syntax-storage-modifier-import: #f9fafb;
+  --color-prettylights-syntax-entity-tag: #34d399;
+  --color-prettylights-syntax-keyword: #f472b6;
+  --color-prettylights-syntax-string: #fbbf24;
+  --color-prettylights-syntax-variable: #f87171;
+  
+  /* 다크 모드 */
+  --color-canvas-default: #111827;
+  --color-canvas-subtle: #1f2937;
+  --color-border-default: #374151;
+  --color-border-muted: #4b5563;
+  
+  --color-neutral-muted: #374151;
+  
+  --color-accent-fg: #60a5fa;
+  --color-accent-emphasis: #3b82f6;
+  --color-accent-muted: #1e3a8a;
+  --color-accent-subtle: #1e40af;
+  
+  --color-success-fg: #34d399;
+  --color-success-emphasis: #10b981;
+  --color-success-muted: #064e3b;
+  --color-success-subtle: #065f46;
+  
+  --color-attention-fg: #fbbf24;
+  --color-attention-emphasis: #f59e0b;
+  --color-attention-muted: #78350f;
+  --color-attention-subtle: #92400e;
+  
+  --color-danger-fg: #f87171;
+  --color-danger-emphasis: #ef4444;
+  --color-danger-muted: #7f1d1d;
+  --color-danger-subtle: #991b1b;
+  
+  --color-fg-default: #f9fafb;
+  --color-fg-muted: #9ca3af;
+  --color-fg-subtle: #6b7280;
+  --color-fg-on-emphasis: #111827;
+}
+
+/* 추가 스타일링 */
+.gsc-reactions-count {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.gsc-comment {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid var(--color-border-default) !important;
+}
+
+.gsc-comment-box-tabs {
+  border-radius: 0.5rem !important;
+  border: 1px solid var(--color-border-default) !important;
+}
+
+.gsc-comment-box-write,
+.gsc-comment-box-preview {
+  border-radius: 0.5rem !important;
+}
+
+.gsc-comment-box-textarea {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  border-radius: 0.375rem !important;
+}
+
+.gsc-reactions button {
+  border-radius: 9999px !important;
+  transition: all 0.2s !important;
+}
+
+.gsc-reactions button:hover {
+  transform: scale(1.1) !important;
+}
