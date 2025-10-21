@@ -43,7 +43,7 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/plugins/autolinker/prism-autolinker.min.css" as="style" crossorigin="anonymous">
     
     <!-- Tailwind CSS v4 -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4?plugins=forms,typography,aspect-ratio,container-queries"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/prism.min.js" integrity="sha512-HiD3V4nv8fcjtouznjT9TqDNDm1EXngV331YGbfVGeKUoH+OLkRTCMzA34ecjlgSQZpdHZupdSrqHY+Hz3l6uQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/components/prism-core.min.js" integrity="sha512-Uw06iFFf9hwoN77+kPl/1DZL66tKsvZg6EWm7n6QxInyptVuycfrO52hATXDRozk7KWeXnrSueiglILct8IkkA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/plugins/autolinker/prism-autolinker.min.js" integrity="sha512-h92O152CCXt3xEUWDYTGLz58u+IOpZU8Z2MEkkBsXsRlAhckPFeEolarVn7tOhTVbjsJPpyknL0CFUrc2rlgPQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
@@ -105,8 +105,27 @@
 
         @custom-variant dark (&:where(.dark, .dark *));
         @custom-variant light (&:where(:not(.dark), :not(.dark *));
-        
+
     </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'element': 'fadeInUp 0.5s ease-in-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
     
     <!-- SEO -->
     <!-- Begin Jekyll SEO tag v2.8.0 -->
