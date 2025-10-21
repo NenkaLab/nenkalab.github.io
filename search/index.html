@@ -64,40 +64,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/plugins/line-numbers/prism-line-numbers.min.css" integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
+
+        @import "tailwindcss";
+        @custom-variant dark (&:where(.dark, .dark *));
         
         /* 다크모드 색상 */
         :root {
             --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             --font-heading: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-        }
-        
-        .dark {
-            --bg-primary: #111827;
-            --bg-secondary: #1f2937;
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --border-color: #374151;
         }
         
         body {
             font-family: var(--font-body);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.2s, color 0.2s;
         }
         
         h1, h2, h3, h4, h5, h6 {
             font-family: var(--font-heading);
         }
         
-        /* 마크다운 스타일 */
-        .prose {
-            /* max-width: 65ch; */
+        /* 포스트 스타일 */
+        .post {
             overflow-wrap: break-word;
             word-break: keep-all;
             -webkit-hyphens: auto;
@@ -105,117 +91,6 @@
             hyphens: auto;
         }
         
-        .prose p {
-            margin-bottom: 1.25em;
-            line-height: 1.75;
-            color: var(--text-primary);
-        }
-        
-        .prose h1, .prose h2, .prose h3 {
-            color: var(--text-primary);
-        }
-        
-        .prose h1 {
-            font-size: 2em;
-            margin-top: 0;
-            margin-bottom: 0.8em;
-            font-weight: 700;
-        }
-        
-        .prose h2 {
-            font-size: 1.5em;
-            margin-top: 2em;
-            margin-bottom: 1em;
-            font-weight: 600;
-        }
-        
-        .prose h3 {
-            font-size: 1.25em;
-            margin-top: 1.6em;
-            margin-bottom: 0.6em;
-            font-weight: 600;
-        }
-        
-        .prose ul, .prose ol {
-            margin-top: 1.25em;
-            margin-bottom: 1.25em;
-            padding-left: 1.625em;
-        }
-        
-        .prose li {
-            margin-top: 0.5em;
-            margin-bottom: 0.5em;
-        }
-        
-        .prose code {
-            /* background-color: #f3f4f6; */
-            padding: 0.2em 0.4em;
-            border-radius: 0.25rem;
-            font-size: 0.875em;
-            font-family: "JetBrains Mono", consolas, monospace;
-            font-feature-settings: "liga" 1;
-            text-shadow: none;
-        }
-        
-        .dark .prose code {
-            /* background-color: #374151; */
-            /* color: #f3f4f6; */
-        }
-        
-        .prose pre {
-            background-color: #1f2937;
-            color: #f3f4f6;
-            padding: 1em;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            margin-top: 1.75em;
-            margin-bottom: 1.75em;
-        }
-        
-        .dark .prose pre {
-            /* background-color: #0f172a; */
-        }
-        
-        .prose pre code {
-            background-color: transparent;
-            padding: 0;
-            color: inherit;
-        }
-        
-        .prose a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-        
-        .prose a:hover {
-            text-decoration: underline;
-        }
-        
-        .prose blockquote {
-            border-left: 4px solid #e5e7eb;
-            padding-left: 1em;
-            font-style: italic;
-            margin: 1.6em 0;
-            color: var(--text-secondary);
-        }
-        
-        .dark .prose blockquote {
-            border-left-color: #4b5563;
-        }
-        
-        .prose img {
-            margin-top: 2em;
-            margin-bottom: 2em;
-            border-radius: 0.5rem;
-        }
-        
-        .prose hr {
-            border: 0;
-            border-top: 1px solid var(--border-color);
-            margin: 3em 0;
-        }
-        
-        /* 텍스트 오버플로우 유틸리티 */
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -236,7 +111,7 @@
 <title>Zabocho | Zabocho(NenkaLab)의 블로그 입니다</title>
 <meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="Zabocho" />
-<meta name="author" content="NenkaLab" />
+<meta name="author" content="nenka.lab" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Zabocho(NenkaLab)의 블로그 입니다" />
 <meta property="og:description" content="Zabocho(NenkaLab)의 블로그 입니다" />
@@ -247,7 +122,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Zabocho" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"NenkaLab"},"description":"Zabocho(NenkaLab)의 블로그 입니다","headline":"Zabocho","url":"https://zabocho.dev/search/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"nenka.lab"},"description":"Zabocho(NenkaLab)의 블로그 입니다","headline":"Zabocho","url":"https://zabocho.dev/search/"}</script>
 <!-- End Jekyll SEO tag -->
 
     
@@ -271,7 +146,7 @@
                 <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <img id="profile-image" 
                          src="https://github.com/NenkaLab.png" 
-                         alt="NenkaLab" 
+                         alt="nenka.lab" 
                          class="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 transition-all duration-300 ease-in-out">
                     <span class="text-xl font-bold transition-all duration-300 ease-in-out">Zabocho</span>
                 </a>
@@ -713,7 +588,7 @@
             <div class="relative">
                 <button id="theme-toggle" 
                         class="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                    <span id="theme-icon" class="material-symbols-outlined text-lg">light_mode</span>
+                    <span id="theme-icon" class="material-symbols-outlined text-lg text-gray-700 dark:text-gray-300">light_mode</span>
                     <span id="theme-text" class="text-gray-700 dark:text-gray-300">라이트</span>
                     <span class="material-symbols-outlined text-lg text-gray-500">expand_more</span>
                 </button>
@@ -723,17 +598,17 @@
                      class="hidden absolute bottom-full mb-2 right-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg min-w-[140px] z-10">
                     <button data-theme="light" 
                             class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
-                        <span class="material-symbols-outlined text-lg">light_mode</span>
+                        <span class="material-symbols-outlined text-lg text-gray-700 dark:text-gray-300">light_mode</span>
                         <span class="text-gray-700 dark:text-gray-300">라이트</span>
                     </button>
                     <button data-theme="dark" 
                             class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
-                        <span class="material-symbols-outlined text-lg">dark_mode</span>
+                        <span class="material-symbols-outlined text-lg text-gray-700 dark:text-gray-300">dark_mode</span>
                         <span class="text-gray-700 dark:text-gray-300">다크</span>
                     </button>
                     <button data-theme="system" 
                             class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left rounded-b-md">
-                        <span class="material-symbols-outlined text-lg">contrast</span>
+                        <span class="material-symbols-outlined text-lg text-gray-700 dark:text-gray-300">contrast</span>
                         <span class="text-gray-700 dark:text-gray-300">시스템</span>
                     </button>
                 </div>
