@@ -109,12 +109,20 @@ module Jekyll
         }
       rescue => e
         Jekyll.logger.warn "LinkPreview:", "Error scraping #{url}: #{e.message}"
+        
+        # 안전하게 domain 추출
+        domain = begin
+          URI.parse(url).host
+        rescue
+          url
+        end
+        
         {
           'url' => url,
           'title' => url,
           'description' => '',
           'image' => '',
-          'domain' => URI.parse(url).host rescue url
+          'domain' => domain
         }
       end
 
