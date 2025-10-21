@@ -10,3 +10,6 @@ Gemfile.lock
 node_modules/
 assets/css/output.css
 _cache/
+
+assets/css/output.css
+assets/css/output.css.map

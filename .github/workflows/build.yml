@@ -21,7 +21,7 @@ jobs:
         run: npm ci
       
       - name: Build Tailwind CSS
-        run: npm run build:css
+        run: NODE_ENV=production npm run build:css
       
       # 빌드된 CSS를 artifact로 저장
       - name: Upload CSS artifact
