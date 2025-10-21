@@ -1,0 +1,23 @@
+{
+  "name": "nenkalab.github.io",
+  "version": "1.0.0",
+  "description": "NenkaLab의 개인 블로그 웹사이트",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify",
+    "watch:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "cssnano": "^6.0.0",
+    "postcss-import": "^16.0.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/container-queries": "^0.1.1"
+  },
+  "author": "NenkaLab",
+  "license": "ISC"
+}
