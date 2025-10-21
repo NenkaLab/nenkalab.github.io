@@ -31,36 +31,47 @@ module Jekyll
     end
 
     def self.process_html(html)
-      doc = Nokogiri::HTML::DocumentFragment.parse(html)
+      # 전체 HTML Document로 파싱 (구조 유지)
+      doc = Nokogiri::HTML(html)
       
-      # 모든 p 태그 찾기
-      doc.css('p').each do |paragraph|
-        links = paragraph.css('a[href]')
-        next if links.empty?
-
-        # 외부 링크만 필터링
-        external_links = links.select do |link|
-          href = link['href']
-          href && 
-          href.start_with?('http://', 'https://') && 
-          !href.include?(LinkPreview.site_url)
-        end
-
-        next if external_links.empty?
-
-        # OG 데이터 수집
-        links_data = external_links.map do |link|
-          fetch_og_data(link['href'])
-        end.compact
-
-        next if links_data.empty?
-
-        # 링크 프리뷰 트리거 버튼 생성
-        trigger = create_trigger_element(links_data)
-        paragraph.add_child(trigger)
+      # content 영역만 선택 (.post.prose 또는 article 태그)
+      content_area = doc.at_css('.post.prose') || doc.at_css('article') || doc.at_css('body')
+      
+      return html unless content_area
+      
+      # content 영역 내부의 p 태그만 처리
+      content_area.css('p').each do |paragraph|
+        process_paragraph(paragraph)
       end
 
+      # 전체 HTML 반환 (구조 유지)
       doc.to_html
+    end
+
+    def self.process_paragraph(paragraph)
+      links = paragraph.css('a[href]')
+      return if links.empty?
+
+      # 외부 링크만 필터링
+      external_links = links.select do |link|
+        href = link['href']
+        href && 
+        href.start_with?('http://', 'https://') && 
+        !href.include?(LinkPreview.site_url)
+      end
+
+      return if external_links.empty?
+
+      # OG 데이터 수집
+      links_data = external_links.map do |link|
+        fetch_og_data(link['href'])
+      end.compact
+
+      return if links_data.empty?
+
+      # 링크 프리뷰 트리거 버튼 생성
+      trigger = create_trigger_element(links_data)
+      paragraph.add_child(trigger)
     end
 
     def self.fetch_og_data(url)
