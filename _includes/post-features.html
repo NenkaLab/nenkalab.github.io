@@ -105,12 +105,12 @@
     });
     
     // ============ 목차 (TOC) ============
-    const article = document.querySelector('.prose');
+    const article = document.querySelector('.post');
     const tocList = document.getElementById('toc-list');
     const tocAside = document.getElementById('toc');
     
     if (article && tocList) {
-        const headings = article.querySelectorAll('h1, h2, h3');
+        const headings = article.querySelectorAll('h1, h2, h3, h4, h5, h6');
         
         if (headings.length > 0) {
             // 각 제목에 ID 추가 및 목차 생성

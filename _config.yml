@@ -16,9 +16,14 @@ author:
 markdown: kramdown
 kramdown:
   input: GFM
+  math_engine: mathjax
   syntax_highlighter_opts:
     disable : true
 permalink: /article/:title/
+
+# Gist settings
+gist:
+  noscript: false
 
 # Pagination
 paginate: 10
@@ -48,6 +53,9 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
   - jekyll-youtube
+  - jekyll-github-metadata
+  - jekyll-gist
+  - jekyll-relative-links
 
 urls:
   - key: "github"

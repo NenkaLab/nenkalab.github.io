@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Jekyll 블로그 시작하기"
-date: 2025-01-01 12:00:00 +0900
+date: 2025-10-19 12:00:00 +0900
 categories: [Jekyll, Tutorial]
 tags: [블로그, 정적사이트, GitHub Pages]
 ---
@@ -53,4 +53,4 @@ def hello():
 
 이것은 예시 글입니다. `_posts/` 폴더에 `YYYY-MM-DD-title.md` 형식으로 파일을 만들면 자동으로 블로그에 표시됩니다.
 
-{% youtube v-GxoMS1U2k %}
+{% youtube "v-GxoMS1U2k" %}
