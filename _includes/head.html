@@ -62,40 +62,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/plugins/line-numbers/prism-line-numbers.min.css" integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
+
+        @import "tailwindcss";
+        @custom-variant dark (&:where(.dark, .dark *));
         
         /* 다크모드 색상 */
         :root {
             --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             --font-heading: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-        }
-        
-        .dark {
-            --bg-primary: #111827;
-            --bg-secondary: #1f2937;
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --border-color: #374151;
         }
         
         body {
             font-family: var(--font-body);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.2s, color 0.2s;
         }
         
         h1, h2, h3, h4, h5, h6 {
             font-family: var(--font-heading);
         }
         
-        /* 마크다운 스타일 */
-        .prose {
-            /* max-width: 65ch; */
+        /* 포스트 스타일 */
+        .post {
             overflow-wrap: break-word;
             word-break: keep-all;
             -webkit-hyphens: auto;
@@ -103,117 +89,6 @@
             hyphens: auto;
         }
         
-        .prose p {
-            margin-bottom: 1.25em;
-            line-height: 1.75;
-            color: var(--text-primary);
-        }
-        
-        .prose h1, .prose h2, .prose h3 {
-            color: var(--text-primary);
-        }
-        
-        .prose h1 {
-            font-size: 2em;
-            margin-top: 0;
-            margin-bottom: 0.8em;
-            font-weight: 700;
-        }
-        
-        .prose h2 {
-            font-size: 1.5em;
-            margin-top: 2em;
-            margin-bottom: 1em;
-            font-weight: 600;
-        }
-        
-        .prose h3 {
-            font-size: 1.25em;
-            margin-top: 1.6em;
-            margin-bottom: 0.6em;
-            font-weight: 600;
-        }
-        
-        .prose ul, .prose ol {
-            margin-top: 1.25em;
-            margin-bottom: 1.25em;
-            padding-left: 1.625em;
-        }
-        
-        .prose li {
-            margin-top: 0.5em;
-            margin-bottom: 0.5em;
-        }
-        
-        .prose code {
-            /* background-color: #f3f4f6; */
-            padding: 0.2em 0.4em;
-            border-radius: 0.25rem;
-            font-size: 0.875em;
-            font-family: "JetBrains Mono", consolas, monospace;
-            font-feature-settings: "liga" 1;
-            text-shadow: none;
-        }
-        
-        .dark .prose code {
-            /* background-color: #374151; */
-            /* color: #f3f4f6; */
-        }
-        
-        .prose pre {
-            background-color: #1f2937;
-            color: #f3f4f6;
-            padding: 1em;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            margin-top: 1.75em;
-            margin-bottom: 1.75em;
-        }
-        
-        .dark .prose pre {
-            /* background-color: #0f172a; */
-        }
-        
-        .prose pre code {
-            background-color: transparent;
-            padding: 0;
-            color: inherit;
-        }
-        
-        .prose a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-        
-        .prose a:hover {
-            text-decoration: underline;
-        }
-        
-        .prose blockquote {
-            border-left: 4px solid #e5e7eb;
-            padding-left: 1em;
-            font-style: italic;
-            margin: 1.6em 0;
-            color: var(--text-secondary);
-        }
-        
-        .dark .prose blockquote {
-            border-left-color: #4b5563;
-        }
-        
-        .prose img {
-            margin-top: 2em;
-            margin-bottom: 2em;
-            border-radius: 0.5rem;
-        }
-        
-        .prose hr {
-            border: 0;
-            border-top: 1px solid var(--border-color);
-            margin: 3em 0;
-        }
-        
-        /* 텍스트 오버플로우 유틸리티 */
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
