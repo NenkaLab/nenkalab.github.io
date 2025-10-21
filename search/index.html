@@ -10,19 +10,19 @@ layout: default
             <span class="material-symbols-outlined text-3xl">search</span>
             검색
         </h1>
-        <p class="text-gray-600 dark:text-gray-400" id="search-count">전체 글에서 검색하세요</p>
+        <p class="text-zinc-600 dark:text-zinc-400" id="search-count">전체 글에서 검색하세요</p>
     </div>
 
     <!-- 검색 UI -->
     <div class="mb-8 space-y-4">
         <!-- 검색바 -->
         <div class="relative">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">search</span>
             <input 
                 type="text" 
                 id="search-input"
                 placeholder="검색어를 입력하세요..."
-                class="w-full pl-12 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors"
+                class="w-full pl-12 pr-4 py-3 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors"
             >
         </div>
         
@@ -49,7 +49,7 @@ layout: default
     <!-- 로딩 -->
     <div id="loading" class="hidden text-center py-12">
         <div class="inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 text-gray-600 dark:text-gray-400">검색 중...</p>
+        <p class="mt-4 text-zinc-600 dark:text-zinc-400">검색 중...</p>
     </div>
 
     <!-- 검색 결과 -->
@@ -58,9 +58,9 @@ layout: default
     </div>
 
     <!-- 결과 없음 -->
-    <div id="no-results" class="hidden text-center py-12 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
-        <span class="material-symbols-outlined text-6xl text-gray-400 mb-4">search_off</span>
-        <p class="text-gray-500 dark:text-gray-400">검색 결과가 없습니다.</p>
+    <div id="no-results" class="hidden text-center py-12 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800">
+        <span class="material-symbols-outlined text-6xl text-zinc-400 mb-4">search_off</span>
+        <p class="text-zinc-500 dark:text-zinc-400">검색 결과가 없습니다.</p>
     </div>
 
     <!-- 페이지네이션 -->
@@ -206,7 +206,7 @@ layout: default
         // 결과 렌더링
         postsToShow.forEach(post => {
             const article = document.createElement('article');
-            article.className = 'card border border-gray-300 dark:border-gray-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 group hover:-translate-y-1 animate-element';
+            article.className = 'card border border-zinc-300 dark:border-zinc-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-800 group hover:-translate-y-1 animate-element';
             
             const date = new Date(post.date);
             const formattedDate = `${date.getFullYear()}년 ${String(date.getMonth() + 1).padStart(2, '0')}월 ${String(date.getDate()).padStart(2, '0')}일`;
@@ -216,16 +216,16 @@ layout: default
                     <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         ${highlightText(post.title, searchInput.value)}
                     </h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                    <p class="text-zinc-600 dark:text-zinc-400 mb-3 line-clamp-2">
                         ${post.excerpt || ''}
                     </p>
-                    <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-500">
+                    <div class="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-500">
                         <time>${formattedDate}</time>
                         ${post.categories && post.categories.length > 0 ? `
                             <span>·</span>
                             <div class="flex gap-2">
                                 ${post.categories.slice(0, 2).map(cat => 
-                                    `<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">${highlightText(cat, searchInput.value)}</span>`
+                                    `<span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-700 rounded text-xs">${highlightText(cat, searchInput.value)}</span>`
                                 ).join('')}
                             </div>
                         ` : ''}
@@ -261,8 +261,8 @@ layout: default
         // 이전 버튼
         const prevBtn = document.createElement('button');
         prevBtn.className = currentPage === 1 
-            ? 'px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed'
-            : 'px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105';
+            ? 'px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
+            : 'px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105';
         prevBtn.textContent = '← 이전';
         prevBtn.disabled = currentPage === 1;
         prevBtn.onclick = () => {
@@ -290,7 +290,7 @@ layout: default
             const pageBtn = document.createElement('button');
             pageBtn.className = i === currentPage
                 ? 'px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold shadow-md'
-                : 'px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105';
+                : 'px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105';
             pageBtn.textContent = i;
             pageBtn.onclick = () => {
                 currentPage = i;
@@ -305,8 +305,8 @@ layout: default
         // 다음 버튼
         const nextBtn = document.createElement('button');
         nextBtn.className = currentPage === totalPages
-            ? 'px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed'
-            : 'px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105';
+            ? 'px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
+            : 'px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105';
         nextBtn.textContent = '다음 →';
         nextBtn.disabled = currentPage === totalPages;
         nextBtn.onclick = () => {

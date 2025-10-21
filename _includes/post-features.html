@@ -5,30 +5,30 @@
 <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
     <!-- 상단으로 -->
     <button id="scroll-to-top" 
-            class="hidden w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 items-center justify-center group"
+            class="hidden w-12 h-12 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 items-center justify-center group"
             aria-label="맨 위로">
-        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">arrow_upward</span>
+        <span class="material-symbols-outlined text-zinc-700 dark:text-zinc-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">arrow_upward</span>
     </button>
     
     <!-- 댓글로 -->
     <button id="scroll-to-comments" 
-            class="hidden w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 items-center justify-center group"
+            class="hidden w-12 h-12 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 items-center justify-center group"
             aria-label="댓글로">
-        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">chat_bubble</span>
+        <span class="material-symbols-outlined text-zinc-700 dark:text-zinc-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">chat_bubble</span>
     </button>
     
     <!-- 하단으로 -->
     <button id="scroll-to-bottom" 
-            class="w-12 h-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 flex items-center justify-center group"
+            class="w-12 h-12 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 flex items-center justify-center group"
             aria-label="맨 아래로">
-        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">arrow_downward</span>
+        <span class="material-symbols-outlined text-zinc-700 dark:text-zinc-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">arrow_downward</span>
     </button>
 </div>
 
 <!-- 목차 (TOC - 넓은 화면에서만) -->
 <aside id="toc" class="hidden xl:block fixed top-24 right-8 w-64 max-h-[calc(100vh-12rem)] overflow-y-auto">
-    <nav class="sticky top-24 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
-        <h3 class="text-sm font-bold mb-3 text-gray-900 dark:text-gray-100">목차</h3>
+    <nav class="sticky top-24 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 shadow-sm">
+        <h3 class="text-sm font-bold mb-3 text-zinc-900 dark:text-zinc-100">목차</h3>
         <ul id="toc-list" class="space-y-2 text-sm">
             <!-- JavaScript로 동적 생성 -->
         </ul>
@@ -125,7 +125,7 @@
                 const a = document.createElement('a');
                 a.href = `#${id}`;
                 a.textContent = heading.textContent;
-                a.className = 'block py-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors toc-link';
+                a.className = 'block py-1 text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors toc-link';
                 a.dataset.target = id;
                 
                 a.addEventListener('click', (e) => {
@@ -164,10 +164,10 @@
                 links.forEach(link => {
                     if (link.dataset.target === activeId) {
                         link.classList.add('font-bold', 'text-blue-600', 'dark:text-blue-400');
-                        link.classList.remove('text-gray-600', 'dark:text-gray-400');
+                        link.classList.remove('text-zinc-600', 'dark:text-zinc-400');
                     } else {
                         link.classList.remove('font-bold', 'text-blue-600', 'dark:text-blue-400');
-                        link.classList.add('text-gray-600', 'dark:text-gray-400');
+                        link.classList.add('text-zinc-600', 'dark:text-zinc-400');
                     }
                 });
             }

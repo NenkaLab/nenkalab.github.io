@@ -1,19 +1,25 @@
 ---
 layout: default
+pagination:
+  enabled: true
+  collection: 'util_posts'
+  per_page: 10
+  permalink: '/utils/page/:num/'
+  sort_reverse: true
 ---
 
 <div class="max-w-5xl mx-auto px-4 py-12">
     
     <!-- 페이지 헤더 -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-2">📝 모든 글</h1>
-        <p class="text-zinc-600 dark:text-zinc-400">총 {{ site.posts.size }}개의 글</p>
+        <h1 class="text-3xl font-bold mb-2">🔧 유틸</h1>
+        <p class="text-zinc-600 dark:text-zinc-400">총 {{ paginator.documents.size }}개의 글</p>
     </div>
 
     <!-- 글 목록 -->
-    {% if paginator.posts.size > 0 %}
+    {% if paginator.documents.size > 0 %}
     <div class="space-y-4 mb-12">
-        {% for post in paginator.posts %}
+        {% for post in paginator.documents %}
         <article class="card border border-zinc-300 dark:border-zinc-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-800 group hover:-translate-y-1 animate-element">
             <a href="{{ post.url | relative_url }}" class="block">
                 <h2 class="text-2xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
@@ -61,12 +67,12 @@ layout: default
                     {{ page }}
                 </span>
                 {% elsif page == 1 %}
-                <a href="{{ '/article' | relative_url }}" 
+                <a href="{{ '/utils' | relative_url }}" 
                    class="px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
                     {{ page }}
                 </a>
                 {% else %}
-                <a href="{{ site.paginate_path | relative_url | replace: ':num', page }}" 
+                <a href="{{ '/utils/page/' | append: page | relative_url }}" 
                    class="px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
                     {{ page }}
                 </a>

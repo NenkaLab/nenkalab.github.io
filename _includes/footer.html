@@ -1,36 +1,36 @@
-<footer class="border-t border-gray-200 dark:border-gray-700 mt-16">
+<footer class="border-t border-zinc-200 dark:border-zinc-700 mt-16">
     <div class="max-w-5xl mx-auto px-4 py-8">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+            <p class="text-center text-sm text-zinc-500 dark:text-zinc-400">
                 © {{ 'now' | date: "%Y" }} {{ site.title }} · Built with Jekyll & Tailwind CSS
             </p>
             
             <!-- 테마 스위처 -->
             <div class="relative">
                 <button id="theme-toggle" 
-                        class="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm">
-                    <span id="theme-icon" class="material-symbols-outlined text-lg text-gray-700 dark:text-gray-300">light_mode</span>
-                    <span id="theme-text" class="text-gray-700 dark:text-gray-300">Light</span>
-                    <span class="material-symbols-outlined text-lg text-gray-500">expand_more</span>
+                        class="flex items-center gap-2 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-sm">
+                    <span id="theme-icon" class="material-symbols-outlined text-lg text-zinc-700 dark:text-zinc-300">light_mode</span>
+                    <span id="theme-text" class="text-zinc-700 dark:text-zinc-300">Light</span>
+                    <span class="material-symbols-outlined text-lg text-zinc-500">expand_more</span>
                 </button>
                 
                 <!-- 드롭다운 메뉴 -->
                 <div id="theme-menu" 
-                     class="hidden absolute bottom-full mb-2 right-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg min-w-[140px] z-10">
+                     class="hidden absolute bottom-full mb-2 right-0 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-lg min-w-[140px] z-10">
                     <button data-theme="light" 
-                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
-                        <span class="material-symbols-outlined text-lg text-gray-700 dark:text-gray-300">light_mode</span>
-                        <span class="text-gray-700 dark:text-gray-300">Light</span>
+                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors text-left">
+                        <span class="material-symbols-outlined text-lg text-zinc-700 dark:text-zinc-300">light_mode</span>
+                        <span class="text-zinc-700 dark:text-zinc-300">Light</span>
                     </button>
                     <button data-theme="dark" 
-                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
-                        <span class="material-symbols-outlined text-lg text-gray-700 dark:text-gray-300">dark_mode</span>
-                        <span class="text-gray-700 dark:text-gray-300">Dark</span>
+                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors text-left">
+                        <span class="material-symbols-outlined text-lg text-zinc-700 dark:text-zinc-300">dark_mode</span>
+                        <span class="text-zinc-700 dark:text-zinc-300">Dark</span>
                     </button>
                     <button data-theme="system" 
-                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left rounded-b-md">
-                        <span class="material-symbols-outlined text-lg text-gray-700 dark:text-gray-300">contrast</span>
-                        <span class="text-gray-700 dark:text-gray-300">System</span>
+                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors text-left rounded-b-md">
+                        <span class="material-symbols-outlined text-lg text-zinc-700 dark:text-zinc-300">contrast</span>
+                        <span class="text-zinc-700 dark:text-zinc-300">System</span>
                     </button>
                 </div>
             </div>

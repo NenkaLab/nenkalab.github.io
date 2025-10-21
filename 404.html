@@ -8,14 +8,14 @@ permalink: /404.html
     <!-- 404 메인 섹션 -->
     <div class="text-center mb-12 animate-element">
         <div class="mb-8">
-            <span class="material-symbols-outlined text-9xl text-gray-300 dark:text-gray-700">
+            <span class="material-symbols-outlined text-9xl text-zinc-300 dark:text-zinc-700">
                 sentiment_dissatisfied
             </span>
         </div>
         
-        <h1 class="text-6xl font-bold mb-4 text-gray-800 dark:text-gray-200">404</h1>
-        <h2 class="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">페이지를 찾을 수 없습니다</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+        <h1 class="text-6xl font-bold mb-4 text-zinc-800 dark:text-zinc-200">404</h1>
+        <h2 class="text-2xl font-semibold mb-4 text-zinc-700 dark:text-zinc-300">페이지를 찾을 수 없습니다</h2>
+        <p class="text-zinc-600 dark:text-zinc-400 mb-8 max-w-md mx-auto">
             요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.
         </p>
         
@@ -28,7 +28,7 @@ permalink: /404.html
             </a>
             
             <a href="{{ '/article' | relative_url }}" 
-               class="flex items-center gap-2 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 hover:scale-105 font-semibold">
+               class="flex items-center gap-2 px-6 py-3 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg text-zinc-700 dark:text-zinc-300 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 hover:scale-105 font-semibold">
                 <span class="material-symbols-outlined text-lg">article</span>
                 <span>글 목록 보기</span>
             </a>
@@ -37,22 +37,22 @@ permalink: /404.html
 
     <!-- 추천 글 섹션 -->
     {% if site.posts.size > 0 %}
-    <div class="border-t border-gray-200 dark:border-gray-700 pt-12">
-        <h3 class="text-xl font-bold mb-6 text-center text-gray-700 dark:text-gray-300">
+    <div class="border-t border-zinc-200 dark:border-zinc-700 pt-12">
+        <h3 class="text-xl font-bold mb-6 text-center text-zinc-700 dark:text-zinc-300">
             💡 이런 글은 어떠세요?
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {% for post in site.posts limit:4 %}
-            <article class="card border border-gray-300 dark:border-gray-700 rounded-lg p-5 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 group hover:-translate-y-1">
+            <article class="card border border-zinc-300 dark:border-zinc-700 rounded-lg p-5 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-800 group hover:-translate-y-1">
                 <a href="{{ post.url | relative_url }}" class="block">
                     <h4 class="text-lg font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
                         {{ post.title }}
                     </h4>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">
+                    <p class="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-2">
                         {{ post.excerpt | strip_html | truncate: 100 }}
                     </p>
-                    <time datetime="{{ post.date | date_to_xmlschema }}" class="text-xs text-gray-500 dark:text-gray-500">
+                    <time datetime="{{ post.date | date_to_xmlschema }}" class="text-xs text-zinc-500 dark:text-zinc-500">
                         {{ post.date | date: "%Y년 %m월 %d일" }}
                     </time>
                 </a>
