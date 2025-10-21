@@ -6,7 +6,7 @@ layout: default
     
     <!-- 페이지 헤더 -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-2 flex items-center gap-2">
+        <h1 class="text-3xl text-zinc-700 dark:text-zinc-300 font-bold mb-2 flex items-center gap-2">
             <span class="material-symbols-outlined text-3xl">search</span>
             검색
         </h1>
@@ -17,7 +17,7 @@ layout: default
     <div class="mb-8 space-y-4">
         <!-- 검색바 -->
         <div class="relative">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">search</span>
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-800 dark:text-zinc-300">search</span>
             <input 
                 type="text" 
                 id="search-input"
@@ -213,7 +213,7 @@ layout: default
             
             article.innerHTML = `
                 <a href="${post.url}" class="block">
-                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                    <h3 class="text-xl text-zinc-900 dark:text-zinc-100 font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         ${highlightText(post.title, searchInput.value)}
                     </h3>
                     <p class="text-zinc-600 dark:text-zinc-400 mb-3 line-clamp-2">

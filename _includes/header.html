@@ -16,7 +16,7 @@
                          src="{{ site.author.image }}" 
                          alt="{{ site.author.name }}" 
                          class="w-10 h-10 rounded-full border border-zinc-300 dark:border-zinc-600 transition-all duration-300 ease-in-out">
-                    <span class="text-xl font-bold transition-all duration-300 ease-in-out">{{ site.title }}</span>
+                    <span class="text-xl text-zinc-700 dark:text-zinc-300 font-bold transition-all duration-300 ease-in-out">{{ site.title }}</span>
                 </a>
             </div>
             
@@ -71,7 +71,7 @@
             const scrollY = window.scrollY;
             
             // 50px 이상 스크롤시 작아진 헤더 적용
-            if (scrollY > 50) {
+            if (lastScrollY > 50) {
                 header.classList.add('scrolled');
             } else {
                 header.classList.remove('scrolled');

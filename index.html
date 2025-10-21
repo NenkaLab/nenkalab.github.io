@@ -8,11 +8,11 @@ layout: default
     <div class="mb-12">
         <div class="flex items-center gap-4 mb-6">
             <a href="{{ site.github_url }}" target="_blank" rel="noopener noreferrer">
-                <img src="{{ site.author.image }}" alt="{{ site.author.name }}" class="w-20 h-20 rounded-full border border-zinc-300 dark:border-zinc-600 flex-shrink-0 hover:scale-110 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300">
+                <img src="{{ site.author.image }}" alt="{{ site.author.name }}" class="w-20 h-20 rounded-full border border-zinc-300 dark:border-zinc-600 flex-shrink-0 hover:scale-110 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300" draggle=ab"false" />
             </a>
             <div class="min-w-0 flex-1">
                 <a href="{{ site.github_url }}" target="_blank" rel="noopener noreferrer" class="inline-block">
-                    <h1 class="text-3xl font-bold break-words hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{{ site.author.name }}</h1>
+                    <h1 class="text-3xl text-zinc-900 dark:text-zinc-200 font-bold break-words hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{{ site.author.name }}</h1>
                 </a>
                 <p class="text-zinc-600 dark:text-zinc-400 break-words">{{ site.author.bio }}</p>
             </div>
@@ -21,13 +21,13 @@ layout: default
             {% if site.author.email %}
             <a href="mailto:{{ site.author.email }}" 
                class="flex items-center gap-2 px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-sm">
-                <span class="material-symbols-outlined text-lg">email</span>
+                <span class="material-symbols-outlined text-lg text-zinc-500">email</span>
                 <span class="text-zinc-700 dark:text-zinc-300">Email</span>
             </a>
             {% endif %}
             <a href="{{ site.github_url }}" target="_blank" rel="noopener noreferrer" 
                class="flex items-center gap-2 px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-sm">
-                <span class="material-symbols-outlined text-lg">code</span>
+                <span class="material-symbols-outlined text-lg text-zinc-500">code</span>
                 <span class="text-zinc-700 dark:text-zinc-300">GitHub</span>
             </a>
         </div>
@@ -35,14 +35,14 @@ layout: default
 
     <!-- Recent Articles -->
     <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-6">📚 Recent Articles</h2>
+        <h2 class="text-2xl text-zinc-800 dark:text-zinc-300 font-bold mb-6">📚 Recent Articles</h2>
         
         {% if site.posts.size > 0 %}
         <div class="space-y-4">
             {% for post in site.posts limit:5 %}
             <article class="card border border-zinc-300 dark:border-zinc-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-800 group hover:-translate-y-1 animate-element">
                 <a href="{{ post.url | relative_url }}" class="block">
-                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                    <h3 class="text-xl text-zinc-900 dark:text-zinc-200 font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         {{ post.title }}
                     </h3>
                     <p class="text-zinc-600 dark:text-zinc-400 mb-3 line-clamp-2">
@@ -86,7 +86,7 @@ layout: default
     <!-- 링크 모음 -->
     {% if site.urls %}
     <div id="nav-links" class="mb-8">
-        <h2 class="text-2xl font-bold mb-6">🔗 Links</h2>
+        <h2 class="text-2xl text-zinc-800 dark:text-zinc-300 font-bold mb-6">🔗 Links</h2>
 
         <div class="flex flex-wrap items-center gap-4">
 

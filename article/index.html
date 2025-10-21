@@ -6,7 +6,7 @@ layout: default
     
     <!-- 페이지 헤더 -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-2">📝 모든 글</h1>
+        <h1 class="text-3xl text-zinc-700 dark:text-zinc-300 font-bold mb-2">📝 모든 글</h1>
         <p class="text-zinc-600 dark:text-zinc-400">총 {{ site.posts.size }}개의 글</p>
     </div>
 
@@ -16,7 +16,7 @@ layout: default
         {% for post in paginator.posts %}
         <article class="card border border-zinc-300 dark:border-zinc-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-800 group hover:-translate-y-1 animate-element">
             <a href="{{ post.url | relative_url }}" class="block">
-                <h2 class="text-2xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                <h2 class="text-2xl text-zinc-900 dark:text-zinc-200 font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                     {{ post.title }}
                 </h2>
                 <p class="text-zinc-600 dark:text-zinc-400 mb-3 line-clamp-3">
@@ -45,7 +45,7 @@ layout: default
     <nav class="flex justify-center items-center gap-2">
         {% if paginator.previous_page %}
         <a href="{{ paginator.previous_page_path | relative_url }}" 
-           class="px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105">
+           class="px-4 py-2 text-zinc-600 dark:text-zinc-400 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105">
             ← 이전
         </a>
         {% else %}
@@ -62,12 +62,12 @@ layout: default
                 </span>
                 {% elsif page == 1 %}
                 <a href="{{ '/article' | relative_url }}" 
-                   class="px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
+                   class="px-4 py-2 text-zinc-600 dark:text-zinc-400 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
                     {{ page }}
                 </a>
                 {% else %}
                 <a href="{{ site.paginate_path | relative_url | replace: ':num', page }}" 
-                   class="px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
+                   class="px-4 py-2 text-zinc-600 dark:text-zinc-400 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:scale-105">
                     {{ page }}
                 </a>
                 {% endif %}
@@ -76,7 +76,7 @@ layout: default
 
         {% if paginator.next_page %}
         <a href="{{ paginator.next_page_path | relative_url }}" 
-           class="px-4 py-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105">
+           class="px-4 py-2 text-zinc-600 dark:text-zinc-400 border-2 border-zinc-300 dark:border-zinc-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all duration-200 hover:scale-105">
             다음 →
         </a>
         {% else %}

@@ -6,7 +6,7 @@ layout: default
 <article class="max-w-5xl mx-auto px-4 py-12 animate-fade-in-up">
     <!-- 글 헤더 -->
     <header class="mb-8">
-        <h1 class="text-4xl font-bold mb-4 break-words">{{ page.title }}</h1>
+        <h1 class="text-4xl text-zinc-900 dark:text-zinc-200 font-bold mb-4 break-words">{{ page.title }}</h1>
         <div class="flex flex-wrap items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
             <time datetime="{{ page.date | date_to_xmlschema }}">
                 {{ page.date | date: "%Y년 %m월 %d일" }}
@@ -45,7 +45,7 @@ layout: default
     </header>
     
     <!-- 글 내용 -->
-    <div class="post prose prose-lg max-w-5xl">
+    <div class="post prose prose-lg max-w-5xl text-zinc-900 dark:text-zinc-200">
         <style>
             .post :where(img, video, iframe, embed, object) {
                 max-width: 65ch;
@@ -61,8 +61,8 @@ layout: default
             {% if page.previous %}
             <a href="{{ page.previous.url | relative_url }}" 
                class="border border-zinc-300 rounded-md p-4 hover:border-zinc-400 transition-colors group">
-                <div class="text-sm text-zinc-500 mb-1">← 이전 글</div>
-                <div class="font-semibold text-zinc-900 group-hover:text-blue-600 transition-colors truncate">
+                <div class="text-sm text-zinc-600 dark:text-zinc-400 mb-1">← 이전 글</div>
+                <div class="font-semibold text-zinc-900 dark:text-zinc-200 group-hover:text-blue-600 transition-colors truncate">
                     {{ page.previous.title }}
                 </div>
             </a>
@@ -74,8 +74,8 @@ layout: default
             {% if page.next %}
             <a href="{{ page.next.url | relative_url }}" 
                class="border border-zinc-300 rounded-md p-4 hover:border-zinc-400 transition-colors group text-right">
-                <div class="text-sm text-zinc-500 mb-1">다음 글 →</div>
-                <div class="font-semibold text-zinc-900 group-hover:text-blue-600 transition-colors truncate">
+                <div class="text-sm text-zinc-600 dark:text-zinc-400 mb-1">다음 글 →</div>
+                <div class="font-semibold text-zinc-900 dark:text-zinc-200 group-hover:text-blue-600 transition-colors truncate">
                     {{ page.next.title }}
                 </div>
             </a>
