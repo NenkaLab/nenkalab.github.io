@@ -64,11 +64,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/plugins/line-numbers/prism-line-numbers.min.css" integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
-
-        @import "tailwindcss";
-        @custom-variant dark (&:where(.dark, .dark *));
-        
-        /* 다크모드 색상 */
         :root {
             --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             --font-heading: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -104,6 +99,13 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+    </style>
+
+    <style type="text/tailwindcss">
+
+        @custom-variant dark (&:where(.dark, .dark *));
+        @custom-variant light (&:where(:not(.dark), :not(.dark *));
+        
     </style>
     
     <!-- SEO -->
