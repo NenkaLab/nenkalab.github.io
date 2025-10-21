@@ -8,15 +8,16 @@
     "watch:css": "postcss ./assets/css/input.css -o ./assets/css/output.css --watch"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.15",
-    "postcss": "^8.4.49",
-    "postcss-cli": "^11.0.0",
-    "cssnano": "^7.0.6",
-    "autoprefixer": "^10.4.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.7",
-    "@tailwindcss/typography": "^0.5.10"
+    "@tailwindcss/postcss": "^4.1.15",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.0",
+    "cssnano": "^7.0.6",
+    "postcss": "^8.4.49",
+    "postcss-cli": "^11.0.0",
+    "tailwindcss": "^4.1.15"
   },
   "author": "NenkaLab",
   "license": "ISC"
