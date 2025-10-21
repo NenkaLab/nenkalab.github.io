@@ -45,7 +45,12 @@ layout: default
     </header>
     
     <!-- 글 내용 -->
-    <div class="post prose prose-lg">
+    <div class="post prose prose-lg max-w-5xl">
+        <style>
+            .post :where(img, video, iframe, embed, object) {
+                max-width: 65ch;
+            }
+        </style>
         {{ content }}
     </div>
     
