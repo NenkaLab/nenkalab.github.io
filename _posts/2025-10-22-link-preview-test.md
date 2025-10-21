@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "링크 프리뷰 기능 사용 예시"
-date: 2025-10-22 12:00:00 +0900
+date: 2025-10-22 05:00:00 +0900
 categories: [Tech, Tutorial]
 tags: [jekyll, link-preview, ui]
 ---
