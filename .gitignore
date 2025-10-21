@@ -9,3 +9,4 @@ Gemfile.lock
 
 node_modules/
 assets/css/output.css
+_cache/

@@ -49,6 +49,8 @@ layout: default
         <style>
             .post :where(img, video, iframe, embed, object) {
                 max-width: 65ch;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .prose * {
@@ -109,3 +111,7 @@ layout: default
 </article>
 
 {% include image-viewer.html %}
+
+
+<link rel="stylesheet" href="{{ '/assets/css/link-preview.css' | relative_url }}">
+<script src="{{ '/assets/js/link-preview.js' | relative_url }}" defer></script>

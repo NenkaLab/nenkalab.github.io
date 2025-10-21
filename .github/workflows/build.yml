@@ -43,6 +43,14 @@ jobs:
         with:
           name: compiled-css
           path: assets/css
+
+      - name: Cache Link Preview Data
+        uses: actions/cache@v3
+        with:
+          path: _cache/link_preview
+          key: link-preview-${{ hashFiles('_posts/**/*.md', '_posts/**/*.markdown') }}
+          restore-keys: |
+            link-preview-
       
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -52,6 +60,8 @@ jobs:
       
       - name: Build Jekyll site
         run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
       
       # Jekyll 빌드 결과를 artifact로 저장
       - name: Upload Jekyll artifact
