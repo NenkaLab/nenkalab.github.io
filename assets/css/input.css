@@ -1,9 +1,7 @@
 @import 'tailwindcss';
+@config 'tailwind.config.js';
 
-/* @tailwind base; 
-@tailwind components;
-@tailwind utilities;
-@tailwind variants; (/
+@layer theme, base, components, utilities;
 
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant light (&:where(:not(.dark), :not(.dark *)));
