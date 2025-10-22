@@ -291,7 +291,7 @@
         if (outputText.value) {
             sessionStorage.setItem('encodeInput', outputText.value);
         }
-        window.location.href = './encbase64';
+        window.location.href = '../encbase64';
     }
 
     // 비밀번호 보기 토글

@@ -286,7 +286,7 @@
                 sessionStorage.setItem('decodePassword', password.value);
             }
         }
-        window.location.href = './decbase64';
+        window.location.href = '../decbase64';
     }
 
     // 비밀번호 보기 토글

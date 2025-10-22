@@ -46,7 +46,7 @@ permalink: /404.html
             {% for post in site.posts limit:4 %}
             <article class="card border border-zinc-300 dark:border-zinc-700 rounded-lg p-5 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-800 group hover:-translate-y-1">
                 <a href="{{ post.url | relative_url }}" class="block">
-                    <h4 class="text-lg font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                    <h4 class="text-lg text-zinc-900 dark:text-zinc-200 font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
                         {{ post.title }}
                     </h4>
                     <p class="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-2">
