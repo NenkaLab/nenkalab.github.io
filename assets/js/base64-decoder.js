@@ -1,5 +1,11 @@
 // assets/js/base64-decoder.js
-(function() {
+(function(run) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+    } else {
+        run();
+    }
+})(function() {
     'use strict';
 
     // LocalForage 설정
@@ -374,4 +380,4 @@
     loadHistory();
     autoResize(inputText);
 
-})();
+});
