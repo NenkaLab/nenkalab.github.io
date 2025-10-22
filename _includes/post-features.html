@@ -1,5 +1,5 @@
 <!-- Progress Bar -->
-<div id="progress-bar"></div>
+<div id="progress-bar" class="fixed top-0 left-0 h-3 bg-zinc-900 dark:bg-zinc-200 rounded-full z-100"></div>
 
 <!-- 플로팅 버튼들 (우하단) -->
 <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
@@ -82,6 +82,15 @@
                 scrollToComments.classList.add('hidden');
                 scrollToComments.classList.remove('flex');
             }
+        }
+
+        // 하단으로 버튼 (문서 끝에서 200px 이내일 때 숨김)
+        if (scrolled + windowHeight >= documentHeight - 100) {
+            scrollToBottom.classList.add('hidden');
+            scrollToBottom.classList.remove('flex');
+        } else {
+            scrollToBottom.classList.remove('hidden');
+            scrollToBottom.classList.add('flex');
         }
     }
     
