@@ -33,6 +33,9 @@ paginate_path: "/article/page:num/"
 lsi: false
 related_posts_limit: 4
 
+# Incremental build
+incremental: true
+
 # Collections
 collections:
   posts:
