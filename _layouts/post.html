@@ -9,22 +9,16 @@ layout: default
         <h1 class="text-4xl text-zinc-900 dark:text-zinc-200 font-bold mb-4 break-words">{{ page.title }}</h1>
         <div class="flex flex-wrap items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
             <time datetime="{{ page.date | date_to_xmlschema }}">
-                {% assign day_num = page.date | date: "%w" %}
-                {% assign days = "일요일,월요일,화요일,수요일,목요일,금요일,토요일" | split: "," %}
-
-                {{ page.date | date: "%Y년 %-m월 %-d일 %H:%M:%S" }} ({{ days[day_num] }})
+                {{ page.date | date: "%Y년 %-m월 %-d일 %H:%M:%S" }}
             </time>
             
             {% if page.last_modified_at %}
             <span>·</span>
             <time datetime="{{ page.last_modified_at | date_to_xmlschema }}" 
                 class="inline-flex items-center gap-1 cursor-help hover:text-blue-600 dark:hover:text-blue-400 group transition-colors">
-                {% assign day_num = page.last_modified_at | date: "%w" %}
-                {% assign days = "일요일,월요일,화요일,수요일,목요일,금요일,토요일" | split: "," %}
-                
                 <span class="group-hover:hidden">수정됨</span>
                 <span class="hidden group-hover:inline whitespace-nowrap">
-                    {{ page.last_modified_at | date: "%Y년 %-m월 %-d일 %H:%M:%S" }} ({{ days[day_num] }})
+                    {{ page.last_modified_at | date: "%Y년 %-m월 %-d일 %H:%M:%S" }}
                 </span>
             </time>
             {% endif %}
