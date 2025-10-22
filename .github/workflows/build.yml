@@ -5,7 +5,7 @@ on:
     branches: [ temp ]
 
 jobs:
-  build-css:
+  build-css-&-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
