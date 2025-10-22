@@ -35,10 +35,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: compiled-js
-          path: 
-            - assets/js/encoding.js
-            - assets/js/sha.js
-            - assets/js/sha-file.js
+          path: |
+            assets/js/encoding.js
+            assets/js/sha.js
+            assets/js/sha-file.js
 
   # Job 2: Jekyll 빌드
   build-jekyll:
