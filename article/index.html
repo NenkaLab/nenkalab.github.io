@@ -12,7 +12,7 @@ layout: default
 
     <!-- 글 목록 -->
     {% if paginator.posts.size > 0 %}
-    <div class="space-y-4 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for post in paginator.posts %}
         <article class="card border border-zinc-300 dark:border-zinc-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-800 group hover:-translate-y-1 animate-element">
             <a href="{{ post.url | relative_url }}" class="block">
