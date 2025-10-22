@@ -33,14 +33,64 @@
 
     let autoDecodeTimeout;
 
-    function encodingSetup() {
+   function encodingSetup() {
+        const groups = EncodingHelper.allSupportedEncodings.reduce((acc, enc) => {
+            (acc[enc.group] = acc[enc.group] || []).push(enc);
+            return acc;
+        }, {});
+
         charEncoding.innerHTML = '';
-        allSupportedEncodings.forEach(enc => {
-            const option = document.createElement('option');
-            option.value = enc.value;
-            option.textContent = `${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`;
-            charEncoding.appendChild(option);
+
+        const groupOrder = [
+            'Unicode', 
+            'Western European', 
+            'Binary/Data', 
+            'Asian', 
+            'Windows', 
+            'ISO-8859', 
+            'IBM/DOS', 
+            'Macintosh', 
+            'KOI8', 
+            'Miscellaneous'
+        ];
+        
+        groupOrder.forEach(groupName => {
+            const encodingsInGroup = groups[groupName];
+            if (!encodingsInGroup) return; 
+
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = groupName; 
+
+            encodingsInGroup.forEach(enc => {
+                const option = document.createElement('option');
+                option.value = enc.value;
+                option.textContent = `  ${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`.trim();
+                optgroup.appendChild(option);
+            });
+
+            charEncoding.appendChild(optgroup);
+            
+            delete groups[groupName];
         });
+        
+        const remainingGroupNames = Object.keys(groups);
+        if (remainingGroupNames.length > 0) {
+            const unknownOptgroup = document.createElement('optgroup');
+            unknownOptgroup.label = '알 수 없음'; 
+
+            remainingGroupNames.forEach(groupName => {
+                const encodingsInGroup = groups[groupName];
+                
+                encodingsInGroup.forEach(enc => {
+                    const option = document.createElement('option');
+                    option.value = enc.value;
+                    option.textContent = `  ${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`.trim();
+                    unknownOaptgroup.appendChild(option);
+                });
+            });
+            
+            charEncoding.appendChild(unknownOptgroup);
+        }
     }
 
     // 설정 로드
@@ -178,7 +228,7 @@
             }
 
             // 바이트 배열을 문자열로 변환
-            const result = bytesToString(bytes, charEncoding.value);
+            const result = EncodingHelper.bytesToString(bytes, charEncoding.value);
             outputText.value = result;
 
             // 히스토리 저장 (자동 디코딩 시)

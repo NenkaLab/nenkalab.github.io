@@ -36,13 +36,63 @@
     let autoEncodeTimeout;
 
     function encodingSetup() {
+        const groups = EncodingHelper.allSupportedEncodings.reduce((acc, enc) => {
+            (acc[enc.group] = acc[enc.group] || []).push(enc);
+            return acc;
+        }, {});
+
         charEncoding.innerHTML = '';
-        allSupportedEncodings.forEach(enc => {
-            const option = document.createElement('option');
-            option.value = enc.value;
-            option.textContent = `${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`;
-            charEncoding.appendChild(option);
+
+        const groupOrder = [
+            'Unicode', 
+            'Western European', 
+            'Binary/Data', 
+            'Asian', 
+            'Windows', 
+            'ISO-8859', 
+            'IBM/DOS', 
+            'Macintosh', 
+            'KOI8', 
+            'Miscellaneous'
+        ];
+        
+        groupOrder.forEach(groupName => {
+            const encodingsInGroup = groups[groupName];
+            if (!encodingsInGroup) return; 
+
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = groupName; 
+
+            encodingsInGroup.forEach(enc => {
+                const option = document.createElement('option');
+                option.value = enc.value;
+                option.textContent = `  ${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`.trim();
+                optgroup.appendChild(option);
+            });
+
+            charEncoding.appendChild(optgroup);
+            
+            delete groups[groupName];
         });
+        
+        const remainingGroupNames = Object.keys(groups);
+        if (remainingGroupNames.length > 0) {
+            const unknownOptgroup = document.createElement('optgroup');
+            unknownOptgroup.label = '알 수 없음'; 
+
+            remainingGroupNames.forEach(groupName => {
+                const encodingsInGroup = groups[groupName];
+                
+                encodingsInGroup.forEach(enc => {
+                    const option = document.createElement('option');
+                    option.value = enc.value;
+                    option.textContent = `  ${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`.trim();
+                    unknownOaptgroup.appendChild(option);
+                });
+            });
+            
+            charEncoding.appendChild(unknownOptgroup);
+        }
     }
 
     // 설정 로드
@@ -144,7 +194,7 @@
 
         try {
             // 입력을 바이트 배열로 변환
-            let bytes = stringToBytes(input, charEncoding.value);
+            let bytes = EncodingHelper.stringToBytes(input, charEncoding.value);
 
             // 비밀번호 사용 시 XOR 적용 (base64 전에!)
             if (usePassword.checked && password.value) {
