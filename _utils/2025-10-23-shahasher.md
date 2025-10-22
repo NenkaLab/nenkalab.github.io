@@ -1,7 +1,7 @@
 ---
 layout: utils
 title: "SHA 해싱"
-description: "텍스트를 SHA 해시로 변환합니다"
+description: "텍스트의 SHA 해시를 계산합니다"
 date: 2025-10-23 01:19:00 +0900
 categories: [SHA, Hash, Hashing]
 tags: [Utils, 유틸]
