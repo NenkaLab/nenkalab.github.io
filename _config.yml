@@ -38,6 +38,9 @@ collections:
   posts:
     output: true
     permalink: /article/:title/
+  utils:
+    output: true
+    permalink: /utils/:title/
 
 # Exclude from build
 exclude:
