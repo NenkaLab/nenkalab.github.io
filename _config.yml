@@ -67,6 +67,7 @@ urls:
   - key: "utils"
     label: "Utils"
     link: "/utils"
+    inline: true
   - key: "github"
     label: "GitHub"
     link: "https://github.com/NenkaLab"
