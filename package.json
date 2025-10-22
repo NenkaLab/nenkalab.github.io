@@ -6,7 +6,11 @@
   "scripts": {
     "build:css": "postcss ./assets/css/input.css -o ./assets/css/output.css",
     "watch:css": "postcss ./assets/css/input.css -o ./assets/css/output.css --watch",
-    "build:js": "browserify ./assets/js/encoding.js -s EncodingHelper -o ./assets/js/encoding-bundle.js"
+
+    "bify:sha": "browserify assets/js/build/sha.js -o assets/js/sha.js",
+    "bify:sha-file": "browserify assets/js/build/sha-file.js -o assets/js/sha-file.js",
+    "bify:encoding": "browserify assets/js/build/encoding.js -o assets/js/encoding.js",
+    "build:js": "npm run bify:sha && npm run bify:sha-file && npm run bify:encoding"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
@@ -17,6 +21,7 @@
     "autoprefixer": "^10.4.0",
     "browserify": "^17.0.1",
     "buffer": "^6.0.3",
+    "crypto-js": "^4.2.0",
     "cssnano": "^7.0.6",
     "iconv-lite": "^0.7.0",
     "postcss": "^8.4.49",

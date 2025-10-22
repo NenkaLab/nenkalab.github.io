@@ -3,7 +3,7 @@ title: Zabocho
 description: Zabocho(NenkaLab)의 블로그 입니다
 url: "https://zabocho.dev"
 baseurl: ""
-github_url: "https://github.com/NenkaLab"
+github_url: "https://github.com/NenkaLab/nenkalab.github.io"
 
 # Author
 author:
@@ -64,6 +64,9 @@ plugins:
   - jekyll-relative-links
 
 urls:
+  - key: "utils"
+    label: "Utils"
+    link: "/utils"
   - key: "github"
     label: "GitHub"
     link: "https://github.com/NenkaLab"

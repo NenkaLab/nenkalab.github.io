@@ -85,7 +85,7 @@
                     const option = document.createElement('option');
                     option.value = enc.value;
                     option.textContent = `  ${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`.trim();
-                    unknownOaptgroup.appendChild(option);
+                    unknownOptgroup.appendChild(option);
                 });
             });
             
