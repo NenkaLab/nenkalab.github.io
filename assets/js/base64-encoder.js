@@ -35,6 +35,16 @@
 
     let autoEncodeTimeout;
 
+    function encodingSetup() {
+        charEncoding.innerHTML = '';
+        allSupportedEncodings.forEach(enc => {
+            const option = document.createElement('option');
+            option.value = enc.value;
+            option.textContent = `${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`;
+            charEncoding.appendChild(option);
+        });
+    }
+
     // 설정 로드
     function loadSettings() {
         encodingType.value = localStorage.getItem('enc_encodingType') || 'standard';
@@ -88,7 +98,7 @@
         return result;
     }
 
-    // 문자열을 바이트 배열로 변환
+    /*// 문자열을 바이트 배열로 변환
     function stringToBytes(str, encoding) {
         const encoder = new TextEncoder();
         
@@ -122,7 +132,7 @@
             default:
                 return encoder.encode(str);
         }
-    }
+    }*/
 
     // Base64 인코딩
     async function encodeBase64() {
@@ -371,6 +381,7 @@
     });
 
     // 초기화
+    encodingSetup();
     loadSettings();
     loadHistory();
     autoResize(inputText);
