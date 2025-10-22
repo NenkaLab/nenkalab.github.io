@@ -1,11 +1,10 @@
-name: Jekyll Deploy with Tailwind
+name: Jekyll Deploy with NodeJS
 
 on:
   push:
     branches: [ temp ]
 
 jobs:
-  # Job 1: Tailwind CSS 빌드
   build-css:
     runs-on: ubuntu-latest
     steps:
@@ -23,12 +22,20 @@ jobs:
       - name: Build Tailwind CSS
         run: NODE_ENV=production npm run build:css
       
-      # 빌드된 CSS를 artifact로 저장
+      - name: Build Project with Browserify
+        run: npm run build:js
+
       - name: Upload CSS artifact
         uses: actions/upload-artifact@v4
         with:
           name: compiled-css
           path: assets/css/output.css
+
+      - name: Upload JS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-js
+          path: assets/js/encoding-bundle.js
 
   # Job 2: Jekyll 빌드
   build-jekyll:
@@ -43,6 +50,13 @@ jobs:
         with:
           name: compiled-css
           path: assets/css
+      
+      # JS artifact 다운로드
+      - name: Download JS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: compiled-js
+          path: assets/js
 
       - name: Cache Link Preview Data
         uses: actions/cache@v3
