@@ -263,7 +263,7 @@
         if (!outputText.value) return;
         
         outputText.select();
-        document.execCommand('copy');
+        document.execCommand('copy', true);
         
         const originalText = copyBtn.innerHTML;
         copyBtn.innerHTML = `
@@ -286,7 +286,7 @@
                 sessionStorage.setItem('decodePassword', password.value);
             }
         }
-        window.location.href = '../decbase64';
+        window.location.href = '/utils/decbase64';
     }
 
     // 비밀번호 보기 토글
