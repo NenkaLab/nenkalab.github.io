@@ -4,3 +4,6 @@
 [submodule "_posts"]
 	path = _posts
 	url = git@github.com:NenkaLab/gh-pages_posts.git
+[submodule "_utils"]
+	path = _utils
+	url = https://github.com/NenkaLab/gh-pages_utils.git
