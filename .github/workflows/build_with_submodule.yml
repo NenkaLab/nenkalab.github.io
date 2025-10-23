@@ -1,0 +1,64 @@
+name: Build and Deploy Jekyll Site with NodeJS
+
+on:
+  push:
+    branches: [ temp ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Update Submodule to Latest Commit
+        run: git submodule update --remote
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Node Dependencies and Build
+        run: |
+          npm ci
+          NODE_ENV=production npm run build:css
+          npm run build:js
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Cache Link Preview Data
+        uses: actions/cache@v3
+        with:
+          path: _cache/link_preview
+          key: link-preview-${{ hashFiles('_posts/**/*.md', '_posts/**/*.markdown') }}
+          restore-keys: |
+            link-preview-
+
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
