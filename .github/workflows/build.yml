@@ -17,7 +17,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY_RESOURCES }}
+          ssh-key: |
+            ${{ secrets.SSH_PRIVATE_KEY_RESOURCES }}
+            ${{ secrets.SSH_PRIVATE_KEY_POSTS }}
 
       - name: Update Submodule to Latest Commit
         run: git submodule update --remote
