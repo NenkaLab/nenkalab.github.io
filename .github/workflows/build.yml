@@ -1,65 +1,44 @@
-name: Jekyll Deploy with NodeJS
+name: Build and Deploy Jekyll Site with NodeJS
 
 on:
   push:
     branches: [ temp ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  build-css-and-js:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY_RESOURCES }}
+
+      - name: Update Submodule to Latest Commit
+        run: git submodule update --remote
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
-      - name: Install Node dependencies
-        run: npm ci
-      
-      - name: Build Tailwind CSS
-        run: NODE_ENV=production npm run build:css
-      
-      - name: Build Project with Browserify
-        run: npm run build:js
 
-      - name: Upload CSS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiled-css
-          path: assets/css/output.css
+      - name: Install Node Dependencies and Build
+        run: |
+          npm ci
+          NODE_ENV=production npm run build:css
+          npm run build:js
 
-      - name: Upload JS artifact
-        uses: actions/upload-artifact@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          name: compiled-js
-          path: |
-            assets/js/encoding.js
-            assets/js/sha.js
-            assets/js/sha-file.js
-
-  # Job 2: Jekyll 빌드
-  build-jekyll:
-    runs-on: ubuntu-latest
-    needs: build-css-and-js  # CSS 빌드 완료 후 실행
-    steps:
-      - uses: actions/checkout@v4
-      
-      # CSS artifact 다운로드
-      - name: Download CSS artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: compiled-css
-          path: assets/css
-      
-      # JS artifact 다운로드
-      - name: Download JS artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: compiled-js
-          path: assets/js
+          ruby-version: '3.3'
+          bundler-cache: true
 
       - name: Cache Link Preview Data
         uses: actions/cache@v3
@@ -68,50 +47,19 @@ jobs:
           key: link-preview-${{ hashFiles('_posts/**/*.md', '_posts/**/*.markdown') }}
           restore-keys: |
             link-preview-
-      
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-          bundler-cache: true
-      
+
       - name: Build Jekyll site
         run: bundle exec jekyll build
         env:
           JEKYLL_ENV: production
-      
-      # Jekyll 빌드 결과를 artifact로 저장
-      - name: Upload Jekyll artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jekyll-site
-          path: _site
 
-  # Job 3: GitHub Pages 배포
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build-jekyll  # Jekyll 빌드 완료 후 실행
-    
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    
-    steps:
-      # Jekyll artifact 다운로드
-      - name: Download Jekyll artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: jekyll-site
-          path: _site
-      
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        
-      - name: Upload pages artifact
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
-          
+
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
