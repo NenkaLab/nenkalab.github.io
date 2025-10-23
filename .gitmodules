@@ -1,3 +1,3 @@
 [submodule "assets/resources"]
 	path = assets/resources
-	url = git@github.com:NenkaLab/resources.git
+	url = git@github.com:NenkaLab/gh-pages_resources.git
