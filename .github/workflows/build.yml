@@ -3,6 +3,7 @@ name: Build and Deploy Jekyll Site with NodeJS
 on:
   push:
     branches: [ temp ]
+  workflow_dispatch:
 
 permissions:
   contents: read
