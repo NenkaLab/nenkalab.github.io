@@ -21,8 +21,8 @@ h1, h2, h3, h4, h5, h6 {
     hyphens: auto;
 }
 
-.post :where(img, video, audio, picture) {
-  max-width: 100%!important;
+.post :is(img, video, audio, picture) {
+  max-width: 100%;
   height: auto;
   border-radius: 8px;
 }
