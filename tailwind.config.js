@@ -4,10 +4,11 @@ module.exports = {
   content: [
     './_includes/**/*.{html,js}',
     './_layouts/**/*.{html,js}',
-    './_posts/**/*.md',
+    './_posts/**/*.{md,html}',
     './assets/**/*.{js}',
+    '/_plugins/**/*.{rb}',
     './*.html',
-    './*.md'
+    './*.md',
   ],
   theme: {
     extend: {},

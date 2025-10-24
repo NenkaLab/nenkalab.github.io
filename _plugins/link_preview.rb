@@ -69,7 +69,7 @@ module Jekyll
 
       return if links_data.empty?
 
-      # 링크 프리뷰 트리거 버튼 생성
+      # 링크 프리뷰 트리거 버튼 생성 (TailwindCSS 사용)
       trigger = create_trigger_element(links_data)
       paragraph.add_child(trigger)
     end

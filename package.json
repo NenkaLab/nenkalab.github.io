@@ -4,8 +4,9 @@
   "description": "NenkaLab의 개인 블로그 웹사이트",
   "main": "index.js",
   "scripts": {
-    "build:css": "postcss ./assets/css/input.css -o ./assets/css/output.css",
-    "watch:css": "postcss ./assets/css/input.css -o ./assets/css/output.css --watch",
+    "pcss:input": "postcss ./assets/css/input.css -o ./assets/css/output.css",
+    "pcss:link": "postcss ./assets/css/link-preview.css -o ./assets/css/link-preview-build.css",
+    "build:css": "npm run pcss:input && npm run pcss:link",
 
     "bify:sha": "browserify assets/js/build/sha.js -s ShaHelper -o assets/js/sha.js",
     "bify:sha-file": "browserify assets/js/build/sha-file.js -s FileShaHelper -o assets/js/sha-file.js",
