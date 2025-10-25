@@ -13,7 +13,7 @@
                     <button id="viewer-filter-toggle" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="필터" title="이미지 효과">
                         <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">palette</span>
                     </button>
-                    <!-- Filter Menu (unchanged) -->
+                    <!-- Filter Menu (unchanged from original) -->
                     <div id="viewer-filter-menu" class="absolute top-12 -left-[50%] bg-zinc-900 rounded-lg shadow-xl hidden min-w-[320px] max-h-[50vh] overflow-y-auto z-20">
                         <div class="sticky top-0 bg-zinc-900 border-b border-zinc-700 p-3 z-10">
                             <div class="flex items-center justify-between mb-2">
@@ -24,7 +24,7 @@
                         </div>
                         
                         <div class="p-3 space-y-4">
-                            <!-- Filter Controls (unchanged) -->
+                            <!-- Filter Controls (unchanged from original) -->
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Grayscale</label>
@@ -106,7 +106,7 @@
                 <span id="viewer-counter"></span>
             </div>
             
-            <!-- Top Right Controls (unchanged) -->
+            <!-- Top Right Controls (unchanged from original) -->
             <div class="flex items-center gap-2">
                 <button id="viewer-rotate" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="회전" title="90° 회전">
                     <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">rotate_right</span>
@@ -125,47 +125,29 @@
     </div>
     
     <!-- Prev Button -->
-    <button id="viewer-prev" class="control-hide absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white bg-opacity-10 hover:bg-opacity-100 transition-colors z-10" aria-label="이전 이미지" title="이전 (←)">
+    <button id="viewer-prev" class="control-hide absolute left-4 top-1/2 -translate-y-12 w-12 h-12 flex items-center justify-center rounded-full bg-white bg-opacity-10 hover:bg-opacity-100 transition-colors z-10" aria-label="이전 이미지" title="이전 (←)">
         <span class="material-symbols-outlined text-zinc-900 text-3xl">chevron_left</span>
     </button>
     
-    <!-- MODIFIED: Image container for sliding -->
-    <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden">
-        <!-- This is the slider track -->
-        <div id="viewer-slider-track" class="absolute top-0 left-0 w-full h-full flex" style="transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform;">
-            
-            <!-- Slide for Previous Image -->
-            <div id="viewer-slide-prev" class="relative w-full h-full flex-shrink-0 flex items-center justify-center p-4">
-                <div class="viewer-image-wrapper">
-                    <img id="viewer-image-prev" src="" alt="" class="viewer-image" draggable="false" oncontextmenu="return false;" />
-                </div>
-            </div>
-            
-            <!-- Slide for Current Image -->
-            <div id="viewer-slide-current" class="relative w-full h-full flex-shrink-0 flex items-center justify-center p-4">
-                <!-- This wrapper is for zooming -->
-                <div id="viewer-image-wrapper" class="viewer-image-wrapper">
-                    <img id="viewer-image" src="" alt="" class="viewer-image" draggable="false" oncontextmenu="return false;" />
-                </div>
-            </div>
-            
-            <!-- Slide for Next Image -->
-            <div id="viewer-slide-next" class="relative w-full h-full flex-shrink-0 flex items-center justify-center p-4">
-                <div class="viewer-image-wrapper">
-                    <img id="viewer-image-next" src="" alt="" class="viewer-image" draggable="false" oncontextmenu="return false;" />
-                </div>
-            </div>
-            
-        </div>
+    <!-- MODIFIED: Container for overlaid images -->
+    <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden p-4">
+        <!-- 
+          JavaScript가 여기에 .viewer-image-instance-wrapper 들을 동적으로 생성합니다.
+          각 래퍼는 다음과 같은 구조를 가집니다:
+          <div class="viewer-image-instance-wrapper">
+              <div class="viewer-zoom-target">
+                  <img src="..." alt="..." class="viewer-image-instance" />
+              </div>
+          </div>
+        -->
     </div>
-    <!-- END MODIFIED -->
     
     <!-- Next Button -->
-    <button id="viewer-next" class="control-hide absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white bg-opacity-10 hover:bg-opacity-100 transition-colors z-10" aria-label="다음 이미지" title="다음 (→)">
+    <button id="viewer-next" class="control-hide absolute right-4 top-1/2 -translate-y-12 w-12 h-12 flex items-center justify-center rounded-full bg-white bg-opacity-10 hover:bg-opacity-100 transition-colors z-10" aria-label="다음 이미지" title="다음 (→)">
         <span class="material-symbols-outlined text-zinc-900 text-3xl">chevron_right</span>
     </button>
     
-    <!-- Bottom Controls (unchanged) -->
+    <!-- Bottom Controls (unchanged from original) -->
     <div class="control-hide absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full flex items-center gap-4 z-10">
         <button id="viewer-zoom-out" class="w-8 h-8 flex items-center justify-center group hover:bg-white/10 rounded-full transition-colors" aria-label="축소" title="축소">
             <span class="material-symbols-outlined text-white text-xl">zoom_out</span>
@@ -191,41 +173,59 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
 
-/* Style for the slider track */
-#viewer-slider-track.no-transition {
-    transition: none;
-}
-
-/* This is now the zoom target wrapper */
-.viewer-image-wrapper { 
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-    will-change: transform, filter;
-    /* Use flex properties from parent slide */
-    width: 100%; 
+/* 동적으로 생성될 개별 이미지 래퍼
+  - position: absolute 로 모두 겹치게 함
+  - opacity: 0 으로 기본 숨김
+  - transition: opacity 로 페이드 효과
+*/
+.viewer-image-instance-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Reset max-width/height from old ID */
-    max-width: none;
-    max-height: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    will-change: opacity;
+    /* 컨테이너의 패딩(p-4)을 고려 */
+    padding: 1rem; 
 }
-.viewer-image-wrapper.zooming { 
+.viewer-image-instance-wrapper.active {
+    opacity: 1;
+}
+
+/* 줌/패닝/회전이 적용될 대상 */
+.viewer-zoom-target {
+    /* 줌/패닝 시 transition (JS가 제어) */
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+    will-change: transform, filter;
+    /* 이미지 크기에 맞게 설정 (JS가 로드 후 처리) */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.viewer-zoom-target.zooming { 
     transition: none; 
 }
 
-/* This is now the style for all 3 images */
-.viewer-image { 
+/* 실제 이미지 태그 */
+.viewer-image-instance {
     transition: filter 0.1s ease, image-rendering 0.1s;
     will-change: filter, image-rendering;
     display: block;
-    /* Tailwind classes equivalent */
     width: auto;
     height: auto;
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
     user-select: none;
+    /* View Transition API를 위한 설정 */
+    view-transition-name: none; 
 }
 
 /* Filter Menu scrollbar (unchanged) */
@@ -272,8 +272,16 @@
     pointer-events: none;
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* View Transition API 스타일 */
+::view-transition-old(viewer-image),
+::view-transition-new(viewer-image) {
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
 </style>
 
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-zoom.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-core.js' | relative_url }}" defer></script>
+

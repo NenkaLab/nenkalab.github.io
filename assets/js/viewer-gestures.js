@@ -66,6 +66,15 @@
          * 포인터 다운 이벤트 핸들러
          */
         handlePointerDown(e) {
+            // (수정) 제스처가 이미지 래퍼 내부에서 시작됐는지 확인
+            // e.target이 .viewer-image-instance-wrapper 또는 그 자식인지 확인
+            const wrapper = e.target.closest('.viewer-image-instance-wrapper');
+            // 줌이 안된 상태이고, 이미지 바깥(배경)을 클릭한 경우 무시 (core.js에서 별도 처리)
+            if (!wrapper && (!this.callbacks.isZoomed || !this.callbacks.isZoomed())) {
+                 // core.js의 viewer.addEventListener('click', ...)가 처리하도록 둠
+                return;
+            }
+
             // 포인터 정보 저장
             this.pointers.set(e.pointerId, {
                 clientX: e.clientX,
@@ -164,6 +173,7 @@
                 
                 // (수정) 드래그 임계값 넘어야 드래그 상태로 변경
                 if (!this.isDragging && distance > this.dragThreshold) {
+                    // (수정) 드래그 시작 시 onDragStart를 다시 호출하지 않음 (down에서 이미 호출)
                     this.isDragging = true;
                 }
                 
@@ -172,7 +182,7 @@
                     const shouldPrevent = this.callbacks.onDrag({
                         x: e.clientX,
                         y: e.clientY,
-                        deltaX: deltaX,
+                        deltaX: deltaX, // (수정) core.js에서 delta가 아닌 x, y를 사용하므로 유지
                         deltaY: deltaY
                     });
                     
@@ -237,11 +247,12 @@
          * 휠 이벤트 핸들러 (마우스 휠 줌)
          */
         handleWheel(e) {
-            // Ctrl 또는 Meta(Cmd) 키와 함께 휠을 돌릴 때만 줌
-            if (e.ctrlKey || e.metaKey) {
+            // (수정) Ctrl/Meta 키 없이도 휠 줌이 되도록 변경 (사용자 선호에 따라)
+            // if (e.ctrlKey || e.metaKey) { 
                 e.preventDefault();
                 
                 const delta = -e.deltaY;
+                // (수정) 휠 민감도 조절 (더 세밀하게)
                 const scale = delta > 0 ? 1.05 : 1 / 1.05; // 5%씩 줌
                 
                 if (this.callbacks.onWheel) {
@@ -250,7 +261,7 @@
                         y: e.clientY
                     });
                 }
-            }
+            // }
         }
         
         /**
@@ -266,3 +277,4 @@
     window.GestureHandler = GestureHandler;
     
 })(window);
+

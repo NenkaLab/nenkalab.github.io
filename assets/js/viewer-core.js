@@ -6,18 +6,6 @@
     const viewerContainer = document.getElementById('viewer-container');
     const viewerCounter = document.getElementById('viewer-counter');
     const viewerLoading = document.getElementById('viewer-loading');
-
-    // --- 슬라이더 요소 (신규) ---
-    const sliderTrack = document.getElementById('viewer-slider-track');
-    const slidePrev = document.getElementById('viewer-slide-prev');
-    const slideCurrent = document.getElementById('viewer-slide-current');
-    const slideNext = document.getElementById('viewer-slide-next');
-
-    // --- 이미지 요소 (viewerImage는 현재 이미지를 가리킴) ---
-    const viewerImageWrapper = document.getElementById('viewer-image-wrapper');
-    const viewerImage = document.getElementById('viewer-image');
-    const imagePrev = document.getElementById('viewer-image-prev');
-    const imageNext = document.getElementById('viewer-image-next');
     
     // --- 컨트롤 버튼 ---
     const closeBtn = document.getElementById('viewer-close');
@@ -55,30 +43,76 @@
     };
     
     // --- 상태 변수 ---
-    let images = [];
+    let articleImages = []; // 원본 <img> 요소들
+    let viewerImages = [];  // 뷰어 내부의 <img> 요소들
+    let viewerZoomTargets = []; // 뷰어 내부의 줌/패닝 대상 래퍼들
+    
     let currentIndex = 0;
     let zoomController = null;
     let gestureHandler = null;
     let isFullscreen = false;
     let imageEffects = [];
-    let isSliding = false; // (신규) 슬라이드 애니메이션 중인지 여부
+    let isTransitioning = false; // 이미지 전환(페이드) 중인지 여부
+
+    const VT_PREFIX = 'viewer-img-'; // View Transition 이름 접두사
     
     /**
      * 뷰어 초기화
      */
     function initImageViewer() {
-        const articleImages = document.querySelectorAll('.prose img');
-        if (articleImages.length === 0) return;
+        const imagesNodeList = document.querySelectorAll('.prose img');
+        if (imagesNodeList.length === 0) return;
         
-        images = Array.from(articleImages);
-        imageEffects = images.map(() => getDefaultEffects());
+        articleImages = Array.from(imagesNodeList);
+        imageEffects = articleImages.map(() => getDefaultEffects());
         
-        images.forEach((img, index) => {
+        // 뷰어 DOM 미리 생성
+        createViewerDOM(); 
+        
+        articleImages.forEach((img, index) => {
             img.style.cursor = 'pointer';
+            // View Transition API를 위해 고유 이름 할당
+            img.style.viewTransitionName = `${VT_PREFIX}${index}`;
             img.addEventListener('click', () => openViewer(index));
         });
         
         setupEventListeners();
+    }
+    
+    /**
+     * (신규) 뷰어 내부에 모든 이미지 래퍼/엘리먼트를 미리 생성
+     */
+    function createViewerDOM() {
+        viewerContainer.innerHTML = ''; // 혹시 모를 기존 내용 삭제
+        viewerImages = [];
+        viewerZoomTargets = [];
+
+        for (let i = 0; i < articleImages.length; i++) {
+            // 1. 최상위 래퍼 (페이드 인/아웃 대상)
+            const wrapper = document.createElement('div');
+            wrapper.className = 'viewer-image-instance-wrapper';
+            
+            // 2. 줌/패닝/회전 대상
+            const zoomTarget = document.createElement('div');
+            zoomTarget.className = 'viewer-zoom-target';
+
+            // 3. 실제 이미지
+            const imgEl = new Image();
+            imgEl.className = 'viewer-image-instance';
+            imgEl.alt = articleImages[i].alt || '';
+            imgEl.draggable = false;
+            imgEl.oncontextmenu = () => false;
+            
+            // View Transition API 이름 준비
+            imgEl.style.viewTransitionName = `${VT_PREFIX}${i}`;
+
+            zoomTarget.appendChild(imgEl);
+            wrapper.appendChild(zoomTarget);
+            viewerContainer.appendChild(wrapper);
+
+            viewerImages.push(imgEl);
+            viewerZoomTargets.push(zoomTarget);
+        }
     }
     
     /**
@@ -92,17 +126,11 @@
         };
     }
     
-    /**
-     * 컨트롤 UI 표시
-     */
     function showControls() {
         const controls = viewer.querySelectorAll('.control-hide');
         controls.forEach(control => control.classList.remove('hide'));
     }
 
-    /**
-     * 컨트롤 UI 숨김
-     */
     function hideControls(e) {
         if (e) e.stopPropagation();
         const controls = viewer.querySelectorAll('.control-hide');
@@ -120,7 +148,7 @@
         viewer.addEventListener('click', showControls);
         hideBtn.addEventListener('click', hideControls);
         
-        // 줌 버튼
+        // 줌 버튼 (중앙 줌 버그 수정됨)
         zoomInBtn.addEventListener('click', () => {
             if (zoomController) {
                 const rect = viewerContainer.getBoundingClientRect();
@@ -142,7 +170,6 @@
             }
         });
         
-        // 기타 버튼
         rotateBtn.addEventListener('click', () => {
             if (zoomController) zoomController.rotate(90);
         });
@@ -150,13 +177,11 @@
         downloadBtn.addEventListener('click', downloadImage);
         shareBtn.addEventListener('click', shareImage);
         
-        // 필터 메뉴 토글
         filterToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             filterMenu.classList.toggle('hidden');
         });
         
-        // 필터 컨트롤 (슬라이더 및 입력)
         Object.keys(filterControls).forEach(key => {
             const control = filterControls[key];
             control.slider.addEventListener('input', (e) => {
@@ -173,17 +198,14 @@
             });
         });
         
-        // 이미지 렌더링
         imageRenderingSelect.addEventListener('change', (e) => {
             imageEffects[currentIndex].rendering = e.target.value;
-            applyStoredEffect(viewerImage); // 현재 이미지에만 적용
+            applyStoredEffect(viewerImages[currentIndex]);
         });
         
-        // 효과 버튼
         applyToAllBtn.addEventListener('click', applyEffectToAll);
         resetEffectsBtn.addEventListener('click', resetEffects);
         
-        // 외부 클릭 시 필터 메뉴 닫기
         document.addEventListener('click', (e) => {
             if (!filterMenu.contains(e.target) && e.target !== filterToggleBtn) {
                 filterMenu.classList.add('hidden');
@@ -192,7 +214,8 @@
         
         // 뷰어 배경 클릭 시 (줌 리셋 또는 닫기)
         viewer.addEventListener('click', (e) => {
-            if (e.target === viewer || e.target === viewerContainer) {
+            // .viewer-image-instance-wrapper 가 클릭됐을 때 (즉, 이미지 바깥의 빈 공간)
+            if (e.target.classList.contains('viewer-image-instance-wrapper')) {
                 if (zoomController && zoomController.getState().isZoomed) {
                     const scale = zoomController.resetZoom();
                     updateZoomDisplay(scale);
@@ -202,7 +225,6 @@
             }
         });
         
-        // 키보드 및 전체화면 이벤트
         document.addEventListener('keydown', handleKeyboard);
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
@@ -210,17 +232,11 @@
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     }
     
-    /**
-     * 필터 값 업데이트 및 적용
-     */
     function updateFilterValue(key, value) {
         imageEffects[currentIndex][key] = value;
-        applyStoredEffect(viewerImage);
+        applyStoredEffect(viewerImages[currentIndex]);
     }
 
-    /**
-     * 브라우저 뒤로가기 버튼으로 닫기
-     */
     function closeOnBack() {
         closeViewer();
     }
@@ -229,206 +245,234 @@
      * 뷰어 열기
      */
     function openViewer(index) {
+        if (isTransitioning) return;
         currentIndex = index;
         showLoading();
 
         window.addEventListener('popstate', closeOnBack);
         history.pushState({ imageViewer: true }, '', '#viewer');
         
-        // (수정) 슬라이더 트랙 즉시 리셋
-        sliderTrack.classList.add('no-transition');
-        sliderTrack.style.transform = 'translateX(-100%)';
-        sliderTrack.offsetHeight; // Reflow
-        sliderTrack.classList.remove('no-transition');
+        const currentWrapper = viewerZoomTargets[currentIndex].parentElement;
+        const currentImage = viewerImages[currentIndex];
+        const currentZoomTarget = viewerZoomTargets[currentIndex];
         
-        const img = images[currentIndex];
-        const tempImage = new Image(); // 현재 이미지만 사전 로드
+        // 이미지 로드 (이미 로드됐으면 캐시 사용)
+        currentImage.src = articleImages[currentIndex].src;
         
-        tempImage.onload = () => {
-            // (신규) 3개 슬라이드 이미지 로드
-            loadSlideImages(currentIndex); 
-            
-            updateViewer(); // 카운터 및 버튼 업데이트
-            viewer.classList.remove('hidden');
-            viewer.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-            
-            // (수정) 줌/제스처 핸들러는 항상 중앙 슬라이드를 기준으로 초기화
-            initZoomController(); 
+        currentImage.onload = () => {
+            // 로드 완료 후 줌 컨트롤러 초기화
+            initZoomController(currentZoomTarget, currentImage);
             initGestureHandler();
+            loadEffectsToUI();
+            applyStoredEffect(currentImage);
+            updateViewer(); // 카운터, 버튼 업데이트
             
-            hideLoading();
+            // View Transition API 적용
+            const transitionName = `${VT_PREFIX}${currentIndex}`;
+            // 썸네일과 뷰어 이미지의 transition-name이 일치하는지 확인
+            articleImages[currentIndex].style.viewTransitionName = transitionName;
+            currentImage.style.viewTransitionName = transitionName;
+
+            const runOpenAnimation = () => {
+                viewer.classList.remove('hidden');
+                viewer.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                currentWrapper.classList.add('active'); // 페이드 인
+                hideLoading();
+            };
+
+            if (document.startViewTransition) {
+                document.startViewTransition(runOpenAnimation);
+            } else {
+                runOpenAnimation();
+            }
+            
+            // (신규) 이전/다음 이미지 미리 로드
+            preloadNeighbors();
         };
         
-        tempImage.onerror = () => {
+        currentImage.onerror = () => {
             hideLoading();
-            console.error('이미지 로드 실패:', img.src);
-            // 여기에 사용자에게 피드백을 주는 로직 추가 가능
+            console.error('이미지 로드 실패:', articleImages[currentIndex].src);
         };
-        
-        tempImage.src = img.src;
-    }
-
-    /**
-     * (신규) 3개의 슬라이드(이전, 현재, 다음)에 이미지 로드
-     */
-    function loadSlideImages(index) {
-        const currentImg = images[index];
-        const prevImg = images[index - 1];
-        const nextImg = images[index + 1];
-
-        // 현재 이미지 로드
-        viewerImage.src = currentImg.src;
-        viewerImage.alt = currentImg.alt || '';
-        
-        // 이전 이미지 로드
-        if (prevImg) {
-            imagePrev.src = prevImg.src;
-            imagePrev.alt = prevImg.alt || '';
-            slidePrev.style.visibility = 'visible';
-        } else {
-            imagePrev.src = ''; // src를 비워 메모리 절약
-            slidePrev.style.visibility = 'hidden';
-        }
-        
-        // 다음 이미지 로드
-        if (nextImg) {
-            imageNext.src = nextImg.src;
-            imageNext.alt = nextImg.alt || '';
-            slideNext.style.visibility = 'visible';
-        } else {
-            imageNext.src = '';
-            slideNext.style.visibility = 'hidden';
-        }
-
-        // 현재 이미지에 대한 효과 로드 및 적용
-        loadEffectsToUI();
-        applyStoredEffect(viewerImage);
     }
     
     /**
      * 뷰어 닫기
      */
     function closeViewer() {
-        viewer.classList.remove('flex');
-        viewer.classList.add('hidden');
-        document.body.style.overflow = '';
-        filterMenu.classList.add('hidden');
+        if (isTransitioning) return;
+
+        const currentWrapper = viewerZoomTargets[currentIndex].parentElement;
+        const currentImage = viewerImages[currentIndex];
         
-        if (zoomController) {
-            zoomController.destroy();
-            zoomController = null;
-        }
-        
-        if (gestureHandler) {
-            gestureHandler.destroy();
-            gestureHandler = null;
-        }
-        
-        if (isFullscreen) exitFullscreen();
-        
-        // (수정) 슬라이드 이미지 소스 비우기
-        viewerImage.src = '';
-        imagePrev.src = '';
-        imageNext.src = '';
-        
-        window.removeEventListener('popstate', closeOnBack);
-        if (history.state && history.state.imageViewer) {
-            history.back();
+        // View Transition API 적용
+        const transitionName = `${VT_PREFIX}${currentIndex}`;
+        articleImages[currentIndex].style.viewTransitionName = transitionName;
+        currentImage.style.viewTransitionName = transitionName;
+
+        const runCloseAnimation = () => {
+            viewer.classList.remove('flex');
+            viewer.classList.add('hidden');
+            document.body.style.overflow = '';
+            filterMenu.classList.add('hidden');
+            currentWrapper.classList.remove('active'); // 페이드 아웃
+        };
+
+        const cleanup = () => {
+            if (zoomController) {
+                zoomController.destroy();
+                zoomController = null;
+            }
+            if (gestureHandler) {
+                gestureHandler.destroy();
+                gestureHandler = null;
+            }
+            if (isFullscreen) exitFullscreen();
+            
+            // transition-name 초기화
+            currentImage.style.viewTransitionName = 'none';
+            articleImages[currentIndex].style.viewTransitionName = 'none';
+            
+            window.removeEventListener('popstate', closeOnBack);
+            if (history.state && history.state.imageViewer) {
+                history.back();
+            }
+        };
+
+        if (document.startViewTransition) {
+            const transition = document.startViewTransition(runCloseAnimation);
+            transition.finished.then(cleanup);
+        } else {
+            runCloseAnimation();
+            cleanup();
         }
     }
     
+    /**
+     * (신규) 이전/다음 이미지 미리 로드
+     */
+    function preloadNeighbors() {
+        if (currentIndex > 0) {
+            viewerImages[currentIndex - 1].src = articleImages[currentIndex - 1].src;
+        }
+        if (currentIndex < articleImages.length - 1) {
+            viewerImages[currentIndex + 1].src = articleImages[currentIndex + 1].src;
+        }
+    }
+
     /**
      * 뷰어 UI 업데이트 (카운터, 버튼)
      */
     function updateViewer() {
-        if (images.length === 0) return;
+        if (articleImages.length === 0) return;
         
-        viewerCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+        viewerCounter.textContent = `${currentIndex + 1} / ${articleImages.length}`;
         prevBtn.style.display = currentIndex > 0 ? 'flex' : 'none';
-        nextBtn.style.display = currentIndex < images.length - 1 ? 'flex' : 'none';
+        nextBtn.style.display = currentIndex < articleImages.length - 1 ? 'flex' : 'none';
         
-        // 줌 리셋은 initZoomController에서 처리
         updateZoomDisplay(1);
     }
     
     /**
-     * (수정) 이전 이미지로 슬라이드
+     * (수정) 이전 이미지로 페이드
      */
     function showPrev() {
-        // 줌 상태가 아니거나 슬라이딩 중이 아닐 때
-        if (currentIndex > 0 && !isSliding && (!zoomController || !zoomController.getState().isZoomed)) {
-            isSliding = true;
-            sliderTrack.style.transform = 'translateX(0%)'; // 왼쪽으로 슬라이드
+        if (currentIndex > 0 && !isTransitioning && (!zoomController || !zoomController.getState().isZoomed)) {
+            isTransitioning = true;
             
-            // 애니메이션 종료 후 (300ms)
-            setTimeout(() => {
-                currentIndex--;
-                
-                // 줌 컨트롤러 파괴
-                if (zoomController) {
-                    zoomController.destroy();
-                    zoomController = null;
-                }
-                
-                // 새 이미지 로드 및 UI 업데이트
-                loadSlideImages(currentIndex);
+            // 1. 현재 줌 리셋 및 컨트롤러 파괴
+            if (zoomController) {
+                zoomController.resetZoom(false); // 애니메이션 없이 리셋
+                zoomController.destroy();
+                zoomController = null;
+            }
+            
+            // 2. 현재 래퍼 페이드 아웃
+            const oldWrapper = viewerZoomTargets[currentIndex].parentElement;
+            oldWrapper.classList.remove('active');
+            
+            // 3. 인덱스 변경
+            currentIndex--;
+            
+            // 4. 새 요소들 가져오기
+            const newWrapper = viewerZoomTargets[currentIndex].parentElement;
+            const newImage = viewerImages[currentIndex];
+            const newZoomTarget = viewerZoomTargets[currentIndex];
+            
+            // 5. 새 이미지 로드 (필요시) 및 컨트롤러 재초기화
+            newImage.src = articleImages[currentIndex].src; // 이미 로드됐으면 캐시 사용
+            newImage.onload = () => {
+                initZoomController(newZoomTarget, newImage);
+                loadEffectsToUI();
+                applyStoredEffect(newImage);
                 updateViewer();
                 
-                // 새 줌 컨트롤러 초기화 (리셋된 상태로)
-                initZoomController(); 
+                // 6. 새 래퍼 페이드 인
+                newWrapper.classList.add('active');
                 
-                // 슬라이더 트랙 위치 즉시 리셋
-                sliderTrack.classList.add('no-transition');
-                sliderTrack.style.transform = 'translateX(-100%)';
-                sliderTrack.offsetHeight; // Reflow
-                sliderTrack.classList.remove('no-transition');
+                // 7. 이웃 미리 로드
+                preloadNeighbors();
                 
-                isSliding = false;
-            }, 300); // CSS transition duration과 일치
+                // 트랜지션 시간(200ms) 후 상태 해제
+                setTimeout(() => { isTransitioning = false; }, 200);
+            };
+            newImage.onerror = () => {
+                console.error('이미지 로드 실패:', articleImages[currentIndex].src);
+                isTransitioning = false;
+            }
         }
     }
     
     /**
-     * (수정) 다음 이미지로 슬라이드
+     * (수정) 다음 이미지로 페이드
      */
     function showNext() {
-        // 줌 상태가 아니거나 슬라이딩 중이 아닐 때
-        if (currentIndex < images.length - 1 && !isSliding && (!zoomController || !zoomController.getState().isZoomed)) {
-            isSliding = true;
-            sliderTrack.style.transform = 'translateX(-200%)'; // 오른쪽으로 슬라이드
+        if (currentIndex < articleImages.length - 1 && !isTransitioning && (!zoomController || !zoomController.getState().isZoomed)) {
+            isTransitioning = true;
             
-            // 애니메이션 종료 후 (300ms)
-            setTimeout(() => {
-                currentIndex++;
-                
-                if (zoomController) {
-                    zoomController.destroy();
-                    zoomController = null;
-                }
-                
-                loadSlideImages(currentIndex);
+            if (zoomController) {
+                zoomController.resetZoom(false);
+                zoomController.destroy();
+                zoomController = null;
+            }
+            
+            const oldWrapper = viewerZoomTargets[currentIndex].parentElement;
+            oldWrapper.classList.remove('active');
+            
+            currentIndex++;
+            
+            const newWrapper = viewerZoomTargets[currentIndex].parentElement;
+            const newImage = viewerImages[currentIndex];
+            const newZoomTarget = viewerZoomTargets[currentIndex];
+            
+            newImage.src = articleImages[currentIndex].src;
+            newImage.onload = () => {
+                initZoomController(newZoomTarget, newImage);
+                loadEffectsToUI();
+                applyStoredEffect(newImage);
                 updateViewer();
-                initZoomController();
                 
-                sliderTrack.classList.add('no-transition');
-                sliderTrack.style.transform = 'translateX(-100%)';
-                sliderTrack.offsetHeight; // Reflow
-                sliderTrack.classList.remove('no-transition');
+                newWrapper.classList.add('active');
                 
-                isSliding = false;
-            }, 300); // CSS transition duration과 일치
+                preloadNeighbors();
+                
+                setTimeout(() => { isTransitioning = false; }, 200);
+            };
+            newImage.onerror = () => {
+                console.error('이미지 로드 실패:', articleImages[currentIndex].src);
+                isTransitioning = false;
+            }
         }
     }
     
     /**
-     * (수정) 줌 컨트롤러 초기화 (항상 중앙 슬라이드 기준)
+     * (수정) 줌 컨트롤러 초기화
      */
-    function initZoomController() {
+    function initZoomController(zoomTarget, imageEl) {
         if (zoomController) zoomController.destroy();
         
-        // viewerImageWrapper와 viewerImage는 항상 중앙 슬라이드의 요소
-        zoomController = new window.ZoomController(viewerImageWrapper, viewerImage, {
+        zoomController = new window.ZoomController(zoomTarget, imageEl, {
             minScale: 1, maxScale: 5, scaleStep: 0.5, doubleTapScale: 2.5
         });
         
@@ -436,13 +480,13 @@
     }
     
     /**
-     * (수정) 제스처 핸들러 초기화 (전체 컨테이너 기준)
+     * (수정) 제스처 핸들러 초기화
      */
     function initGestureHandler() {
         if (gestureHandler) gestureHandler.destroy();
         
-        // 제스처는 viewerContainer 전체에서 감지
-        gestureHandler = new window.GestureHandler(viewerContainer, {
+        // 제스처는 뷰어 전체(배경 포함)에서 감지
+        gestureHandler = new window.GestureHandler(viewer, {
             onDoubleTap: (point) => {
                 if (zoomController) {
                     const scale = zoomController.toggleZoom(point.x, point.y);
@@ -459,22 +503,19 @@
                 if (zoomController) zoomController.startDrag(point.x, point.y);
             },
             onDrag: (data) => {
-                // (수정) 줌 상태일 때만 드래그(패닝) 활성화
                 if (zoomController && zoomController.getState().isZoomed) {
                     zoomController.drag(data.x, data.y);
                     return true; // preventDefault
                 }
-                return false; // 줌 아닐 땐 기본 동작 (슬라이드)
+                return false;
             },
             onDragEnd: () => {
                 if (zoomController) zoomController.endDrag();
             },
             onSwipeLeft: () => {
-                // (수정) 줌 아닐 때만 다음 이미지
                 if (zoomController && !zoomController.getState().isZoomed) showNext();
             },
             onSwipeRight: () => {
-                // (수정) 줌 아닐 때만 이전 이미지
                 if (zoomController && !zoomController.getState().isZoomed) showPrev();
             },
             onWheel: (scale, point) => {
@@ -484,12 +525,10 @@
                     updateZoomDisplay(newScale);
                 }
             },
-            // (신규) 펜 회전으로 줌
             onPenRotate: (delta, point) => {
                 if (zoomController) {
                     const currentScale = zoomController.getState().scale;
-                    // delta > 0: 시계방향 (줌인), delta < 0: 반시계방향 (줌아웃)
-                    const scaleFactor = 1 + (delta * 0.5); // 0.5는 민감도
+                    const scaleFactor = 1 + (delta * 0.5); 
                     const newScale = zoomController.setZoom(currentScale * scaleFactor, point.x, point.y, false);
                     updateZoomDisplay(newScale);
                 }
@@ -497,16 +536,13 @@
         });
     }
     
-    /**
-     * 줌 레벨 표시 업데이트
-     */
     function updateZoomDisplay(scale) {
         const percentage = Math.round(scale * 100);
         zoomLevelDisplay.textContent = `${percentage}%`;
     }
     
     /**
-     * 현재 이미지의 효과를 UI 컨트롤에 로드
+     * (수정) 현재 이미지의 효과를 UI 컨트롤에 로드
      */
     function loadEffectsToUI() {
         const effect = imageEffects[currentIndex] || getDefaultEffects();
@@ -542,9 +578,6 @@
         imageElement.style.imageRendering = effect.rendering;
     }
     
-    /**
-     * 현재 효과를 모든 이미지에 적용
-     */
     function applyEffectToAll() {
         const currentEffect = { ...imageEffects[currentIndex] };
         for (let i = 0; i < imageEffects.length; i++) {
@@ -553,19 +586,13 @@
         showToast('현재 효과가 모든 이미지에 적용되었습니다', 'success');
     }
     
-    /**
-     * 현재 이미지 효과 리셋
-     */
     function resetEffects() {
         imageEffects[currentIndex] = getDefaultEffects();
         loadEffectsToUI();
-        applyStoredEffect(viewerImage);
+        applyStoredEffect(viewerImages[currentIndex]);
         showToast('효과가 초기화되었습니다', 'info');
     }
     
-    /**
-     * 토스트 메시지 표시
-     */
     function showToast(message, type) {
         const bgColor = type === 'success' ? 'bg-green-600' : 'bg-blue-600';
         const toast = document.createElement('div');
@@ -575,12 +602,9 @@
         setTimeout(() => { toast.remove(); }, 2000);
     }
     
-    /**
-     * 이미지 다운로드
-     */
     async function downloadImage() {
         try {
-            const img = images[currentIndex];
+            const img = articleImages[currentIndex];
             const response = await fetch(img.src);
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
@@ -598,11 +622,8 @@
         }
     }
     
-    /**
-     * 이미지 공유
-     */
     async function shareImage() {
-        const img = images[currentIndex];
+        const img = articleImages[currentIndex];
         if (navigator.share) {
             try {
                 const response = await fetch(img.src);
@@ -620,9 +641,6 @@
         }
     }
     
-    /**
-     * 대체 공유 (클립보드 복사)
-     */
     function fallbackShare(img) {
         const url = img.src;
         if (navigator.clipboard) {
@@ -637,9 +655,6 @@
         }
     }
     
-    /**
-     * 전체화면 토글
-     */
     function toggleFullscreen() {
         if (!isFullscreen) enterFullscreen();
         else exitFullscreen();
@@ -666,12 +681,8 @@
         icon.textContent = isFullscreen ? 'fullscreen_exit' : 'fullscreen';
     }
     
-    /**
-     * 키보드 이벤트 처리
-     */
     function handleKeyboard(e) {
-        if (viewer.classList.contains('hidden')) return;
-        if (isSliding) return; // 슬라이드 중에는 키보드 입력 무시
+        if (viewer.classList.contains('hidden') || isTransitioning) return;
 
         switch(e.key) {
             case 'Escape':
@@ -729,7 +740,6 @@
         viewerLoading.classList.add('hidden');
     }
     
-    // DOM 로드 후 뷰어 초기화
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initImageViewer);
     } else {
@@ -737,3 +747,4 @@
     }
     
 })();
+
