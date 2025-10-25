@@ -25,36 +25,11 @@
   let isControlsVisible = true;
   let controlsHideTimer = null;
 
-  const viewer = document.getElementById('image-viewer-container');
-  const wrapper = document.getElementById('iv-image-wrapper');
-  const img1 = document.getElementById('iv-image-1');
-  const img2 = document.getElementById('iv-image-2');
-  
-  const topBar = document.getElementById('iv-top-bar');
-  const bottomBar = document.getElementById('iv-bottom-bar');
-  const pageNumEl = document.getElementById('iv-page-number');
-  const prevBtn = document.getElementById('iv-prev-button');
-  const nextBtn = document.getElementById('iv-next-button');
-
-  const zoomInBtn = document.getElementById('iv-zoom-in');
-  const zoomOutBtn = document.getElementById('iv-zoom-out');
-  const zoomPercentEl = document.getElementById('iv-zoom-percent');
-  const rotateLeftBtn = document.getElementById('iv-rotate-left');
-  const rotateRightBtn = document.getElementById('iv-rotate-right');
-  const rotateResetBtn = document.getElementById('iv-rotate-reset');
-  const posResetBtn = document.getElementById('iv-position-reset');
-
-  const closeBtnLeft = document.getElementById('iv-close-left');
-  const closeBtnRight = document.getElementById('iv-close-right');
-  const fullscreenBtn = document.getElementById('iv-fullscreen-button');
-  const effectsBtn = document.getElementById('iv-effects-button');
-  
-  const effectsPopup = document.getElementById('iv-effects-popup');
-  const effectsCloseBtn = document.getElementById('iv-effects-close-btn');
-  const effectsListEl = document.getElementById('iv-effects-list');
-  const effectResetCurrentBtn = document.getElementById('iv-effect-reset-current');
-  const effectApplyAllBtn = document.getElementById('iv-effect-apply-all');
-  const effectResetAllBtn = document.getElementById('iv-effect-reset-all');
+  let viewer, wrapper, img1, img2, topBar, bottomBar, pageNumEl, prevBtn, nextBtn,
+      zoomInBtn, zoomOutBtn, zoomPercentEl, rotateLeftBtn, rotateRightBtn, 
+      rotateResetBtn, posResetBtn, closeBtnLeft, closeBtnRight, fullscreenBtn, 
+      effectsBtn, effectsPopup, effectsCloseBtn, effectsListEl, 
+      effectResetCurrentBtn, effectApplyAllBtn, effectResetAllBtn;
 
   const filterDefinitions = {
     brightness: { name: '밝기', min: 0, max: 200, value: 100, unit: '%', cssValue: (v) => v / 100 },
@@ -68,7 +43,38 @@
   };
 
   function initImageViewer() {
+    viewer = document.getElementById('image-viewer-container');
     if (!viewer) return;
+    
+    wrapper = document.getElementById('iv-image-wrapper');
+    img1 = document.getElementById('iv-image-1');
+    img2 = document.getElementById('iv-image-2');
+    
+    topBar = document.getElementById('iv-top-bar');
+    bottomBar = document.getElementById('iv-bottom-bar');
+    pageNumEl = document.getElementById('iv-page-number');
+    prevBtn = document.getElementById('iv-prev-button');
+    nextBtn = document.getElementById('iv-next-button');
+
+    zoomInBtn = document.getElementById('iv-zoom-in');
+    zoomOutBtn = document.getElementById('iv-zoom-out');
+    zoomPercentEl = document.getElementById('iv-zoom-percent');
+    rotateLeftBtn = document.getElementById('iv-rotate-left');
+    rotateRightBtn = document.getElementById('iv-rotate-right');
+    rotateResetBtn = document.getElementById('iv-rotate-reset');
+    posResetBtn = document.getElementById('iv-position-reset');
+
+    closeBtnLeft = document.getElementById('iv-close-left');
+    closeBtnRight = document.getElementById('iv-close-right');
+    fullscreenBtn = document.getElementById('iv-fullscreen-button');
+    effectsBtn = document.getElementById('iv-effects-button');
+    
+    effectsPopup = document.getElementById('iv-effects-popup');
+    effectsCloseBtn = document.getElementById('iv-effects-close-btn');
+    effectsListEl = document.getElementById('iv-effects-list');
+    effectResetCurrentBtn = document.getElementById('iv-effect-reset-current');
+    effectApplyAllBtn = document.getElementById('iv-effect-apply-all');
+    effectResetAllBtn = document.getElementById('iv-effect-reset-all');
     
     document.body.appendChild(viewer);
 
@@ -189,7 +195,11 @@
     activeImgEl.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) rotate(${rotate}deg)`;
     activeImgEl.style.filter = filterString.trim() || 'none';
     
-    wrapper.classList.toggle('is-zoomed', zoom > 1);
+    if (zoom > 1) {
+      wrapper.classList.add('is-zoomed');
+    } else {
+      wrapper.classList.remove('is-zoomed');
+    }
     
     if (allImages[currentIndex]) {
       allImages[currentIndex].transform = { ...transformState };
@@ -278,9 +288,9 @@
 
   function updateFullscreenIcon() {
     if (document.fullscreenElement) {
-      fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen_exit</span>';
+      fullscreenBtn.innerHTML = '<span class="material-symbols-outlined text-2xl leading-none">fullscreen_exit</span>';
     } else {
-      fullscreenBtn.innerHTML = '<span class="material-symbols-outlined">fullscreen</span>';
+      fullscreenBtn.innerHTML = '<span class="material-symbols-outlined text-2xl leading-none">fullscreen</span>';
     }
   }
 
@@ -629,11 +639,9 @@
       const px = transformState.pan.x;
       const py = transformState.pan.y;
       
-      // 뷰포트 중심을 기준으로 한 pan 값으로 변환
       const panXFromCenter = px + (wrapper.clientWidth / 2 || window.innerWidth / 2);
       const panYFromCenter = py + (wrapper.clientHeight / 2 || window.innerHeight / 2);
 
-      // 줌 중심(origin)을 기준으로 pan 값을 재계산
       transformState.pan.x = (panXFromCenter - originX) * ratio + originX - (wrapper.clientWidth / 2 || window.innerWidth / 2);
       transformState.pan.y = (panYFromCenter - originY) * ratio + originY - (wrapper.clientHeight / 2 || window.innerHeight / 2);
     }
@@ -668,7 +676,7 @@
             <button class="iv-effect-reset-btn text-xs text-blue-400 opacity-0" title="초기화">초기화</button>
           </div>
         </div>
-        <input type="range" min="${props.min}" max="${props.max}" value="${props.value}" step="${props.step || (props.max > 100 ? 1 : 0.1)}" class="mt-1 h-2 w-full cursor-pointer appearance-none rounded-lg bg-zinc-600 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white">
+        <input type="range" min="${props.min}" max="${props.max}" value="${props.value}" step="${props.step || (props.max > 100 ? 1 : 0.1)}" class="mt-1 h-2 w-full cursor-pointer appearance-none rounded-lg bg-zinc-600 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:duration-100 [&::-webkit-slider-thumb]:ease-out [&::-webkit-slider-thumb]:active:scale-125">
       `;
       
       const slider = item.querySelector('input[type="range"]');
@@ -752,7 +760,7 @@
     if (isHidden) {
       loadEffectsUI(currentIndex);
       updateEffectsOptionsUI();
-      effectsPopup.style.display = 'block';
+      effectsPopup.style.display = 'flex';
       clearTimeout(controlsHideTimer);
       viewer.classList.remove('iv-controls-hidden');
       if (!fromPopstate) {
@@ -802,14 +810,12 @@
   function updateEffectsOptionsUI() {
       document.querySelectorAll('#iv-render-mode button').forEach(btn => {
           const isActive = btn.dataset.value === currentRenderMode;
-          btn.classList.toggle('iv-btn-active', isActive);
           btn.classList.toggle('bg-blue-600', isActive);
           btn.classList.toggle('bg-zinc-600', !isActive);
           btn.classList.toggle('hover:bg-zinc-500', !isActive);
       });
       document.querySelectorAll('#iv-quality-mode button').forEach(btn => {
           const isActive = btn.dataset.value === currentQualityMode;
-          btn.classList.toggle('iv-btn-active', isActive);
           btn.classList.toggle('bg-blue-600', isActive);
           btn.classList.toggle('bg-zinc-600', !isActive);
           btn.classList.toggle('hover:bg-zinc-500', !isActive);
