@@ -1,256 +1,110 @@
-<!-- 이미지 뷰어 HTML 구조 -->
-<!-- Jekyll 레이아웃의 body 태그 끝 직전에 추가하세요 -->
+<div id="image-viewer-container" class="fixed inset-0 z-[999] hidden h-full w-full flex-col items-center justify-center bg-black/80 text-white backdrop-blur-sm" style="touch-action: none;">
+
+  <div id="iv-image-wrapper" class="absolute inset-0 h-full w-full cursor-grab overflow-hidden">
+    <img id="iv-image-1" class="absolute left-1/2 top-1/2 h-auto w-auto max-w-[95%] max-h-[95%] translate-x-[-50%] translate-y-[-50%] opacity-0 transition-opacity duration-300" style="will-change: transform;" />
+    <img id="iv-image-2" class="absolute left-1/2 top-1/2 h-auto w-auto max-w-[95%] max-h-[95%] translate-x-[-50%] translate-y-[-50%] opacity-0 transition-opacity duration-300" style="will-change: transform;" />
+  </div>
+
+  <div id="iv-top-bar" class="iv-control-bar absolute top-4 z-10 mx-auto flex w-full max-w-lg items-center justify-between gap-2 rounded-xl bg-zinc-900/30 p-2 backdrop-blur-md transition-transform duration-300 md:max-w-sm">
+    <button id="iv-close-left" class="iv-button rounded-full p-2 hover:bg-white/20">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    
+    <div id="iv-page-number" class="flex-shrink-0 rounded-full bg-black/20 px-4 py-2 text-sm font-medium">
+      1 / 10
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button id="iv-effects-button" class="iv-button rounded-full p-2 hover:bg-white/20">
+        <span class="material-symbols-outlined">tune</span>
+      </button>
+      <button id="iv-fullscreen-button" class="iv-button rounded-full p-2 hover:bg-white/20">
+        <span class="material-symbols-outlined">fullscreen</span>
+      </button>
+      <button id="iv-close-right" class="iv-button rounded-full p-2 hover:bg-white/20">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  </div>
+
+  <button id="iv-prev-button" class="iv-control-bar iv-button absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-zinc-900/30 p-2 backdrop-blur-md transition-all duration-300 hover:bg-white/20 md:left-8 md:p-3">
+    <span class="material-symbols-outlined">arrow_back_ios_new</span>
+  </button>
+  <button id="iv-next-button" class="iv-control-bar iv-button absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-zinc-900/30 p-2 backdrop-blur-md transition-all duration-300 hover:bg-white/20 md:right-8 md:p-3">
+    <span class="material-symbols-outlined">arrow_forward_ios</span>
+  </button>
+
+  <div id="iv-bottom-bar" class="iv-control-bar absolute bottom-4 z-10 mx-auto flex w-full max-w-lg flex-wrap items-center justify-center gap-2 rounded-xl bg-zinc-900/30 p-2 backdrop-blur-md transition-transform duration-300 md:max-w-2xl">
+    <div class="flex items-center gap-1 rounded-full bg-black/20 p-1">
+      <button id="iv-zoom-out" class="iv-button rounded-full p-2 hover:bg-white/20">
+        <span class="material-symbols-outlined">remove</span>
+      </button>
+      <div id="iv-zoom-percent" class="cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium hover:bg-white/20" title="줌 초기화 (클릭)">
+        100%
+      </div>
+      <button id="iv-zoom-in" class="iv-button rounded-full p-2 hover:bg-white/20">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+    </div>
+    
+    <div class="flex items-center gap-1 rounded-full bg-black/20 p-1">
+      <button id="iv-rotate-left" class="iv-button rounded-full p-2 hover:bg-white/20" title="시계 반대 방향 회전 (Ctrl+클릭: 10도)">
+        <span class="material-symbols-outlined">rotate_left</span>
+      </button>
+      <button id="iv-rotate-reset" class="iv-button rounded-full p-2 hover:bg-white/20" title="회전 초기화">
+        <span class="material-symbols-outlined">refresh</span>
+      </button>
+      <button id="iv-rotate-right" class="iv-button rounded-full p-2 hover:bg-white/20" title="시계 방향 회전 (Ctrl+클릭: 10도)">
+        <span class="material-symbols-outlined">rotate_right</span>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-1 rounded-full bg-black/20 p-1">
+      <button id="iv-position-reset" class="iv-button rounded-full p-2 hover:bg-white/20" title="위치 초기화">
+        <span class="material-symbols-outlined">center_focus_strong</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="iv-effects-popup" class="absolute z-20 m-4 hidden w-full max-w-sm rounded-lg bg-zinc-800 p-4 shadow-xl">
+    <h3 class="mb-4 text-lg font-medium">이미지 효과</h3>
+    
+    <div id="iv-effects-list" class="flex flex-col gap-4">
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-zinc-700 pt-4">
+      <button id="iv-effect-reset-current" class="rounded-md bg-zinc-600 px-3 py-1.5 text-sm hover:bg-zinc-500">
+        현재 이미지 초기화
+      </button>
+      <button id="iv-effect-apply-all" class="rounded-md bg-blue-600 px-3 py-1.5 text-sm hover:bg-blue-500">
+        전체 이미지에 적용
+      </button>
+      <button id="iv-effect-reset-all" class="rounded-md bg-red-600 px-3 py-1.5 text-sm hover:bg-red-500">
+        전체 초기화
+      </button>
+    </div>
+  </div>
+
+</div>
 
 <style>
-/* View Transition API 애니메이션 
-   Chrome 111+, Edge 111+, Safari 18+에서 작동
-   미지원 브라우저는 자동으로 일반 전환으로 폴백 */
-@supports (view-transition-name: none) {
-    /* 이미지 전환 애니메이션 */
-    ::view-transition-old(image-old),
-    ::view-transition-new(image-new) {
-        animation-duration: 0.3s;
-        animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    
-    ::view-transition-old(image-old) {
-        animation-name: fade-out;
-    }
-    
-    ::view-transition-new(image-new) {
-        animation-name: fade-in;
-    }
-    
-    /* 본문 <-> 뷰어 전환 애니메이션 */
-    ::view-transition-old(active-image),
-    ::view-transition-new(active-image) {
-        animation-duration: 0.4s;
-        animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    
-    /* 이미지 크기와 위치 애니메이션 */
-    ::view-transition-old(active-image),
-    ::view-transition-new(active-image) {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-    
-    @keyframes fade-out {
-        from {
-            opacity: 1;
-        }
-        to {
-            opacity: 0;
-        }
-    }
-    
-    @keyframes fade-in {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
+#image-viewer-container.iv-controls-hidden #iv-top-bar {
+  transform: translateY(-150%);
 }
-
-/* 이미지 스택 기본 전환 (View Transition 미지원 시) */
-.image-stack-item {
-    transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+#image-viewer-container.iv-controls-hidden #iv-bottom-bar {
+  transform: translateY(150%);
+}
+#image-viewer-container.iv-controls-hidden #iv-prev-button,
+#image-viewer-container.iv-controls-hidden #iv-next-button {
+  opacity: 0;
+}
+#iv-image-wrapper.is-zoomed {
+  cursor: grab;
+}
+#iv-image-wrapper.is-zoomed:active {
+  cursor: grabbing;
 }
 </style>
 
-<div id="image-viewer" class="hidden fixed inset-0 bg-black/95 z-[9999] flex-col">
-    
-    <!-- 상단 컨트롤 바 -->
-    <div class="control-hide absolute top-0 left-0 right-0 z-10 p-4 flex items-center justify-between transition-opacity duration-300">
-        <div class="flex items-center gap-2">
-            <button id="viewer-close" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            <span id="viewer-counter" class="text-white font-semibold bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 px-3 py-1 rounded-lg">1 / 1</span>
-        </div>
-        
-        <button id="viewer-hide-controls" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-            <span class="material-symbols-outlined">visibility_off</span>
-        </button>
-    </div>
-    
-    <!-- 이미지 컨테이너 -->
-    <div id="viewer-container" class="flex-1 relative overflow-hidden">
-        <!-- 이미지 스택이 동적으로 생성됩니다 -->
-    </div>
-    
-    <!-- 이전/다음 버튼 (중앙) -->
-    <div class="control-hide absolute inset-y-0 left-4 flex items-center z-20 transition-opacity duration-300">
-        <button id="viewer-prev" class="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-full hover:bg-white/20 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
-            <span class="material-symbols-outlined text-3xl">chevron_left</span>
-        </button>
-    </div>
-    
-    <div class="control-hide absolute inset-y-0 right-4 flex items-center z-20 transition-opacity duration-300">
-        <button id="viewer-next" class="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-full hover:bg-white/20 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
-            <span class="material-symbols-outlined text-3xl">chevron_right</span>
-        </button>
-    </div>
-    
-    <!-- 하단 컨트롤 바 -->
-    <div class="control-hide absolute bottom-0 left-0 right-0 z-10 p-4 transition-opacity duration-300">
-        <div class="flex items-center justify-center gap-2 flex-wrap">
-            <!-- 줌 컨트롤 -->
-            <button id="viewer-zoom-out" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">zoom_out</span>
-            </button>
-            <span id="viewer-zoom-level" class="text-white font-semibold bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 px-3 py-1 rounded-lg min-w-[4rem] text-center">100%</span>
-            <button id="viewer-zoom-in" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">zoom_in</span>
-            </button>
-            <button id="viewer-zoom-reset" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">fit_screen</span>
-            </button>
-            
-            <div class="w-px h-8 bg-zinc-700/50 mx-2"></div>
-            
-            <!-- 기타 기능 -->
-            <button id="viewer-rotate" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">rotate_right</span>
-            </button>
-            <button id="viewer-fullscreen" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">fullscreen</span>
-            </button>
-            <button id="viewer-download" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">download</span>
-            </button>
-            <button id="viewer-share" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">share</span>
-            </button>
-            
-            <div class="w-px h-8 bg-zinc-700/50 mx-2"></div>
-            
-            <!-- 필터 버튼 -->
-            <button id="viewer-filter-toggle" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">tune</span>
-            </button>
-        </div>
-    </div>
-    
-    <!-- 필터 메뉴 -->
-    <div id="viewer-filter-menu" class="hidden absolute bottom-20 right-4 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl p-4 max-w-sm w-full z-20">
-        <h3 class="text-white font-bold mb-3">이미지 효과</h3>
-        
-        <div class="space-y-3 max-h-[60vh] overflow-y-auto">
-            <!-- 그레이스케일 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">그레이스케일</label>
-                <div class="flex items-center gap-2">
-                    <input type="range" id="filter-grayscale" min="0" max="100" value="0" class="flex-1 accent-zinc-500">
-                    <input type="number" id="filter-grayscale-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
-                </div>
-            </div>
-            
-            <!-- 세피아 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">세피아</label>
-                <div class="flex items-center gap-2">
-                    <input type="range" id="filter-sepia" min="0" max="100" value="0" class="flex-1 accent-zinc-500">
-                    <input type="number" id="filter-sepia-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
-                </div>
-            </div>
-            
-            <!-- 반전 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">반전</label>
-                <div class="flex items-center gap-2">
-                    <input type="range" id="filter-invert" min="0" max="100" value="0" class="flex-1 accent-zinc-500">
-                    <input type="number" id="filter-invert-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
-                </div>
-            </div>
-            
-            <!-- 채도 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">채도</label>
-                <div class="flex items-center gap-2">
-                    <input type="range" id="filter-saturate" min="0" max="200" value="100" class="flex-1 accent-zinc-500">
-                    <input type="number" id="filter-saturate-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
-                </div>
-            </div>
-            
-            <!-- 대비 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">대비</label>
-                <div class="flex items-center gap-2">
-                    <input type="range" id="filter-contrast" min="0" max="200" value="100" class="flex-1 accent-zinc-500">
-                    <input type="number" id="filter-contrast-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
-                </div>
-            </div>
-            
-            <!-- 밝기 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">밝기</label>
-                <div class="flex items-center gap-2">
-                    <input type="range" id="filter-brightness" min="0" max="200" value="100" class="flex-1 accent-zinc-500">
-                    <input type="number" id="filter-brightness-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
-                </div>
-            </div>
-            
-            <!-- 블러 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">블러</label>
-                <div class="flex items-center gap-2">
-                    <input type="range" id="filter-blur" min="0" max="10" value="0" step="0.1" class="flex-1 accent-zinc-500">
-                    <input type="number" id="filter-blur-input" min="0" max="10" value="0" step="0.1" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
-                </div>
-            </div>
-            
-            <!-- 색조 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">색조</label>
-                <div class="flex items-center gap-2">
-                    <input type="range" id="filter-hue" min="0" max="360" value="0" class="flex-1 accent-zinc-500">
-                    <input type="number" id="filter-hue-input" min="0" max="360" value="0" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
-                </div>
-            </div>
-            
-            <!-- 이미지 렌더링 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">이미지 렌더링</label>
-                <select id="image-rendering" class="w-full px-3 py-2 bg-zinc-800 text-white border border-zinc-700 rounded">
-                    <option value="auto">자동</option>
-                    <option value="crisp-edges">선명하게</option>
-                    <option value="pixelated">픽셀화</option>
-                </select>
-            </div>
-            
-            <!-- 성능/퀄리티 설정 -->
-            <div>
-                <label class="text-sm font-medium text-zinc-300">렌더링 우선순위</label>
-                <select id="performance-mode" class="w-full px-3 py-2 bg-zinc-800 text-white border border-zinc-700 rounded">
-                    <option value="performance">성능 우선</option>
-                    <option value="quality">품질 우선</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="flex gap-2 mt-4">
-            <button id="viewer-apply-to-all" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-lg active:scale-95 transition-all">
-                전체 적용
-            </button>
-            <button id="viewer-reset-effects" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-lg active:scale-95 transition-all">
-                초기화
-            </button>
-        </div>
-    </div>
-    
-    <!-- 로딩 표시 -->
-    <div id="viewer-loading" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-zinc-500 border-t-white"></div>
-    </div>
-    
-</div>
-
-
-<script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>
-<script src="{{ '/assets/js/viewer-zoom.js' | relative_url }}" defer></script>
-<script src="{{ '/assets/js/viewer-core.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/image-viewer.js' | relative_url }}" defer></script>
 
