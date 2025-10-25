@@ -7,7 +7,6 @@
             this.element = element;
             this.callbacks = callbacks || {};
             
-            
             this.touches = [];
             this.lastTap = 0;
             this.startDistance = 0;
@@ -23,29 +22,24 @@
         }
         
         init() {
-            
             this.element.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
             this.element.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
             this.element.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
             this.element.addEventListener('touchcancel', this.handleTouchEnd.bind(this), { passive: false });
-            
             
             this.element.addEventListener('mousedown', this.handleMouseDown.bind(this));
             this.element.addEventListener('mousemove', this.handleMouseMove.bind(this));
             this.element.addEventListener('mouseup', this.handleMouseUp.bind(this));
             this.element.addEventListener('mouseleave', this.handleMouseUp.bind(this));
             
-            
             this.element.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
         }
-        
         
         getDistance(touch1, touch2) {
             const dx = touch2.clientX - touch1.clientX;
             const dy = touch2.clientY - touch1.clientY;
             return Math.sqrt(dx * dx + dy * dy);
         }
-        
         
         getCenter(touch1, touch2) {
             return {
@@ -58,7 +52,6 @@
             this.touches = Array.from(e.touches);
             
             if (this.touches.length === 2) {
-                
                 e.preventDefault();
                 this.isPinching = true;
                 this.startDistance = this.getDistance(this.touches[0], this.touches[1]);
@@ -68,7 +61,6 @@
                     this.callbacks.onPinchStart(center);
                 }
             } else if (this.touches.length === 1) {
-                
                 this.swipeStartX = this.touches[0].clientX;
                 this.swipeStartY = this.touches[0].clientY;
                 
@@ -108,7 +100,6 @@
                     });
                 }
                 
-                
                 if (Math.abs(deltaX) > this.swipeThreshold || Math.abs(deltaY) > this.swipeThreshold) {
                     this.isSwiping = true;
                 }
@@ -125,7 +116,6 @@
                 const deltaX = this.touches[0].clientX - this.swipeStartX;
                 const deltaY = this.touches[0].clientY - this.swipeStartY;
                 
-                
                 const now = Date.now();
                 if (now - this.lastTap < this.doubleTapDelay && !this.isSwiping) {
                     if (this.callbacks.onDoubleTap) {
@@ -139,10 +129,8 @@
                     this.lastTap = now;
                 }
                 
-                
                 if (this.isSwiping) {
                     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                        
                         if (deltaX > this.swipeThreshold && this.callbacks.onSwipeRight) {
                             this.callbacks.onSwipeRight();
                         } else if (deltaX < -this.swipeThreshold && this.callbacks.onSwipeLeft) {
@@ -160,7 +148,6 @@
             this.isSwiping = false;
         }
         
-        
         handleMouseDown(e) {
             if (e.button !== 0) return; 
             
@@ -174,7 +161,6 @@
                     y: e.clientY
                 });
             }
-            
             
             const now = Date.now();
             if (now - this.lastTap < this.doubleTapDelay) {
@@ -216,7 +202,6 @@
         
         handleWheel(e) {
             if (e.ctrlKey || e.metaKey) {
-                
                 e.preventDefault();
                 
                 const delta = -e.deltaY;
@@ -232,10 +217,8 @@
         }
         
         destroy() {
-            
         }
     }
-    
     
     window.GestureHandler = GestureHandler;
     

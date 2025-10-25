@@ -1,7 +1,5 @@
-
 (function() {
     'use strict';
-    
     
     const viewer = document.getElementById('image-viewer');
     const viewerImage = document.getElementById('viewer-image');
@@ -9,7 +7,6 @@
     const viewerContainer = document.getElementById('viewer-container');
     const viewerCounter = document.getElementById('viewer-counter');
     const viewerLoading = document.getElementById('viewer-loading');
-    
     
     const closeBtn = document.getElementById('viewer-close');
     const prevBtn = document.getElementById('viewer-prev');
@@ -23,58 +20,38 @@
     const zoomResetBtn = document.getElementById('viewer-zoom-reset');
     const zoomLevelDisplay = document.getElementById('viewer-zoom-level');
     
-    
     const filterToggleBtn = document.getElementById('viewer-filter-toggle');
     const filterMenu = document.getElementById('viewer-filter-menu');
     const filterOptions = document.querySelectorAll('.filter-option');
     const applyToAllBtn = document.getElementById('viewer-apply-to-all');
     const resetEffectsBtn = document.getElementById('viewer-reset-effects');
     
-    
     let images = [];
     let currentIndex = 0;
     let zoomController = null;
     let gestureHandler = null;
-    let currentFilter = 'none';
-    let currentBlend = 'normal';
     let isFullscreen = false;
-    
-    
     let imageEffects = [];
-    
     
     function initImageViewer() {
         const articleImages = document.querySelectorAll('.prose img');
-        
         if (articleImages.length === 0) return;
         
         images = Array.from(articleImages);
-        
-        
-        imageEffects = images.map(() => ({
-            filter: 'none',
-            blend: 'normal'
-        }));
-        
+        imageEffects = images.map(() => ({ filter: 'none', blend: 'normal' }));
         
         images.forEach((img, index) => {
             img.style.cursor = 'pointer';
-            img.addEventListener('click', () => {
-                openViewer(index);
-            });
+            img.addEventListener('click', () => openViewer(index));
         });
-        
         
         setupEventListeners();
     }
     
-    
     function setupEventListeners() {
-        
         closeBtn.addEventListener('click', closeViewer);
         prevBtn.addEventListener('click', showPrev);
         nextBtn.addEventListener('click', showNext);
-        
         
         zoomInBtn.addEventListener('click', () => {
             if (zoomController) {
@@ -99,22 +76,13 @@
             }
         });
         
-        
         rotateBtn.addEventListener('click', () => {
-            if (zoomController) {
-                zoomController.rotate(90);
-            }
+            if (zoomController) zoomController.rotate(90);
         });
         
-        
         fullscreenBtn.addEventListener('click', toggleFullscreen);
-        
-        
         downloadBtn.addEventListener('click', downloadImage);
-        
-        
         shareBtn.addEventListener('click', shareImage);
-        
         
         filterToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -126,20 +94,12 @@
                 const type = option.dataset.type;
                 const value = option.dataset.value;
                 applyEffect(type, value);
-                
+                updateFilterUI();
             });
         });
         
-        
-        applyToAllBtn.addEventListener('click', () => {
-            applyCurrentEffectToAll();
-        });
-        
-        
-        resetEffectsBtn.addEventListener('click', () => {
-            resetCurrentImageEffects();
-        });
-        
+        applyToAllBtn.addEventListener('click', applyEffectToAll);
+        resetEffectsBtn.addEventListener('click', resetEffects);
         
         document.addEventListener('click', (e) => {
             if (!filterMenu.contains(e.target) && e.target !== filterToggleBtn) {
@@ -147,11 +107,9 @@
             }
         });
         
-        
         viewer.addEventListener('click', (e) => {
             if (e.target === viewer || e.target === viewerContainer) {
                 if (zoomController && zoomController.getState().isZoomed) {
-                    
                     const scale = zoomController.resetZoom();
                     updateZoomDisplay(scale);
                 } else {
@@ -160,21 +118,16 @@
             }
         });
         
-        
         document.addEventListener('keydown', handleKeyboard);
-        
-        
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     }
     
-    
     function openViewer(index) {
         currentIndex = index;
         showLoading();
-        
         
         const img = images[currentIndex];
         const tempImage = new Image();
@@ -188,11 +141,9 @@
             viewer.classList.add('flex');
             document.body.style.overflow = 'hidden';
             
-            
             initZoomController();
-            
-            
             initGestureHandler();
+            applyStoredEffect();
             
             hideLoading();
         };
@@ -205,12 +156,11 @@
         tempImage.src = img.src;
     }
     
-    
     function closeViewer() {
         viewer.classList.remove('flex');
         viewer.classList.add('hidden');
         document.body.style.overflow = '';
-        
+        filterMenu.classList.add('hidden');
         
         if (zoomController) {
             zoomController.destroy();
@@ -222,35 +172,21 @@
             gestureHandler = null;
         }
         
-        
-        if (isFullscreen) {
-            exitFullscreen();
-        }
-        
-        
-        applyFilter('none');
+        if (isFullscreen) exitFullscreen();
     }
-    
     
     function updateViewer() {
         if (images.length === 0) return;
         
         viewerCounter.textContent = `${currentIndex + 1} / ${images.length}`;
-        
-        
         prevBtn.style.display = currentIndex > 0 ? 'flex' : 'none';
         nextBtn.style.display = currentIndex < images.length - 1 ? 'flex' : 'none';
-        
         
         if (zoomController) {
             zoomController.reset();
             updateZoomDisplay(1);
         }
-        
-        
-        restoreImageEffects();
     }
-    
     
     function showPrev() {
         if (currentIndex > 0 && (!zoomController || !zoomController.getState().isZoomed)) {
@@ -259,7 +195,6 @@
         }
     }
     
-    
     function showNext() {
         if (currentIndex < images.length - 1 && (!zoomController || !zoomController.getState().isZoomed)) {
             currentIndex++;
@@ -267,90 +202,49 @@
         }
     }
     
-    
     function initZoomController() {
-        if (zoomController) {
-            zoomController.destroy();
-        }
+        if (zoomController) zoomController.destroy();
         
         zoomController = new window.ZoomController(viewerImageWrapper, viewerImage, {
-            minScale: 1,
-            maxScale: 5,
-            scaleStep: 0.5,
-            doubleTapScale: 2.5
+            minScale: 1, maxScale: 5, scaleStep: 0.5, doubleTapScale: 2.5
         });
         
         updateZoomDisplay(1);
     }
     
-    
     function initGestureHandler() {
-        if (gestureHandler) {
-            gestureHandler.destroy();
-        }
+        if (gestureHandler) gestureHandler.destroy();
         
         gestureHandler = new window.GestureHandler(viewerContainer, {
-            
             onDoubleTap: (point) => {
                 if (zoomController) {
                     const scale = zoomController.toggleZoom(point.x, point.y);
                     updateZoomDisplay(scale);
                 }
             },
-            
-            
-            onPinchStart: (center) => {
-                
-            },
-            
             onPinch: (scale, center) => {
                 if (zoomController) {
                     const newScale = zoomController.pinchZoom(scale, center.x, center.y);
                     updateZoomDisplay(newScale);
                 }
             },
-            
-            onPinchEnd: () => {
-                
-            },
-            
-            
             onDragStart: (point) => {
-                if (zoomController) {
-                    zoomController.startDrag(point.x, point.y);
-                }
+                if (zoomController) zoomController.startDrag(point.x, point.y);
             },
-            
             onDrag: (data) => {
-                if (zoomController) {
-                    const state = zoomController.getState();
-                    if (state.isZoomed) {
-                        
-                        zoomController.drag(data.x, data.y);
-                    }
+                if (zoomController && zoomController.getState().isZoomed) {
+                    zoomController.drag(data.x, data.y);
                 }
             },
-            
             onDragEnd: () => {
-                if (zoomController) {
-                    zoomController.endDrag();
-                }
+                if (zoomController) zoomController.endDrag();
             },
-            
-            
             onSwipeLeft: () => {
-                if (zoomController && !zoomController.getState().isZoomed) {
-                    showNext();
-                }
+                if (zoomController && !zoomController.getState().isZoomed) showNext();
             },
-            
             onSwipeRight: () => {
-                if (zoomController && !zoomController.getState().isZoomed) {
-                    showPrev();
-                }
+                if (zoomController && !zoomController.getState().isZoomed) showPrev();
             },
-            
-            
             onWheel: (scale, point) => {
                 if (zoomController) {
                     const rect = viewerContainer.getBoundingClientRect();
@@ -364,40 +258,83 @@
         });
     }
     
-    
     function updateZoomDisplay(scale) {
         const percentage = Math.round(scale * 100);
         zoomLevelDisplay.textContent = `${percentage}%`;
     }
     
-    
-    function applyFilter(filter) {
+    function applyEffect(type, value) {
+        const effect = imageEffects[currentIndex];
         
-        viewerImage.classList.remove(
-            'filter-grayscale',
-            'filter-sepia',
-            'filter-invert',
-            'filter-saturate',
-            'filter-contrast'
-        );
-        
-        
-        if (filter !== 'none') {
-            viewerImage.classList.add(`filter-${filter}`);
+        if (type === 'filter') {
+            effect.filter = value;
+        } else if (type === 'blend') {
+            effect.blend = value;
         }
         
-        currentFilter = filter;
+        applyStoredEffect();
+    }
+    
+    function applyStoredEffect() {
+        const effect = imageEffects[currentIndex];
         
+        if (effect.filter === 'none') {
+            viewerImage.style.filter = '';
+        } else {
+            viewerImage.style.filter = effect.filter;
+        }
+        
+        viewerImage.style.mixBlendMode = effect.blend;
+        
+        updateFilterUI();
+    }
+    
+    function applyEffectToAll() {
+        const currentEffect = { ...imageEffects[currentIndex] };
+        
+        for (let i = 0; i < imageEffects.length; i++) {
+            imageEffects[i] = { ...currentEffect };
+        }
+        
+        const message = document.createElement('div');
+        message.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        message.textContent = '현재 효과가 모든 이미지에 적용되었습니다';
+        document.body.appendChild(message);
+        
+        setTimeout(() => {
+            message.remove();
+        }, 2000);
+    }
+    
+    function resetEffects() {
+        imageEffects[currentIndex] = { filter: 'none', blend: 'normal' };
+        applyStoredEffect();
+        
+        const message = document.createElement('div');
+        message.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        message.textContent = '효과가 초기화되었습니다';
+        document.body.appendChild(message);
+        
+        setTimeout(() => {
+            message.remove();
+        }, 2000);
+    }
+    
+    function updateFilterUI() {
+        const effect = imageEffects[currentIndex];
         
         filterOptions.forEach(option => {
-            if (option.dataset.filter === filter) {
-                option.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            const type = option.dataset.type;
+            const value = option.dataset.value;
+            
+            if ((type === 'filter' && effect.filter === value) ||
+                (type === 'blend' && effect.blend === value)) {
+                option.style.backgroundColor = 'rgba(59, 130, 246, 0.3)';
             } else {
                 option.style.backgroundColor = '';
             }
         });
     }
-    
     
     async function downloadImage() {
         try {
@@ -419,7 +356,6 @@
             alert('이미지 다운로드에 실패했습니다.');
         }
     }
-    
     
     async function shareImage() {
         const img = images[currentIndex];
@@ -445,7 +381,6 @@
         }
     }
     
-    
     function fallbackShare(img) {
         const url = img.src;
         
@@ -461,7 +396,6 @@
         }
     }
     
-    
     function toggleFullscreen() {
         if (!isFullscreen) {
             enterFullscreen();
@@ -469,7 +403,6 @@
             exitFullscreen();
         }
     }
-    
     
     function enterFullscreen() {
         const elem = viewer;
@@ -485,7 +418,6 @@
         }
     }
     
-    
     function exitFullscreen() {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -498,7 +430,6 @@
         }
     }
     
-    
     function handleFullscreenChange() {
         isFullscreen = !!(document.fullscreenElement || 
                          document.webkitFullscreenElement || 
@@ -508,7 +439,6 @@
         const icon = fullscreenBtn.querySelector('.material-symbols-outlined');
         icon.textContent = isFullscreen ? 'fullscreen_exit' : 'fullscreen';
     }
-    
     
     function handleKeyboard(e) {
         if (viewer.classList.contains('hidden')) return;
@@ -552,9 +482,7 @@
                 break;
             case 'r':
             case 'R':
-                if (zoomController) {
-                    zoomController.rotate(90);
-                }
+                if (zoomController) zoomController.rotate(90);
                 break;
             case 'f':
             case 'F':
@@ -563,16 +491,13 @@
         }
     }
     
-    
     function showLoading() {
         viewerLoading.classList.remove('hidden');
     }
     
-    
     function hideLoading() {
         viewerLoading.classList.add('hidden');
     }
-    
     
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initImageViewer);
@@ -580,4 +505,4 @@
         initImageViewer();
     }
     
-})(); 
+})();

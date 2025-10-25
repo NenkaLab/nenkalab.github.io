@@ -8,12 +8,11 @@
             this.image = image;
             this.options = Object.assign({
                 minScale: 1,
-                maxScale: 5,
+                maxScale: 15,
                 scaleStep: 0.5,
-                doubleTapScale: 2.5,
-                animationDuration: 300
+                doubleTapScale: 5,
+                animationDuration: 200
             }, options);
-            
             
             this.scale = 1;
             this.translateX = 0;
@@ -28,7 +27,6 @@
             
             this.updateTransform();
         }
-        
         
         updateTransform(animate = false) {
             if (this.animationFrame) {
@@ -53,13 +51,10 @@
             });
         }
         
-        
         setZoom(newScale, centerX, centerY, animate = true) {
-            
             newScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, newScale));
             
             if (centerX !== undefined && centerY !== undefined && this.scale !== this.options.minScale) {
-                
                 const rect = this.wrapper.getBoundingClientRect();
                 const offsetX = centerX - rect.left - rect.width / 2;
                 const offsetY = centerY - rect.top - rect.height / 2;
@@ -70,7 +65,6 @@
             }
             
             this.scale = newScale;
-            
             
             if (this.scale === this.options.minScale) {
                 this.translateX = 0;
@@ -85,16 +79,13 @@
             return this.scale;
         }
         
-        
         zoomIn(centerX, centerY) {
             return this.setZoom(this.scale + this.options.scaleStep, centerX, centerY);
         }
         
-        
         zoomOut(centerX, centerY) {
             return this.setZoom(this.scale - this.options.scaleStep, centerX, centerY);
         }
-        
         
         resetZoom(animate = true) {
             this.scale = this.options.minScale;
@@ -105,7 +96,6 @@
             return this.scale;
         }
         
-        
         toggleZoom(centerX, centerY) {
             if (this.scale > this.options.minScale) {
                 return this.resetZoom();
@@ -114,12 +104,10 @@
             }
         }
         
-        
         pinchZoom(scale, centerX, centerY) {
             const newScale = this.scale * scale;
             return this.setZoom(newScale, centerX, centerY, false);
         }
-        
         
         startDrag(x, y) {
             if (this.scale <= this.options.minScale) return false;
@@ -133,7 +121,6 @@
             return true;
         }
         
-        
         drag(x, y) {
             if (!this.isDragging || this.scale <= this.options.minScale) return false;
             
@@ -146,12 +133,10 @@
             return true;
         }
         
-        
         endDrag() {
             this.isDragging = false;
             return true;
         }
-        
         
         constrainPan() {
             if (this.scale <= this.options.minScale) {
@@ -173,12 +158,10 @@
             this.translateY = Math.max(-maxTranslateY, Math.min(maxTranslateY, this.translateY));
         }
         
-        
         rotate(degrees = 90) {
             this.rotation = (this.rotation + degrees) % 360;
             this.updateTransform(true);
         }
-        
         
         getState() {
             return {
@@ -189,7 +172,6 @@
                 isZoomed: this.scale > this.options.minScale
             };
         }
-        
         
         reset() {
             this.scale = this.options.minScale;
@@ -206,7 +188,6 @@
             }
         }
     }
-    
     
     window.ZoomController = ZoomController;
     
