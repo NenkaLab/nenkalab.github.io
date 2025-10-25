@@ -117,7 +117,7 @@
                 <button id="viewer-fullscreen" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="전체화면" title="전체화면">
                     <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">fullscreen</span>
                 </button>
-                <button id="viewer-hide-controls" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="전체화면" title="전체화면">
+                <button id="viewer-hide-controls" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="UI 가리기" title="UI 가리기">
                     <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">visibility_off</span>
                 </button>
                 <button id="viewer-close" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="닫기" title="닫기 (ESC)">
@@ -127,18 +127,18 @@
         </div>
     </div>
     
-    <button id="viewer-prev" class="control-hide absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors z-10" aria-label="이전 이미지" title="이전 (←)">
-        <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-3xl">chevron_left</span>
+    <button id="viewer-prev" class="control-hide absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white bg-opacity-10 hover:bg-opacity-100 transition-colors z-10" aria-label="이전 이미지" title="이전 (←)">
+        <span class="material-symbols-outlined text-zinc-900 text-3xl">chevron_left</span>
     </button>
     
     <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden">
-        <div id="viewer-image-wrapper" class="relative w-full h-full flex items-center justify-center" style="touch-action: none;">
-            <img id="viewer-image" src="" alt="" class="w-auto h-auto max-w-full max-h-full object-contain select-none" draggable="false">
+        <div id="viewer-image-wrapper" class="relative w-full h-full flex items-center justify-center">
+            <img id="viewer-image" src="" alt="" class="w-auto h-auto max-w-full max-h-full object-contain select-none" draggable="false" oncontextmenu="return false;" />
         </div>
     </div>
     
-    <button id="viewer-next" class="control-hide absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors z-10" aria-label="다음 이미지" title="다음 (→)">
-        <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-3xl">chevron_right</span>
+    <button id="viewer-next" class="control-hide absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white bg-opacity-10 hover:bg-opacity-100 transition-colors z-10" aria-label="다음 이미지" title="다음 (→)">
+        <span class="material-symbols-outlined text-zinc-900 text-3xl">chevron_right</span>
     </button>
     
     <div class="control-hide absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full flex items-center gap-4 z-10">
@@ -164,14 +164,14 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
 #viewer-image-wrapper { 
-    /* transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);  */
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
     will-change: transform, filter;
     max-width: 100%;
     max-height: 100%;
 }
 #viewer-image-wrapper.zooming { transition: none; }
 #viewer-image { 
-    /* transition: filter 0.3s ease, image-rendering 0.1s; */
+    transition: filter 0.1s ease, image-rendering 0.1s;
     will-change: filter, image-rendering;
     display: block;
 }

@@ -193,7 +193,7 @@
         showLoading();
 
         window.addEventListener('popstate', closeOnBack);
-        history.pushState({ imageViewer: true }, '');
+        history.pushState({ imageViewer: true }, '', '#viewer');
         
         const img = images[currentIndex];
         const tempImage = new Image();
