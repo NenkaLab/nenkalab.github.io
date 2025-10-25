@@ -1,7 +1,7 @@
 <!-- (수정) 'hidden' 클래스를 다시 추가하고, 'flex'는 JS가 제어하도록 제거 -->
-<div id="image-viewer" class="fixed inset-0 backdrop-blur-2xl bg-black bg-opacity-95 z-1000 hidden items-center justify-center">
+<div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-[1000] hidden items-center justify-center">
     <!-- Top Controls -->
-    <div class="control-hide absolute top-0 left-0 right-0 bg-linear-to-b from-black/50 to-transparent p-4 z-10">
+    <div class="control-hide absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent p-4 z-10">
         <div class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center gap-2">
                 <button id="viewer-download" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="다운로드" title="다운로드">
@@ -163,7 +163,6 @@
     </div>
 </div>
 
-<!-- (수정) Styles -->
 <style>
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
@@ -178,7 +177,6 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.2s ease-in-out;
     will-change: opacity;
     padding: 1rem; 
 }
@@ -209,7 +207,6 @@
     user-select: none;
 }
 
-/* ... (기존 Filter Menu, Slider, Control hide 스타일) ... */
 #viewer-filter-menu { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.3) transparent; }
 #viewer-filter-menu::-webkit-scrollbar { width: 8px; }
 #viewer-filter-menu::-webkit-scrollbar-track { background: transparent; }
@@ -252,10 +249,22 @@
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+::view-transition-old(viewer-transition),
+::view-transition-new(viewer-transition) {
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-image-pair(viewer-transition) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
 </style>
 
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-zoom.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-core.js' | relative_url }}" defer></script>
+
 
 

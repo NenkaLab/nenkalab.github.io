@@ -54,11 +54,12 @@
     let imageEffects = [];
     let isTransitioning = false; // (수정) 애니메이션 및 이미지 전환(페이드) 플래그
     
-    const FADE_DURATION = 200; // (신규) CSS 페이드 시간과 일치
+    // (신규) View Transition API용 고유 이름
+    const VT_NAME = 'viewer-transition';
     
     /**
      * 뷰어 초기화
-     */
+// ... existing code ... */
     function initImageViewer() {
         const imagesNodeList = document.querySelectorAll('.prose img');
         if (imagesNodeList.length === 0) return;
@@ -71,6 +72,8 @@
         
         articleImages.forEach((img, index) => {
             img.style.cursor = 'pointer';
+            // (신규) 썸네일에도 view-transition-name 준비 (초기엔 'none')
+            img.style.viewTransitionName = 'none';
             img.addEventListener('click', () => openViewer(index));
         });
         
@@ -100,6 +103,8 @@
             imgEl.alt = articleImages[i].alt || '';
             imgEl.draggable = false;
             imgEl.oncontextmenu = () => false;
+            // (신규) 뷰어 이미지에도 view-transition-name 준비 (초기엔 'none')
+            imgEl.style.viewTransitionName = 'none';
 
             zoomTarget.appendChild(imgEl);
             wrapper.appendChild(zoomTarget);
@@ -112,7 +117,7 @@
     
     /**
      * 기본 효과 객체 반환
-     */
+// ... existing code ... */
     function getDefaultEffects() {
         return {
             grayscale: 0, sepia: 0, invert: 0,
@@ -242,7 +247,7 @@
 
     /**
      * (신규) popstate 이벤트 핸들러 (뒤로가기 버튼)
-     */
+// ... existing code ... */
     function closeOnBack() {
         // (수정) 'hidden' 클래스로 뷰어 활성화 상태 체크
         if (!viewer.classList.contains('hidden')) {
@@ -258,33 +263,52 @@
         isTransitioning = true;
 
         const currentWrapper = viewerZoomTargets[currentIndex]?.parentElement;
-        
-        // 1. 닫기 애니메이션 시작 (페이드 아웃)
-        if(currentWrapper) {
-             currentWrapper.classList.remove('active');
-        }
+        const currentImage = viewerImages[currentIndex];
+        const articleImage = articleImages[currentIndex];
 
-        // 2. 페이드 아웃 시간(200ms) 후 정리 작업
-        setTimeout(() => {
-            // (수정) 뷰어 숨김 처리
-            viewer.classList.remove('flex');
-            viewer.classList.add('hidden');
-            
-            document.body.style.overflow = '';
-            filterMenu.classList.add('hidden');
-            
-            if (zoomController) {
-                zoomController.destroy();
-                zoomController = null;
-            }
-            if (gestureHandler) {
-                gestureHandler.destroy();
-                gestureHandler = null;
-            }
-            if (isFullscreen) exitFullscreen();
-            
-            isTransitioning = false;
-        }, FADE_DURATION); // CSS transition 시간과 일치
+        // (신규) 뷰 트랜지션 준비
+        const startTransition = () => {
+            // 1. 닫기 애니메이션 시작
+            currentWrapper.classList.remove('active');
+
+            // 2. JS가 DOM을 업데이트한 후 브라우저에 알림
+            return Promise.resolve().then(() => {
+                // 3. 뷰어 숨김 및 정리
+                viewer.classList.remove('flex');
+                viewer.classList.add('hidden');
+                document.body.style.overflow = '';
+                filterMenu.classList.add('hidden');
+                
+                if (zoomController) {
+                    zoomController.destroy();
+                    zoomController = null;
+                }
+                if (gestureHandler) {
+                    gestureHandler.destroy();
+                    gestureHandler = null;
+                }
+                if (isFullscreen) exitFullscreen();
+            });
+        };
+
+        // (신규) View Transition API 실행
+        if (document.startViewTransition) {
+            // (수정) 트랜지션할 요소에만 이름 할당
+            articleImage.style.viewTransitionName = VT_NAME;
+            currentImage.style.viewTransitionName = VT_NAME;
+
+            document.startViewTransition(startTransition).finally(() => {
+                // (수정) 트랜지션 완료 후 이름 해제 (버그 수정)
+                articleImage.style.viewTransitionName = 'none';
+                currentImage.style.viewTransitionName = 'none';
+                isTransitioning = false;
+            });
+        } else {
+            // API 미지원 시 폴백
+            startTransition().finally(() => {
+                isTransitioning = false;
+            });
+        }
     }
 
     
@@ -308,6 +332,7 @@
         const currentWrapper = viewerZoomTargets[currentIndex].parentElement;
         const currentImage = viewerImages[currentIndex];
         const currentZoomTarget = viewerZoomTargets[currentIndex];
+        const articleImage = articleImages[currentIndex]; // (신규)
         
         // 이미지 로드 (이미 로드됐으면 캐시 사용)
         currentImage.src = articleImages[currentIndex].src;
@@ -321,43 +346,46 @@
             updateViewer(); // 카운터, 버튼 업데이트
             
             const runOpenAnimation = () => {
-                // (수정) hidden 클래스 제거, flex 추가
+                // (수정) DOM 변경 로직
                 document.body.style.overflow = 'hidden';
                 viewer.classList.remove('hidden');
                 viewer.classList.add('flex');
                 
-                // (수정) 래퍼 페이드 인
-                // requestAnimationFrame을 사용해 flex 변경 후 opacity 변경이 적용되도록 함
-                requestAnimationFrame(() => {
-                    currentWrapper.classList.add('active'); 
-                });
-                
-                // (수정) Android 애니메이션 클래스 제거
-                
+                // (수정) 래퍼 페이드 인 (VT가 처리)
+                currentWrapper.classList.add('active'); 
                 hideLoading();
-
-                // (수정) 페이드 인 완료 후 transition 해제
-                setTimeout(() => {
-                    isTransitioning = false;
-                }, FADE_DURATION);
+                
+                // (신규) 이전/다음 이미지 미리 로드
+                preloadNeighbors();
             };
 
-            runOpenAnimation();
-            
-            // 이전/다음 이미지 미리 로드
-            preloadNeighbors();
+            // (신규) View Transition API 적용
+            if (document.startViewTransition) {
+                isTransitioning = true;
+                // (수정) 트랜지션할 요소에만 이름 할당
+                articleImage.style.viewTransitionName = VT_NAME;
+                currentImage.style.viewTransitionName = VT_NAME;
+                
+                document.startViewTransition(runOpenAnimation).finally(() => {
+                    // (수정) 트랜지션 완료 후 이름 해제 (버그 수정)
+                    articleImage.style.viewTransitionName = 'none';
+                    currentImage.style.viewTransitionName = 'none';
+                    isTransitioning = false;
+                });
+            } else {
+                runOpenAnimation(); // API 미지원 시 즉시 실행
+            }
         };
         
         currentImage.onerror = () => {
             hideLoading();
             console.error('이미지 로드 실패:', articleImages[currentIndex].src);
-            isTransitioning = false; // (신규) 에러 시 플래그 해제
         };
     }
     
     /**
      * (수정) 뷰어 닫기 (버튼/키보드용)
-     */
+// ... existing code ... */
     function closeViewer() {
         if (isTransitioning) return;
 
@@ -371,7 +399,7 @@
     }
     
     /**
-     * 이전/다음 이미지 미리 로드
+     * (수정) 이전 이미지로 페이드 (View Transition API 적용)
      */
     function preloadNeighbors() {
         if (currentIndex > 0) {
@@ -399,50 +427,155 @@
      * (수정) 이전 이미지로 페이드
      */
     function showPrev() {
-        // (수정) isTransitioning 플래그 사용
         if (currentIndex > 0 && !isTransitioning && (!zoomController || !zoomController.getState().isZoomed)) {
             isTransitioning = true;
             
-            // 1. 현재 줌 리셋 및 컨트롤러 파괴
-            if (zoomController) {
-                zoomController.resetZoom(false); // 애니메이션 없이 리셋
-                zoomController.destroy();
-                zoomController = null;
+            // (신규) VT API 미지원 시 폴백
+            if (!document.startViewTransition) {
+                _performLegacyImageTransition(currentIndex - 1);
+                return;
             }
-            
-            // 2. 현재 래퍼 페이드 아웃
-            const oldWrapper = viewerZoomTargets[currentIndex].parentElement;
-            oldWrapper.classList.remove('active');
-            
-            // 3. 인덱스 변경
-            currentIndex--;
-            
-            // 4. 새 요소들 가져오기
-            const newWrapper = viewerZoomTargets[currentIndex].parentElement;
-            const newImage = viewerImages[currentIndex];
-            const newZoomTarget = viewerZoomTargets[currentIndex];
 
-            // 5. 새 이미지 로드 (필요시) 및 컨트롤러 재초기화
-            newImage.src = articleImages[currentIndex].src; // 이미 로드됐으면 캐시 사용
-            newImage.onload = () => {
-                initZoomController(newZoomTarget, newImage);
-                loadEffectsToUI();
-                applyStoredEffect(newImage);
-                updateViewer();
+            const oldIndex = currentIndex;
+            const newIndex = currentIndex - 1;
+
+            const oldWrapper = viewerZoomTargets[oldIndex].parentElement;
+            const oldImage = viewerImages[oldIndex];
+            const newWrapper = viewerZoomTargets[newIndex].parentElement;
+            const newImage = viewerImages[newIndex];
+            const newZoomTarget = viewerZoomTargets[newIndex];
+
+            // (신규) 뷰 트랜지션 실행
+            document.startViewTransition(() => {
+                // 1. 줌 리셋 (즉시)
+                if (zoomController) {
+                    zoomController.resetZoom(false); // 애니메이션 없이 리셋
+                    zoomController.destroy();
+                    zoomController = null;
+                }
+            
+                // 2. 이전 래퍼 숨김
+                oldWrapper.classList.remove('active');
+                oldImage.style.viewTransitionName = 'none'; // (신규) 이름 해제
+
+                // 3. 인덱스 변경
+                currentIndex = newIndex;
+
+                // 4. 새 이미지 로드 (필요시) 및 컨트롤러 재초기화
+                newImage.src = articleImages[currentIndex].src; // 이미 로드됐으면 캐시 사용
+                newImage.onload = () => { // 로드가 필요해도 VT가 대기
+                    initZoomController(newZoomTarget, newImage);
+                    loadEffectsToUI();
+                    applyStoredEffect(newImage);
+                    updateViewer();
+                    preloadNeighbors();
+                };
                 
-                // 6. 새 래퍼 페이드 인
+                // 5. 새 래퍼 표시 및 VT 이름 할당
                 newWrapper.classList.add('active');
-                
-                // 7. 이웃 미리 로드
-                preloadNeighbors();
-                
-                // (수정) 페이드 트랜지션 시간(200ms) 후 상태 해제
-                setTimeout(() => { isTransitioning = false; }, FADE_DURATION);
-            };
-            newImage.onerror = () => {
-                console.error('이미지 로드 실패:', articleImages[currentIndex].src);
+                newImage.style.viewTransitionName = VT_NAME; // (신규) 이름 할당
+
+            }).finally(() => {
+                // 6. 완료 후 새 이미지의 VT 이름 해제 (다음을 위해)
+                newImage.style.viewTransitionName = 'none';
                 isTransitioning = false;
+            });
+        }
+    }
+    
+    /**
+     * (수정) 다음 이미지로 페이드 (View Transition API 적용)
+     */
+    function showNext() {
+        if (currentIndex < articleImages.length - 1 && !isTransitioning && (!zoomController || !zoomController.getState().isZoomed)) {
+            isTransitioning = true;
+            
+            // (신규) VT API 미지원 시 폴백
+            if (!document.startViewTransition) {
+                _performLegacyImageTransition(currentIndex + 1);
+                return;
             }
+
+            const oldIndex = currentIndex;
+            const newIndex = currentIndex + 1;
+
+            const oldWrapper = viewerZoomTargets[oldIndex].parentElement;
+            const oldImage = viewerImages[oldIndex];
+            const newWrapper = viewerZoomTargets[newIndex].parentElement;
+            const newImage = viewerImages[newIndex];
+            const newZoomTarget = viewerZoomTargets[newIndex];
+
+            // (신규) 뷰 트랜지션 실행
+            document.startViewTransition(() => {
+                if (zoomController) {
+                    zoomController.resetZoom(false);
+                    zoomController.destroy();
+                    zoomController = null;
+                }
+                
+                oldWrapper.classList.remove('active');
+                oldImage.style.viewTransitionName = 'none';
+
+                currentIndex = newIndex;
+
+                newImage.src = articleImages[currentIndex].src;
+                newImage.onload = () => {
+                    initZoomController(newZoomTarget, newImage);
+                    loadEffectsToUI();
+                    applyStoredEffect(newImage);
+                    updateViewer();
+                    preloadNeighbors();
+                };
+                
+                newWrapper.classList.add('active');
+                newImage.style.viewTransitionName = VT_NAME;
+
+            }).finally(() => {
+                newImage.style.viewTransitionName = 'none';
+                isTransitioning = false;
+            });
+        }
+    }
+
+    /**
+     * (신규) View Transition API 미지원 시 사용할 레거시 전환 로직 (Gap 버그 수정됨)
+     */
+    function _performLegacyImageTransition(newIndex) {
+        if (zoomController) {
+            zoomController.resetZoom(false);
+            zoomController.destroy();
+            zoomController = null;
+        }
+
+        const oldIndex = currentIndex;
+        currentIndex = newIndex;
+
+        const newWrapper = viewerZoomTargets[currentIndex].parentElement;
+        const newImage = viewerImages[currentIndex];
+        const newZoomTarget = viewerZoomTargets[currentIndex];
+
+        newImage.src = articleImages[currentIndex].src;
+        newImage.onload = () => {
+            // (수정) 새 이미지 로드 완료 후 이전 이미지 숨김 (Gap 버그 수정)
+            const oldWrapper = viewerZoomTargets[oldIndex].parentElement;
+            oldWrapper.classList.remove('active');
+
+            initZoomController(newZoomTarget, newImage);
+            loadEffectsToUI();
+            applyStoredEffect(newImage);
+            updateViewer();
+            
+            newWrapper.classList.add('active');
+            
+            preloadNeighbors();
+            
+            // 페이드 트랜지션 시간(200ms) 후 상태 해제
+            setTimeout(() => { isTransitioning = false; }, 200); 
+        };
+        newImage.onerror = () => {
+            console.error('이미지 로드 실패:', articleImages[currentIndex].src);
+            isTransitioning = false;
+            currentIndex = oldIndex; // (신규) 실패 시 인덱스 복구
         }
     }
     
@@ -770,7 +903,7 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initImageViewer);
     } else {
-        initImageViewer(); // (수정) initImageViewTagger -> initImageViewer
+        initImageViewer();
     }
     
 })();
