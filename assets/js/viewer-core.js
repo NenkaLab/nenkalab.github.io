@@ -183,10 +183,17 @@
         imageEffects[currentIndex][key] = value;
         applyStoredEffect();
     }
+
+    function closeOnBack() {
+        closeViewer();
+    }
     
     function openViewer(index) {
         currentIndex = index;
         showLoading();
+
+        window.addEventListener('popstate', closeOnBack);
+        history.pushState({ imageViewer: true }, '');
         
         const img = images[currentIndex];
         const tempImage = new Image();
@@ -233,6 +240,11 @@
         }
         
         if (isFullscreen) exitFullscreen();
+        
+        window.removeEventListener('popstate', closeOnBack);
+        if (history.state && history.state.imageViewer) {
+            history.back();
+        }
     }
     
     function updateViewer() {

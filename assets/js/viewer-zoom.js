@@ -53,7 +53,7 @@
         setZoom(newScale, centerX, centerY, animate = true) {
             newScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, newScale));
             
-            if (centerX !== undefined && centerY !== undefined && this.scale !== this.options.minScale) {
+            if (centerX !== undefined && centerY !== undefined && this.scale > this.options.minScale) {
                 const rect = this.wrapper.getBoundingClientRect();
                 const offsetX = centerX - rect.left - rect.width / 2;
                 const offsetY = centerY - rect.top - rect.height / 2;
@@ -69,7 +69,7 @@
             if (this.scale === this.options.minScale) {
                 this.translateX = 0;
                 this.translateY = 0;
-                this.rotation = 0;
+                // this.rotation = 0;
             } else {
                 this.constrainPan();
             }
@@ -91,7 +91,7 @@
             this.scale = this.options.minScale;
             this.translateX = 0;
             this.translateY = 0;
-            this.rotation = 0;
+            // this.rotation = 0;
             this.updateTransform(animate);
             return this.scale;
         }
