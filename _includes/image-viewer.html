@@ -1,199 +1,182 @@
-<!-- 이미지 뷰어 컴포넌트 -->
-<!-- 기존 HTML 페이지의 </body> 태그 앞에 이 코드를 추가하세요 -->
+<!-- 이미지 뷰어 HTML 구조 -->
+<!-- Jekyll 레이아웃의 body 태그 끝 직전에 추가하세요 -->
 
-<!-- 필수: 최소한의 커스텀 스타일 -->
-<style>
-    * { -webkit-tap-highlight-color: transparent; }
-    .control-hide { transition: opacity 0.3s ease, visibility 0.3s ease; }
-    .control-hide.opacity-0 { visibility: hidden; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .animate-spin { animation: spin 1s linear infinite; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-</style>
-
-<!-- 이미지 뷰어 -->
-<div id="image-viewer" class="hidden fixed inset-0 bg-zinc-950 z-[9999] flex-col">
+<div id="image-viewer" class="hidden fixed inset-0 bg-black/95 z-[9999] flex-col">
     
     <!-- 상단 컨트롤 바 -->
     <div class="control-hide absolute top-0 left-0 right-0 z-10 p-4 flex items-center justify-between transition-opacity duration-300">
         <div class="flex items-center gap-2">
-            <button id="viewer-close" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+            <button id="viewer-close" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
                 <span class="material-symbols-outlined">close</span>
             </button>
-            <span id="viewer-counter" class="text-white font-semibold bg-zinc-800/80 backdrop-blur-md px-3 py-2 rounded-lg border border-zinc-700/50">1 / 1</span>
+            <span id="viewer-counter" class="text-white font-semibold bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 px-3 py-1 rounded-lg">1 / 1</span>
         </div>
-        <button id="viewer-hide-controls" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+        
+        <button id="viewer-hide-controls" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
             <span class="material-symbols-outlined">visibility_off</span>
         </button>
     </div>
     
     <!-- 이미지 컨테이너 -->
-    <div id="viewer-container" class="flex-1 relative overflow-hidden"></div>
+    <div id="viewer-container" class="flex-1 relative overflow-hidden">
+        <!-- 이미지 스택이 동적으로 생성됩니다 -->
+    </div>
     
-    <!-- 좌우 네비게이션 버튼 -->
-    <button id="viewer-prev" class="control-hide absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md text-white p-3 rounded-full hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/20 z-10">
-        <span class="material-symbols-outlined text-3xl">chevron_left</span>
-    </button>
-    <button id="viewer-next" class="control-hide absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md text-white p-3 rounded-full hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/20 z-10">
-        <span class="material-symbols-outlined text-3xl">chevron_right</span>
-    </button>
+    <!-- 이전/다음 버튼 (중앙) -->
+    <div class="control-hide absolute inset-y-0 left-4 flex items-center z-20 transition-opacity duration-300">
+        <button id="viewer-prev" class="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-full hover:bg-white/20 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined text-3xl">chevron_left</span>
+        </button>
+    </div>
+    
+    <div class="control-hide absolute inset-y-0 right-4 flex items-center z-20 transition-opacity duration-300">
+        <button id="viewer-next" class="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-full hover:bg-white/20 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined text-3xl">chevron_right</span>
+        </button>
+    </div>
     
     <!-- 하단 컨트롤 바 -->
     <div class="control-hide absolute bottom-0 left-0 right-0 z-10 p-4 transition-opacity duration-300">
         <div class="flex items-center justify-center gap-2 flex-wrap">
             <!-- 줌 컨트롤 -->
-            <button id="viewer-zoom-out" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+            <button id="viewer-zoom-out" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
                 <span class="material-symbols-outlined">zoom_out</span>
             </button>
-            <span id="viewer-zoom-level" class="text-white font-semibold bg-zinc-800/80 backdrop-blur-md px-3 py-2 rounded-lg min-w-[4rem] text-center border border-zinc-700/50 tabular-nums">100%</span>
-            <button id="viewer-zoom-in" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+            <span id="viewer-zoom-level" class="text-white font-semibold bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 px-3 py-1 rounded-lg min-w-[4rem] text-center">100%</span>
+            <button id="viewer-zoom-in" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
                 <span class="material-symbols-outlined">zoom_in</span>
             </button>
-            <button id="viewer-zoom-reset" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+            <button id="viewer-zoom-reset" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
                 <span class="material-symbols-outlined">fit_screen</span>
             </button>
             
-            <div class="w-px h-8 bg-zinc-600/50 mx-1"></div>
-            
-            <!-- 회전 컨트롤 -->
-            <button id="viewer-rotate-left" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
-                <span class="material-symbols-outlined">rotate_left</span>
-            </button>
-            <span id="viewer-rotate-level" class="text-white font-semibold bg-zinc-800/80 backdrop-blur-md px-3 py-2 rounded-lg min-w-[3.5rem] text-center border border-zinc-700/50 tabular-nums">0°</span>
-            <button id="viewer-rotate-right" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
-                <span class="material-symbols-outlined">rotate_right</span>
-            </button>
-            <button id="viewer-rotate-reset" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
-                <span class="material-symbols-outlined text-sm">refresh</span>
-            </button>
-            
-            <div class="w-px h-8 bg-zinc-600/50 mx-1"></div>
+            <div class="w-px h-8 bg-zinc-700/50 mx-2"></div>
             
             <!-- 기타 기능 -->
-            <button id="viewer-fullscreen" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+            <button id="viewer-rotate" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
+                <span class="material-symbols-outlined">rotate_right</span>
+            </button>
+            <button id="viewer-fullscreen" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
                 <span class="material-symbols-outlined">fullscreen</span>
             </button>
-            <button id="viewer-download" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+            <button id="viewer-download" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
                 <span class="material-symbols-outlined">download</span>
             </button>
-            <button id="viewer-share" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+            <button id="viewer-share" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
                 <span class="material-symbols-outlined">share</span>
             </button>
             
-            <div class="w-px h-8 bg-zinc-600/50 mx-1"></div>
+            <div class="w-px h-8 bg-zinc-700/50 mx-2"></div>
             
             <!-- 필터 버튼 -->
-            <button id="viewer-filter-toggle" class="bg-zinc-800/80 backdrop-blur-md text-white p-2 rounded-lg hover:bg-zinc-700/80 transition-colors border border-zinc-700/50">
+            <button id="viewer-filter-toggle" class="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 text-white p-2 rounded-lg hover:bg-zinc-700/50 active:scale-95 transition-all">
                 <span class="material-symbols-outlined">tune</span>
             </button>
         </div>
     </div>
     
     <!-- 필터 메뉴 -->
-    <div id="viewer-filter-menu" class="hidden absolute bottom-20 right-4 bg-zinc-800 rounded-lg shadow-2xl p-4 max-w-sm w-full z-20 border border-zinc-700">
-        <h3 class="font-bold mb-3 text-white">이미지 효과</h3>
+    <div id="viewer-filter-menu" class="hidden absolute bottom-20 right-4 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl p-4 max-w-sm w-full z-20">
+        <h3 class="text-white font-bold mb-3">이미지 효과</h3>
         
-        <div class="space-y-3 max-h-[60vh] overflow-y-auto hide-scrollbar">
+        <div class="space-y-3 max-h-[60vh] overflow-y-auto">
             <!-- 그레이스케일 -->
             <div>
                 <label class="text-sm font-medium text-zinc-300">그레이스케일</label>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="range" id="filter-grayscale" min="0" max="100" value="0" class="flex-1 accent-zinc-400">
-                    <input type="number" id="filter-grayscale-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
+                <div class="flex items-center gap-2">
+                    <input type="range" id="filter-grayscale" min="0" max="100" value="0" class="flex-1 accent-zinc-500">
+                    <input type="number" id="filter-grayscale-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
                 </div>
             </div>
             
             <!-- 세피아 -->
             <div>
                 <label class="text-sm font-medium text-zinc-300">세피아</label>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="range" id="filter-sepia" min="0" max="100" value="0" class="flex-1 accent-zinc-400">
-                    <input type="number" id="filter-sepia-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
+                <div class="flex items-center gap-2">
+                    <input type="range" id="filter-sepia" min="0" max="100" value="0" class="flex-1 accent-zinc-500">
+                    <input type="number" id="filter-sepia-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
                 </div>
             </div>
             
             <!-- 반전 -->
             <div>
                 <label class="text-sm font-medium text-zinc-300">반전</label>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="range" id="filter-invert" min="0" max="100" value="0" class="flex-1 accent-zinc-400">
-                    <input type="number" id="filter-invert-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
+                <div class="flex items-center gap-2">
+                    <input type="range" id="filter-invert" min="0" max="100" value="0" class="flex-1 accent-zinc-500">
+                    <input type="number" id="filter-invert-input" min="0" max="100" value="0" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
                 </div>
             </div>
             
             <!-- 채도 -->
             <div>
                 <label class="text-sm font-medium text-zinc-300">채도</label>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="range" id="filter-saturate" min="0" max="200" value="100" class="flex-1 accent-zinc-400">
-                    <input type="number" id="filter-saturate-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
+                <div class="flex items-center gap-2">
+                    <input type="range" id="filter-saturate" min="0" max="200" value="100" class="flex-1 accent-zinc-500">
+                    <input type="number" id="filter-saturate-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
                 </div>
             </div>
             
             <!-- 대비 -->
             <div>
                 <label class="text-sm font-medium text-zinc-300">대비</label>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="range" id="filter-contrast" min="0" max="200" value="100" class="flex-1 accent-zinc-400">
-                    <input type="number" id="filter-contrast-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
+                <div class="flex items-center gap-2">
+                    <input type="range" id="filter-contrast" min="0" max="200" value="100" class="flex-1 accent-zinc-500">
+                    <input type="number" id="filter-contrast-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
                 </div>
             </div>
             
             <!-- 밝기 -->
             <div>
                 <label class="text-sm font-medium text-zinc-300">밝기</label>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="range" id="filter-brightness" min="0" max="200" value="100" class="flex-1 accent-zinc-400">
-                    <input type="number" id="filter-brightness-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
+                <div class="flex items-center gap-2">
+                    <input type="range" id="filter-brightness" min="0" max="200" value="100" class="flex-1 accent-zinc-500">
+                    <input type="number" id="filter-brightness-input" min="0" max="200" value="100" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
                 </div>
             </div>
             
             <!-- 블러 -->
             <div>
                 <label class="text-sm font-medium text-zinc-300">블러</label>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="range" id="filter-blur" min="0" max="10" value="0" step="0.1" class="flex-1 accent-zinc-400">
-                    <input type="number" id="filter-blur-input" min="0" max="10" value="0" step="0.1" class="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
+                <div class="flex items-center gap-2">
+                    <input type="range" id="filter-blur" min="0" max="10" value="0" step="0.1" class="flex-1 accent-zinc-500">
+                    <input type="number" id="filter-blur-input" min="0" max="10" value="0" step="0.1" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
                 </div>
             </div>
             
             <!-- 색조 -->
             <div>
                 <label class="text-sm font-medium text-zinc-300">색조</label>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="range" id="filter-hue" min="0" max="360" value="0" class="flex-1 accent-zinc-400">
-                    <input type="number" id="filter-hue-input" min="0" max="360" value="0" class="w-16 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
+                <div class="flex items-center gap-2">
+                    <input type="range" id="filter-hue" min="0" max="360" value="0" class="flex-1 accent-zinc-500">
+                    <input type="number" id="filter-hue-input" min="0" max="360" value="0" class="w-16 px-2 py-1 bg-zinc-800 text-white border border-zinc-700 rounded">
                 </div>
             </div>
             
-            <div class="border-t border-zinc-700 pt-3 mt-3">
-                <!-- 이미지 렌더링 -->
-                <div class="mb-3">
-                    <label class="text-sm font-medium text-zinc-300">이미지 렌더링</label>
-                    <select id="image-rendering" class="w-full mt-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
-                        <option value="auto">자동</option>
-                        <option value="crisp-edges">선명하게</option>
-                        <option value="pixelated">픽셀화</option>
-                    </select>
-                </div>
-                
-                <!-- 성능 모드 -->
-                <div>
-                    <label class="text-sm font-medium text-zinc-300">렌더링 우선순위</label>
-                    <select id="performance-mode" class="w-full mt-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white text-sm">
-                        <option value="performance">성능 우선</option>
-                        <option value="quality">품질 우선</option>
-                    </select>
-                </div>
+            <!-- 이미지 렌더링 -->
+            <div>
+                <label class="text-sm font-medium text-zinc-300">이미지 렌더링</label>
+                <select id="image-rendering" class="w-full px-3 py-2 bg-zinc-800 text-white border border-zinc-700 rounded">
+                    <option value="auto">자동</option>
+                    <option value="crisp-edges">선명하게</option>
+                    <option value="pixelated">픽셀화</option>
+                </select>
+            </div>
+            
+            <!-- 성능/퀄리티 설정 -->
+            <div>
+                <label class="text-sm font-medium text-zinc-300">렌더링 우선순위</label>
+                <select id="performance-mode" class="w-full px-3 py-2 bg-zinc-800 text-white border border-zinc-700 rounded">
+                    <option value="performance">성능 우선</option>
+                    <option value="quality">품질 우선</option>
+                </select>
             </div>
         </div>
         
-        <div class="flex gap-2 mt-4 pt-3 border-t border-zinc-700">
-            <button id="viewer-apply-to-all" class="flex-1 bg-zinc-600 text-white px-4 py-2 rounded-lg hover:bg-zinc-500 transition-colors text-sm font-medium">
+        <div class="flex gap-2 mt-4">
+            <button id="viewer-apply-to-all" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-lg active:scale-95 transition-all">
                 전체 적용
             </button>
-            <button id="viewer-reset-effects" class="flex-1 bg-zinc-700 text-white px-4 py-2 rounded-lg hover:bg-zinc-600 transition-colors text-sm font-medium">
+            <button id="viewer-reset-effects" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-lg active:scale-95 transition-all">
                 초기화
             </button>
         </div>
@@ -201,12 +184,11 @@
     
     <!-- 로딩 표시 -->
     <div id="viewer-loading" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-zinc-500 border-t-white"></div>
     </div>
     
 </div>
 
-<!-- (수정) 스크립트 로드 순서 및 이름 확인 -->
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-zoom.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-core.js' | relative_url }}" defer></script>

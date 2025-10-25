@@ -21,8 +21,8 @@
             this.isDragging = false;
             this.dragStartX = 0;
             this.dragStartY = 0;
-            this.dragStartTranslateX = 0;
-            this.dragStartTranslateY = 0;
+            this.lastTranslateX = 0;
+            this.lastTranslateY = 0;
             
             this.isPinching = false;
             this.pinchStartScale = 1;
@@ -54,23 +54,14 @@
         setZoom(newScale, centerX, centerY, animate = true) {
             newScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, newScale));
             
-            if (centerX !== undefined && centerY !== undefined && this.scale !== this.options.minScale) {
+            if (centerX !== undefined && centerY !== undefined) {
                 const rect = this.wrapper.getBoundingClientRect();
-                
-                const rad = -this.rotation * Math.PI / 180;
-                const cos = Math.cos(rad);
-                const sin = Math.sin(rad);
-                
                 const offsetX = centerX - rect.left - rect.width / 2;
                 const offsetY = centerY - rect.top - rect.height / 2;
-                
-                const rotatedOffsetX = offsetX * cos - offsetY * sin;
-                const rotatedOffsetY = offsetX * sin + offsetY * cos;
-                
                 const scaleRatio = newScale / this.scale;
                 
-                this.translateX = rotatedOffsetX - (rotatedOffsetX - this.translateX) * scaleRatio;
-                this.translateY = rotatedOffsetY - (rotatedOffsetY - this.translateY) * scaleRatio;
+                this.translateX = centerX - rect.left - rect.width / 2 - (centerX - rect.left - rect.width / 2 - this.translateX) * scaleRatio;
+                this.translateY = centerY - rect.top - rect.height / 2 - (centerY - rect.top - rect.height / 2 - this.translateY) * scaleRatio;
             }
             
             this.scale = newScale;
@@ -86,68 +77,12 @@
             return this.scale;
         }
         
-        startPinch(distance, center) {
-            this.isPinching = true;
-            this.pinchStartScale = this.scale;
-            this.pinchStartDistance = distance;
-        }
-        
-        pinchZoom(data) {
-            if (!this.isPinching) {
-                this.startPinch(data.startDistance, data.center);
-            }
-            
-            const scaleRatio = data.distance / this.pinchStartDistance;
-            const newScale = this.pinchStartScale * scaleRatio;
-            
-            const clampedScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, newScale));
-            
-            const rect = this.wrapper.getBoundingClientRect();
-            
-            const rad = -this.rotation * Math.PI / 180;
-            const cos = Math.cos(rad);
-            const sin = Math.sin(rad);
-            
-            const offsetX = data.center.x - rect.left - rect.width / 2;
-            const offsetY = data.center.y - rect.top - rect.height / 2;
-            
-            const rotatedOffsetX = offsetX * cos - offsetY * sin;
-            const rotatedOffsetY = offsetX * sin + offsetY * cos;
-            
-            const currentScaleRatio = clampedScale / this.scale;
-            
-            this.translateX = rotatedOffsetX - (rotatedOffsetX - this.translateX) * currentScaleRatio;
-            this.translateY = rotatedOffsetY - (rotatedOffsetY - this.translateY) * currentScaleRatio;
-            
-            this.scale = clampedScale;
-            
-            this.constrainPan();
-            this.updateTransform(false);
-            
-            return this.scale;
-        }
-        
-        endPinch() {
-            this.isPinching = false;
-        }
-        
-        rotate(angleDelta, animate = false) {
-            this.rotation += angleDelta;
-            this.rotation = this.rotation % 360;
-            this.updateTransform(animate);
-        }
-        
-        setRotation(angle, animate = false) {
-            this.rotation = angle % 360;
-            this.updateTransform(animate);
-        }
-        
         zoomIn(centerX, centerY) {
-            return this.setZoom(this.scale + this.options.scaleStep, centerX, centerY, true);
+            return this.setZoom(this.scale + this.options.scaleStep, centerX, centerY);
         }
         
         zoomOut(centerX, centerY) {
-            return this.setZoom(this.scale - this.options.scaleStep, centerX, centerY, true);
+            return this.setZoom(this.scale - this.options.scaleStep, centerX, centerY);
         }
         
         resetZoom(animate = true) {
@@ -158,27 +93,46 @@
             return this.scale;
         }
         
-        resetRotation(animate = true) {
-            this.rotation = 0;
-            this.updateTransform(animate);
-        }
-        
-        reset(animate = false) {
-            this.scale = this.options.minScale;
-            this.translateX = 0;
-            this.translateY = 0;
-            this.rotation = 0;
-            this.isPinching = false;
-            this.isDragging = false;
-            this.updateTransform(animate);
-        }
-        
         toggleZoom(centerX, centerY) {
             if (this.scale > this.options.minScale) {
-                return this.resetZoom(true);
+                return this.resetZoom();
             } else {
-                return this.setZoom(this.options.doubleTapScale, centerX, centerY, true);
+                return this.setZoom(this.options.doubleTapScale, centerX, centerY);
             }
+        }
+        
+        startPinchZoom(distance, center) {
+            this.isPinching = true;
+            this.pinchStartScale = this.scale;
+            this.pinchStartDistance = distance;
+        }
+        
+        pinchZoom(distance, center) {
+            if (!this.isPinching || this.pinchStartDistance === 0) return this.scale;
+            
+            const scaleRatio = distance / this.pinchStartDistance;
+            const newScale = this.pinchStartScale * scaleRatio;
+            const clampedScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, newScale));
+            
+            const rect = this.wrapper.getBoundingClientRect();
+            const offsetX = center.x - rect.left - rect.width / 2;
+            const offsetY = center.y - rect.top - rect.height / 2;
+            
+            const scaleChange = clampedScale / this.scale;
+            this.translateX = offsetX - (offsetX - this.translateX) * scaleChange;
+            this.translateY = offsetY - (offsetY - this.translateY) * scaleChange;
+            
+            this.scale = clampedScale;
+            this.constrainPan();
+            this.updateTransform(false);
+            
+            return this.scale;
+        }
+        
+        endPinchZoom() {
+            this.isPinching = false;
+            this.pinchStartScale = this.scale;
+            this.pinchStartDistance = 0;
         }
         
         startDrag(x, y) {
@@ -187,17 +141,20 @@
             this.isDragging = true;
             this.dragStartX = x;
             this.dragStartY = y;
-            this.dragStartTranslateX = this.translateX;
-            this.dragStartTranslateY = this.translateY;
+            this.lastTranslateX = this.translateX;
+            this.lastTranslateY = this.translateY;
             
             return true;
         }
         
-        drag(deltaX, deltaY) {
+        drag(x, y) {
             if (!this.isDragging || this.scale <= this.options.minScale) return false;
             
-            this.translateX = this.dragStartTranslateX + deltaX;
-            this.translateY = this.dragStartTranslateY + deltaY;
+            const deltaX = x - this.dragStartX;
+            const deltaY = y - this.dragStartY;
+            
+            this.translateX = this.lastTranslateX + deltaX;
+            this.translateY = this.lastTranslateY + deltaY;
             
             this.constrainPan();
             this.updateTransform(false);
@@ -225,7 +182,6 @@
             const containerAspect = wrapperRect.width / wrapperRect.height;
             
             let displayWidth, displayHeight;
-            
             if (imageAspect > containerAspect) {
                 displayWidth = Math.min(wrapperRect.width, imageNaturalWidth);
                 displayHeight = displayWidth / imageAspect;
@@ -234,15 +190,8 @@
                 displayWidth = displayHeight * imageAspect;
             }
             
-            const rad = Math.abs(this.rotation * Math.PI / 180);
-            const cos = Math.cos(rad);
-            const sin = Math.sin(rad);
-            
-            const rotatedWidth = displayWidth * cos + displayHeight * sin;
-            const rotatedHeight = displayWidth * sin + displayHeight * cos;
-            
-            const scaledWidth = rotatedWidth * this.scale;
-            const scaledHeight = rotatedHeight * this.scale;
+            const scaledWidth = displayWidth * this.scale;
+            const scaledHeight = displayHeight * this.scale;
             
             const maxX = Math.max(0, (scaledWidth - wrapperRect.width) / 2);
             const maxY = Math.max(0, (scaledHeight - wrapperRect.height) / 2);
@@ -251,16 +200,41 @@
             this.translateY = Math.max(-maxY, Math.min(maxY, this.translateY));
         }
         
+        rotate(degrees) {
+            this.rotation = (this.rotation + degrees) % 360;
+            this.updateTransform(true);
+        }
+        
+        setRotation(degrees) {
+            this.rotation = degrees % 360;
+            this.updateTransform(false);
+        }
+        
+        resetRotation(animate = true) {
+            this.rotation = 0;
+            this.updateTransform(animate);
+        }
+        
         getState() {
             return {
                 scale: this.scale,
                 translateX: this.translateX,
                 translateY: this.translateY,
                 rotation: this.rotation,
-                isZoomed: this.scale > this.options.minScale,
-                isDragging: this.isDragging,
-                isPinching: this.isPinching
+                isZoomed: this.scale > this.options.minScale
             };
+        }
+        
+        reset(keepRotation = false) {
+            this.scale = this.options.minScale;
+            this.translateX = 0;
+            this.translateY = 0;
+            if (!keepRotation) {
+                this.rotation = 0;
+            }
+            this.isDragging = false;
+            this.isPinching = false;
+            this.updateTransform(false);
         }
         
         destroy() {

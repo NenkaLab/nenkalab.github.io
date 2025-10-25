@@ -12,22 +12,19 @@
     const nextBtn = document.getElementById('viewer-next');
     const downloadBtn = document.getElementById('viewer-download');
     const shareBtn = document.getElementById('viewer-share');
-    const rotateLeftBtn = document.getElementById('viewer-rotate-left');
-    const rotateRightBtn = document.getElementById('viewer-rotate-right');
+    const rotateBtn = document.getElementById('viewer-rotate');
     const fullscreenBtn = document.getElementById('viewer-fullscreen');
     const zoomInBtn = document.getElementById('viewer-zoom-in');
     const zoomOutBtn = document.getElementById('viewer-zoom-out');
     const zoomResetBtn = document.getElementById('viewer-zoom-reset');
-    const rotateResetBtn = document.getElementById('viewer-rotate-reset');
     const zoomLevelDisplay = document.getElementById('viewer-zoom-level');
-    const rotateLevelDisplay = document.getElementById('viewer-rotate-level');
     
     const filterToggleBtn = document.getElementById('viewer-filter-toggle');
     const filterMenu = document.getElementById('viewer-filter-menu');
     const applyToAllBtn = document.getElementById('viewer-apply-to-all');
     const resetEffectsBtn = document.getElementById('viewer-reset-effects');
     const imageRenderingSelect = document.getElementById('image-rendering');
-    const performanceModeSelect = document.getElementById('performance-mode');
+    const performanceSelect = document.getElementById('performance-mode');
     
     const filterControls = {
         grayscale: { slider: document.getElementById('filter-grayscale'), input: document.getElementById('filter-grayscale-input'), default: 0 },
@@ -43,24 +40,40 @@
     let images = [];
     let currentIndex = 0;
     let imageStack = [];
+    let zoomControllers = new Map();
     let gestureHandler = null;
     let isFullscreen = false;
     let imageEffects = [];
     let performanceMode = 'performance';
     
     function initImageViewer() {
-        const articleImages = document.querySelectorAll('.prose img');
+        const articleImages = document.querySelectorAll('.prose img, article img, .content img');
         if (articleImages.length === 0) return;
         
         images = Array.from(articleImages);
         imageEffects = images.map(() => getDefaultEffects());
         
         images.forEach((img, index) => {
-            img.style.cursor = 'pointer';
+            img.classList.add('cursor-pointer', 'transition-transform', 'duration-200', 'hover:scale-105');
             img.addEventListener('click', () => openViewer(index));
         });
         
         setupEventListeners();
+        loadPerformanceMode();
+    }
+    
+    function loadPerformanceMode() {
+        const saved = localStorage.getItem('imageViewerPerformance');
+        if (saved) {
+            performanceMode = saved;
+            if (performanceSelect) {
+                performanceSelect.value = performanceMode;
+            }
+        }
+    }
+    
+    function savePerformanceMode() {
+        localStorage.setItem('imageViewerPerformance', performanceMode);
     }
     
     function getDefaultEffects() {
@@ -79,13 +92,17 @@
     
     function showControls() {
         const controls = viewer.querySelectorAll('.control-hide');
-        controls.forEach(control => control.classList.remove('opacity-0', 'pointer-events-none'));
+        controls.forEach(control => {
+            control.classList.remove('opacity-0', 'pointer-events-none');
+        });
     }
 
     function hideControls(e) {
         e.stopPropagation();
         const controls = viewer.querySelectorAll('.control-hide');
-        controls.forEach(control => control.classList.add('opacity-0', 'pointer-events-none'));
+        controls.forEach(control => {
+            control.classList.add('opacity-0', 'pointer-events-none');
+        });
     }
 
     function setupEventListeners() {
@@ -97,70 +114,50 @@
         hideBtn.addEventListener('click', hideControls);
         
         zoomInBtn.addEventListener('click', () => {
-            const current = getCurrentZoomController();
-            if (current) {
+            const controller = zoomControllers.get(currentIndex);
+            if (controller) {
                 const rect = viewerContainer.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                const scale = current.zoomIn(centerX, centerY);
+                const scale = controller.zoomIn(rect.left + rect.width / 2, rect.top + rect.height / 2);
                 updateZoomDisplay(scale);
             }
         });
         
         zoomOutBtn.addEventListener('click', () => {
-            const current = getCurrentZoomController();
-            if (current) {
+            const controller = zoomControllers.get(currentIndex);
+            if (controller) {
                 const rect = viewerContainer.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                const scale = current.zoomOut(centerX, centerY);
+                const scale = controller.zoomOut(rect.left + rect.width / 2, rect.top + rect.height / 2);
                 updateZoomDisplay(scale);
             }
         });
         
         zoomResetBtn.addEventListener('click', () => {
-            const current = getCurrentZoomController();
-            if (current) {
-                const scale = current.resetZoom(true);
+            const controller = zoomControllers.get(currentIndex);
+            if (controller) {
+                const scale = controller.resetZoom();
                 updateZoomDisplay(scale);
             }
         });
         
-        rotateLeftBtn.addEventListener('click', () => {
-            const current = getCurrentZoomController();
-            if (current) {
-                current.rotate(-90, true);
-                updateRotateDisplay(current.getState().rotation);
-            }
-        });
-        
-        rotateRightBtn.addEventListener('click', () => {
-            const current = getCurrentZoomController();
-            if (current) {
-                current.rotate(90, true);
-                updateRotateDisplay(current.getState().rotation);
-            }
-        });
-        
-        rotateResetBtn.addEventListener('click', () => {
-            const current = getCurrentZoomController();
-            if (current) {
-                current.resetRotation(true);
-                updateRotateDisplay(0);
-            }
+        rotateBtn.addEventListener('click', () => {
+            const controller = zoomControllers.get(currentIndex);
+            if (controller) controller.rotate(90);
         });
         
         fullscreenBtn.addEventListener('click', toggleFullscreen);
         downloadBtn.addEventListener('click', downloadImage);
         shareBtn.addEventListener('click', shareImage);
         
-        filterToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            filterMenu.classList.toggle('hidden');
-        });
+        if (filterToggleBtn) {
+            filterToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                filterMenu.classList.toggle('hidden');
+            });
+        }
         
         Object.keys(filterControls).forEach(key => {
             const control = filterControls[key];
+            if (!control.slider || !control.input) return;
             
             control.slider.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
@@ -177,30 +174,40 @@
             });
         });
         
-        imageRenderingSelect.addEventListener('change', (e) => {
-            imageEffects[currentIndex].rendering = e.target.value;
-            applyStoredEffect();
-        });
+        if (imageRenderingSelect) {
+            imageRenderingSelect.addEventListener('change', (e) => {
+                imageEffects[currentIndex].rendering = e.target.value;
+                applyStoredEffect();
+            });
+        }
         
-        performanceModeSelect.addEventListener('change', (e) => {
-            performanceMode = e.target.value;
-            applyPerformanceMode();
-        });
+        if (performanceSelect) {
+            performanceSelect.addEventListener('change', (e) => {
+                performanceMode = e.target.value;
+                savePerformanceMode();
+                applyPerformanceMode();
+            });
+        }
         
-        applyToAllBtn.addEventListener('click', applyEffectToAll);
-        resetEffectsBtn.addEventListener('click', resetEffects);
+        if (applyToAllBtn) {
+            applyToAllBtn.addEventListener('click', applyEffectToAll);
+        }
+        
+        if (resetEffectsBtn) {
+            resetEffectsBtn.addEventListener('click', resetEffects);
+        }
         
         document.addEventListener('click', (e) => {
-            if (!filterMenu.contains(e.target) && e.target !== filterToggleBtn) {
+            if (filterMenu && !filterMenu.contains(e.target) && e.target !== filterToggleBtn) {
                 filterMenu.classList.add('hidden');
             }
         });
         
         viewer.addEventListener('click', (e) => {
             if (e.target === viewer || e.target === viewerContainer) {
-                const current = getCurrentZoomController();
-                if (current && current.getState().isZoomed) {
-                    const scale = current.resetZoom(true);
+                const controller = zoomControllers.get(currentIndex);
+                if (controller && controller.getState().isZoomed) {
+                    const scale = controller.resetZoom();
                     updateZoomDisplay(scale);
                 } else {
                     closeViewer();
@@ -213,6 +220,18 @@
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    }
+    
+    function applyPerformanceMode() {
+        imageStack.forEach((item) => {
+            if (performanceMode === 'quality') {
+                item.wrapper.style.imageRendering = 'auto';
+                item.img.style.imageRendering = 'auto';
+            } else {
+                item.wrapper.style.imageRendering = 'optimizeSpeed';
+                item.img.style.imageRendering = 'optimizeSpeed';
+            }
+        });
     }
     
     function updateFilterValue(key, value) {
@@ -244,89 +263,62 @@
     }
     
     function createImageStack() {
-        imageStack.forEach(item => {
-            if (item.zoomController) {
-                item.zoomController.destroy();
-            }
-            if (item.wrapper) {
-                item.wrapper.remove();
-            }
-        });
-        imageStack = [];
         viewerContainer.innerHTML = '';
+        imageStack = [];
+        zoomControllers.clear();
         
-        images.forEach((srcImg, index) => {
+        images.forEach((img, index) => {
             const wrapper = document.createElement('div');
-            wrapper.className = 'absolute inset-0 flex items-center justify-center';
-            wrapper.style.willChange = 'transform';
-            wrapper.style.transition = 'none';
+            wrapper.className = 'absolute inset-0 flex items-center justify-center transition-opacity duration-300';
+            wrapper.style.pointerEvents = index === currentIndex ? 'auto' : 'none';
+            wrapper.style.opacity = index === currentIndex ? '1' : '0';
+            wrapper.style.visibility = index === currentIndex ? 'visible' : 'hidden';
+            wrapper.style.zIndex = index === currentIndex ? '10' : '1';
             
-            const img = document.createElement('img');
-            img.src = srcImg.src;
-            img.alt = srcImg.alt || '';
-            img.className = 'max-w-full max-h-full object-contain select-none';
-            img.style.pointerEvents = 'none';
-            img.draggable = false;
+            const imageWrapper = document.createElement('div');
+            imageWrapper.className = 'w-full h-full flex items-center justify-center';
             
-            wrapper.appendChild(img);
+            const image = document.createElement('img');
+            image.src = img.src;
+            image.alt = img.alt || '';
+            image.className = 'max-w-full max-h-full object-contain select-none';
+            image.draggable = false;
             
-            if (index === currentIndex) {
-                wrapper.style.opacity = '1';
-                wrapper.style.visibility = 'visible';
-                wrapper.style.zIndex = '1';
-                wrapper.style.pointerEvents = 'auto';
-            } else {
-                wrapper.style.opacity = '0';
-                wrapper.style.visibility = 'hidden';
-                wrapper.style.zIndex = '0';
-                wrapper.style.pointerEvents = 'none';
-            }
-            
+            imageWrapper.appendChild(image);
+            wrapper.appendChild(imageWrapper);
             viewerContainer.appendChild(wrapper);
-            
-            const zoomController = new ZoomController(wrapper, img, {
-                minScale: 1,
-                maxScale: 50,
-                scaleStep: 0.2,
-                doubleTapScale: 3
-            });
             
             imageStack.push({
                 wrapper: wrapper,
-                img: img,
-                zoomController: zoomController
+                imageWrapper: imageWrapper,
+                img: image,
+                index: index
             });
-        });
-    }
-    
-    function getCurrentZoomController() {
-        return imageStack[currentIndex]?.zoomController;
-    }
-    
-    function switchToImage(newIndex) {
-        if (newIndex < 0 || newIndex >= images.length) return;
-        
-        const oldIndex = currentIndex;
-        
-        const oldItem = imageStack[oldIndex];
-        if (oldItem) {
-            oldItem.wrapper.style.opacity = '0';
-            oldItem.wrapper.style.visibility = 'hidden';
-            oldItem.wrapper.style.zIndex = '0';
-            oldItem.wrapper.style.pointerEvents = 'none';
             
-            oldItem.zoomController.reset(false);
-        }
+            const controller = new ZoomController(imageWrapper, image);
+            zoomControllers.set(index, controller);
+        });
+        
+        applyPerformanceMode();
+    }
+    
+    function switchImage(newIndex, direction = 0) {
+        if (newIndex < 0 || newIndex >= images.length || newIndex === currentIndex) return;
+        
+        const oldItem = imageStack[currentIndex];
+        const newItem = imageStack[newIndex];
+        
+        oldItem.wrapper.style.pointerEvents = 'none';
+        oldItem.wrapper.style.zIndex = '1';
+        oldItem.wrapper.classList.add('opacity-0');
+        oldItem.wrapper.style.visibility = 'hidden';
+        
+        newItem.wrapper.style.pointerEvents = 'auto';
+        newItem.wrapper.style.zIndex = '10';
+        newItem.wrapper.classList.remove('opacity-0');
+        newItem.wrapper.style.visibility = 'visible';
         
         currentIndex = newIndex;
-        const newItem = imageStack[currentIndex];
-        if (newItem) {
-            newItem.wrapper.style.opacity = '1';
-            newItem.wrapper.style.visibility = 'visible';
-            newItem.wrapper.style.zIndex = '1';
-            newItem.wrapper.style.pointerEvents = 'auto';
-        }
-        
         updateViewer();
     }
     
@@ -336,127 +328,91 @@
         }
         
         gestureHandler = new GestureHandler(viewerContainer, {
-            onDoubleTap: (point) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    const scale = current.toggleZoom(point.x, point.y);
+            onDoubleTap: (data) => {
+                const controller = zoomControllers.get(currentIndex);
+                if (controller) {
+                    const scale = controller.toggleZoom(data.x, data.y);
                     updateZoomDisplay(scale);
                 }
             },
             
             onPinchStart: (center) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    // Handled in pinchZoom
+                const controller = zoomControllers.get(currentIndex);
+                if (controller) {
+                    controller.startPinchZoom(0, center);
                 }
             },
             
             onPinch: (data) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    const scale = current.pinchZoom(data);
+                const controller = zoomControllers.get(currentIndex);
+                if (controller) {
+                    const scale = controller.pinchZoom(data.distance, data.center);
                     updateZoomDisplay(scale);
+                    
+                    if (data.rotation && data.inputType === 'touch') {
+                        controller.setRotation(controller.getState().rotation + data.rotation * 0.5);
+                    }
                 }
             },
             
             onPinchEnd: () => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    current.endPinch();
+                const controller = zoomControllers.get(currentIndex);
+                if (controller) {
+                    controller.endPinchZoom();
                 }
             },
             
-            onRotate: (data) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    current.rotate(data.angle, false);
-                    updateRotateDisplay(current.getState().rotation);
-                }
-            },
-            
-            onDragStart: (point) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    const started = current.startDrag(point.x, point.y);
-                    return started;
+            onDragStart: (data) => {
+                const controller = zoomControllers.get(currentIndex);
+                if (controller) {
+                    return controller.startDrag(data.x, data.y);
                 }
                 return false;
             },
             
             onDrag: (data) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    const isDragging = current.drag(data.deltaX, data.deltaY);
-                    
-                    if (!isDragging && !current.getState().isZoomed) {
-                        const progress = data.totalDeltaX / viewerContainer.offsetWidth;
-                        
-                        if (Math.abs(progress) > 0.3) {
-                            const opacity = 1 - Math.abs(progress) * 0.5;
-                            imageStack[currentIndex].wrapper.style.opacity = opacity.toString();
-                        }
-                    }
-                    
-                    return isDragging;
+                const controller = zoomControllers.get(currentIndex);
+                if (controller && controller.getState().isZoomed) {
+                    return controller.drag(data.x, data.y);
                 }
                 return false;
             },
             
             onDragEnd: (data) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    current.endDrag();
-                    
-                    if (!current.getState().isZoomed) {
-                        const threshold = viewerContainer.offsetWidth * 0.3;
-                        const velocity = Math.abs(data.velocityX);
+                const controller = zoomControllers.get(currentIndex);
+                if (controller) {
+                    if (controller.getState().isZoomed) {
+                        controller.endDrag();
+                    } else {
+                        const containerWidth = viewerContainer.getBoundingClientRect().width;
+                        const threshold = containerWidth * 0.3;
+                        const shouldSlide = Math.abs(data.deltaX) > threshold || Math.abs(data.velocity) > 0.5;
                         
-                        if (Math.abs(data.totalDeltaX) > threshold || velocity > 0.5) {
-                            if (data.totalDeltaX > 0) {
+                        if (shouldSlide) {
+                            if (data.deltaX > 0 && currentIndex > 0) {
                                 showPrev();
-                            } else {
+                            } else if (data.deltaX < 0 && currentIndex < images.length - 1) {
                                 showNext();
                             }
-                        } else {
-                            imageStack[currentIndex].wrapper.style.opacity = '1';
                         }
                     }
                 }
             },
             
-            onWheel: (data) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    const currentScale = current.getState().scale;
-                    const newScale = currentScale * data.scale;
-                    current.setZoom(newScale, data.center.x, data.center.y, false);
+            onWheel: (scale, center) => {
+                const controller = zoomControllers.get(currentIndex);
+                if (controller) {
+                    const currentScale = controller.getState().scale;
+                    const newScale = currentScale * scale;
+                    controller.setZoom(newScale, center.x, center.y, false);
                     updateZoomDisplay(newScale);
                 }
             },
             
-            onWheelRotate: (data) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    current.rotate(data.angle, false);
-                    updateRotateDisplay(current.getState().rotation);
-                }
-            },
-            
-            onPenZoom: (data) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    const currentScale = current.getState().scale;
-                    const newScale = currentScale * data.scale;
-                    current.setZoom(newScale, data.center.x, data.center.y, false);
-                    updateZoomDisplay(newScale);
-                }
-            },
-            
-            onPenRotate: (data) => {
-                const current = getCurrentZoomController();
-                if (current) {
-                    current.setRotation(data.angle, false);
-                    updateRotateDisplay(current.getState().rotation);
+            onRotate: (rotation, center) => {
+                const controller = zoomControllers.get(currentIndex);
+                if (controller) {
+                    controller.rotate(rotation);
                 }
             }
         });
@@ -472,11 +428,9 @@
             gestureHandler = null;
         }
         
-        imageStack.forEach(item => {
-            if (item.zoomController) {
-                item.zoomController.destroy();
-            }
-        });
+        zoomControllers.forEach(controller => controller.destroy());
+        zoomControllers.clear();
+        
         imageStack = [];
         viewerContainer.innerHTML = '';
 
@@ -489,13 +443,13 @@
     
     function showPrev() {
         if (currentIndex > 0) {
-            switchToImage(currentIndex - 1);
+            switchImage(currentIndex - 1, -1);
         }
     }
     
     function showNext() {
         if (currentIndex < images.length - 1) {
-            switchToImage(currentIndex + 1);
+            switchImage(currentIndex + 1, 1);
         }
     }
     
@@ -505,11 +459,9 @@
         prevBtn.disabled = currentIndex === 0;
         nextBtn.disabled = currentIndex === images.length - 1;
         
-        const current = getCurrentZoomController();
-        if (current) {
-            const state = current.getState();
-            updateZoomDisplay(state.scale);
-            updateRotateDisplay(state.rotation);
+        const controller = zoomControllers.get(currentIndex);
+        if (controller) {
+            updateZoomDisplay(controller.getState().scale);
         }
         
         loadEffectsToUI();
@@ -521,28 +473,26 @@
         zoomLevelDisplay.textContent = `${percentage}%`;
     }
     
-    function updateRotateDisplay(rotation) {
-        const normalized = ((rotation % 360) + 360) % 360;
-        rotateLevelDisplay.textContent = `${Math.round(normalized)}°`;
-    }
-    
     function loadEffectsToUI() {
         const effect = imageEffects[currentIndex];
         
         Object.keys(filterControls).forEach(key => {
             const control = filterControls[key];
+            if (!control.slider || !control.input) return;
             const value = effect[key];
             control.slider.value = value;
             control.input.value = value;
         });
         
-        imageRenderingSelect.value = effect.rendering || 'auto';
+        if (imageRenderingSelect) {
+            imageRenderingSelect.value = effect.rendering || 'auto';
+        }
     }
     
     function applyStoredEffect() {
         const effect = imageEffects[currentIndex];
-        const img = imageStack[currentIndex]?.img;
-        if (!img) return;
+        const item = imageStack[currentIndex];
+        if (!item) return;
         
         const filters = [];
         if (effect.grayscale > 0) filters.push(`grayscale(${effect.grayscale}%)`);
@@ -554,20 +504,8 @@
         if (effect.blur > 0) filters.push(`blur(${effect.blur}px)`);
         if (effect.hue > 0) filters.push(`hue-rotate(${effect.hue}deg)`);
         
-        img.style.filter = filters.length > 0 ? filters.join(' ') : '';
-        img.style.imageRendering = effect.rendering;
-    }
-    
-    function applyPerformanceMode() {
-        imageStack.forEach(item => {
-            if (performanceMode === 'performance') {
-                item.img.style.imageRendering = 'auto';
-                item.wrapper.style.willChange = 'transform';
-            } else {
-                item.img.style.imageRendering = 'high-quality';
-                item.wrapper.style.willChange = 'auto';
-            }
-        });
+        item.img.style.filter = filters.length > 0 ? filters.join(' ') : '';
+        item.img.style.imageRendering = effect.rendering;
     }
     
     function applyEffectToAll() {
@@ -590,13 +528,12 @@
     function showToast(message, type) {
         const bgColor = type === 'success' ? 'bg-green-600' : 'bg-blue-600';
         const toast = document.createElement('div');
-        toast.className = `fixed top-20 left-1/2 -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-[1001] transition-opacity duration-300`;
+        toast.className = `fixed top-20 left-1/2 -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-[1001]`;
         toast.textContent = message;
         document.body.appendChild(toast);
         
         setTimeout(() => {
-            toast.classList.add('opacity-0');
-            setTimeout(() => toast.remove(), 300);
+            toast.remove();
         }, 2000);
     }
     
@@ -650,7 +587,7 @@
         
         if (navigator.clipboard) {
             navigator.clipboard.writeText(url).then(() => {
-                showToast('이미지 URL이 클립보드에 복사되었습니다', 'info');
+                alert('이미지 URL이 클립보드에 복사되었습니다.');
             }).catch(err => {
                 console.error('복사 실패:', err);
                 prompt('이미지 URL:', url);
@@ -709,12 +646,11 @@
     function handleKeyboard(e) {
         if (viewer.classList.contains('hidden')) return;
         
-        const current = getCurrentZoomController();
-        
         switch(e.key) {
             case 'Escape':
-                if (current && current.getState().isZoomed) {
-                    const scale = current.resetZoom(true);
+                const controller = zoomControllers.get(currentIndex);
+                if (controller && controller.getState().isZoomed) {
+                    const scale = controller.resetZoom();
                     updateZoomDisplay(scale);
                 } else {
                     closeViewer();
@@ -728,31 +664,30 @@
                 break;
             case '+':
             case '=':
-                if (current) {
+                if (zoomControllers.has(currentIndex)) {
                     const rect = viewerContainer.getBoundingClientRect();
-                    const scale = current.zoomIn(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    const scale = zoomControllers.get(currentIndex).zoomIn(rect.left + rect.width / 2, rect.top + rect.height / 2);
                     updateZoomDisplay(scale);
                 }
                 break;
             case '-':
             case '_':
-                if (current) {
+                if (zoomControllers.has(currentIndex)) {
                     const rect = viewerContainer.getBoundingClientRect();
-                    const scale = current.zoomOut(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    const scale = zoomControllers.get(currentIndex).zoomOut(rect.left + rect.width / 2, rect.top + rect.height / 2);
                     updateZoomDisplay(scale);
                 }
                 break;
             case '0':
-                if (current) {
-                    const scale = current.resetZoom(true);
+                if (zoomControllers.has(currentIndex)) {
+                    const scale = zoomControllers.get(currentIndex).resetZoom();
                     updateZoomDisplay(scale);
                 }
                 break;
             case 'r':
             case 'R':
-                if (current) {
-                    current.rotate(e.shiftKey ? -90 : 90, true);
-                    updateRotateDisplay(current.getState().rotation);
+                if (zoomControllers.has(currentIndex)) {
+                    zoomControllers.get(currentIndex).rotate(90);
                 }
                 break;
             case 'f':
