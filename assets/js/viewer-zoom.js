@@ -98,7 +98,7 @@
         }
         
         toggleZoom(centerX, centerY) {
-            if (this.scale > this.options.defaultScale) {
+            if (this.scale != options.defaultScale) {
                 return this.resetZoom();
             } else {
                 return this.setZoom(this.options.doubleTapScale, centerX, centerY);

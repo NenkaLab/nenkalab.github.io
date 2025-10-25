@@ -73,9 +73,9 @@
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Blur</label>
-                                    <input type="number" id="filter-blur-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="10" step="0.1" value="0">
+                                    <input type="number" id="filter-blur-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="25" step="0.01" value="0">
                                 </div>
-                                <input type="range" id="filter-blur" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="10" step="0.1" value="0">
+                                <input type="range" id="filter-blur" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="25" step="0.01" value="0">
                             </div>
                             
                             <div class="filter-control">
@@ -187,7 +187,7 @@
     border-radius: 50%;
     background: #3b82f6;
     cursor: pointer;
-    transform: translateY(-50%);
+    transform: translateY(-4px);
 }
 .slider::-moz-range-thumb {
     width: 16px;
@@ -196,7 +196,7 @@
     background: #3b82f6;
     cursor: pointer;
     border: none;
-    transform: translateY(-50%);
+    transform: translateY(-4px);
 }
 .slider::-webkit-slider-runnable-track {
     height: 8px;
@@ -210,33 +210,9 @@
 }
 
 .control-hide.hide {
-    opacity: 0!important;
-    pointer-events: none!important;
-    transition: opacity 0.3s ease;
+    display: none!important;
 }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const viewerImage = document.getElementById('image-viewer');
-        const viewer = viewerImage.getElementById('viewer-container');
-        const hideControlsBtn = viewerImage.getElementById('viewer-hide-controls');
-        let hideControlsTimeout;
-
-        function showControls() {
-            const controls = viewerImage.querySelectorAll('.control-hide');
-            controls.forEach(control => control.classList.remove('hide'));
-        }
-
-        function hideControls() {
-            const controls = viewerImage.querySelectorAll('.control-hide');
-            controls.forEach(control => control.classList.add('hide'));
-        }
-
-        viewer.addEventListener('click', showControls);
-        hideControlsBtn.addEventListener('click', hideControls);
-    });
-</script>
 
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-zoom.js' | relative_url }}" defer></script>

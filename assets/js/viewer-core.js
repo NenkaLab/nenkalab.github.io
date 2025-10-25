@@ -9,6 +9,7 @@
     const viewerLoading = document.getElementById('viewer-loading');
     
     const closeBtn = document.getElementById('viewer-close');
+    const hideBtn = document.getElementById('viewer-hide-controls');
     const prevBtn = document.getElementById('viewer-prev');
     const nextBtn = document.getElementById('viewer-next');
     const downloadBtn = document.getElementById('viewer-download');
@@ -73,10 +74,24 @@
         };
     }
     
+    function showControls() {
+        const controls = viewer.querySelectorAll('.control-hide');
+        controls.forEach(control => control.classList.remove('hide'));
+    }
+
+    function hideControls(e) {
+        e.stopPropagation();
+        const controls = viewer.querySelectorAll('.control-hide');
+        controls.forEach(control => control.classList.add('hide'));
+    }
+
     function setupEventListeners() {
         closeBtn.addEventListener('click', closeViewer);
         prevBtn.addEventListener('click', showPrev);
         nextBtn.addEventListener('click', showNext);
+
+        viewer.addEventListener('click', showControls);
+        hideBtn.addEventListener('click', hideControls);
         
         zoomInBtn.addEventListener('click', () => {
             if (zoomController) {
