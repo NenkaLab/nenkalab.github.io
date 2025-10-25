@@ -1,4 +1,5 @@
-<div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-[1000] hidden items-center justify-center">
+<!-- (수정) 'hidden' 클래스 제거, CSS로 초기 상태 제어 -->
+<div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-[1000] flex items-center justify-center">
     <!-- Top Controls -->
     <div class="control-hide absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent p-4 z-10">
         <div class="flex items-center justify-between max-w-7xl mx-auto">
@@ -13,8 +14,9 @@
                     <button id="viewer-filter-toggle" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="필터" title="이미지 효과">
                         <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">palette</span>
                     </button>
-                    <!-- Filter Menu (unchanged from original) -->
+                    <!-- Filter Menu (unchanged) -->
                     <div id="viewer-filter-menu" class="absolute top-12 -left-[50%] bg-zinc-900 rounded-lg shadow-xl hidden min-w-[320px] max-h-[50vh] overflow-y-auto z-20">
+                        <!-- ... (필터 메뉴 내용) ... -->
                         <div class="sticky top-0 bg-zinc-900 border-b border-zinc-700 p-3 z-10">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-white text-sm font-semibold">이미지 효과</span>
@@ -24,7 +26,7 @@
                         </div>
                         
                         <div class="p-3 space-y-4">
-                            <!-- Filter Controls (unchanged from original) -->
+                            <!-- Filter Controls (unchanged) -->
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Grayscale</label>
@@ -106,7 +108,7 @@
                 <span id="viewer-counter"></span>
             </div>
             
-            <!-- Top Right Controls (unchanged from original) -->
+            <!-- Top Right Controls (unchanged) -->
             <div class="flex items-center gap-2">
                 <button id="viewer-rotate" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="회전" title="90° 회전">
                     <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">rotate_right</span>
@@ -129,17 +131,9 @@
         <span class="material-symbols-outlined text-zinc-900 text-3xl">chevron_left</span>
     </button>
     
-    <!-- MODIFIED: Container for overlaid images -->
+    <!-- Container for overlaid images -->
     <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden p-4">
-        <!-- 
-          JavaScript가 여기에 .viewer-image-instance-wrapper 들을 동적으로 생성합니다.
-          각 래퍼는 다음과 같은 구조를 가집니다:
-          <div class="viewer-image-instance-wrapper">
-              <div class="viewer-zoom-target">
-                  <img src="..." alt="..." class="viewer-image-instance" />
-              </div>
-          </div>
-        -->
+        <!-- JS가 여기에 .viewer-image-instance-wrapper 들을 동적으로 생성 -->
     </div>
     
     <!-- Next Button -->
@@ -147,8 +141,9 @@
         <span class="material-symbols-outlined text-zinc-900 text-3xl">chevron_right</span>
     </button>
     
-    <!-- Bottom Controls (unchanged from original) -->
+    <!-- Bottom Controls (unchanged) -->
     <div class="control-hide absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full flex items-center gap-4 z-10">
+        <!-- ... (줌 버튼들) ... -->
         <button id="viewer-zoom-out" class="w-8 h-8 flex items-center justify-center group hover:bg-white/10 rounded-full transition-colors" aria-label="축소" title="축소">
             <span class="material-symbols-outlined text-white text-xl">zoom_out</span>
         </button>
@@ -168,16 +163,12 @@
     </div>
 </div>
 
-<!-- MODIFIED: Styles -->
+<!-- (수정) Styles -->
 <style>
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
 
-/* 동적으로 생성될 개별 이미지 래퍼
-  - position: absolute 로 모두 겹치게 함
-  - opacity: 0 으로 기본 숨김
-  - transition: opacity 로 페이드 효과
-*/
+/* ... (기존 .viewer-image-instance-wrapper, .viewer-zoom-target 등 스타일) ... */
 .viewer-image-instance-wrapper {
     position: absolute;
     top: 0;
@@ -190,19 +181,14 @@
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
     will-change: opacity;
-    /* 컨테이너의 패딩(p-4)을 고려 */
     padding: 1rem; 
 }
 .viewer-image-instance-wrapper.active {
     opacity: 1;
 }
-
-/* 줌/패닝/회전이 적용될 대상 */
 .viewer-zoom-target {
-    /* 줌/패닝 시 transition (JS가 제어) */
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
     will-change: transform, filter;
-    /* 이미지 크기에 맞게 설정 (JS가 로드 후 처리) */
     width: 100%;
     height: 100%;
     display: flex;
@@ -212,8 +198,6 @@
 .viewer-zoom-target.zooming { 
     transition: none; 
 }
-
-/* 실제 이미지 태그 */
 .viewer-image-instance {
     transition: filter 0.1s ease, image-rendering 0.1s;
     will-change: filter, image-rendering;
@@ -224,18 +208,15 @@
     max-height: 100%;
     object-fit: contain;
     user-select: none;
-    /* View Transition API를 위한 설정 */
-    view-transition-name: none; 
 }
 
-/* Filter Menu scrollbar (unchanged) */
+/* ... (기존 Filter Menu, Slider, Control hide 스타일) ... */
 #viewer-filter-menu { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.3) transparent; }
 #viewer-filter-menu::-webkit-scrollbar { width: 8px; }
 #viewer-filter-menu::-webkit-scrollbar-track { background: transparent; }
 #viewer-filter-menu::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.3); border-radius: 4px; }
 #viewer-filter-menu::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.5); }
 
-/* Slider styles (unchanged) */
 .slider::-webkit-slider-thumb {
     appearance: none;
     width: 16px;
@@ -265,7 +246,6 @@
     background: #374151;
 }
 
-/* Control hide (unchanged) */
 .control-hide.hide {
     will-change: opacity;
     opacity: 0;
@@ -273,12 +253,38 @@
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* View Transition API 스타일 */
-::view-transition-old(viewer-image),
-::view-transition-new(viewer-image) {
-    animation-duration: 0.3s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+/* (신규) Android Activity 스타일 애니메이션 
+  - 본문 콘텐츠가 <main> 태그로 감싸져 있다고 가정합니다.
+  - 아닐 경우, 'main' 셀렉터를 실제 콘텐츠 래퍼로 변경해주세요. (예: '#content')
+*/
+main {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, filter;
 }
+
+#image-viewer {
+    /* (수정) 'hidden' 클래스 대신 opacity/pointer-events로 제어 */
+    opacity: 0;
+    transform: translateX(5%);
+    pointer-events: none; 
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+}
+
+/* 뷰어 활성화 상태 */
+html.viewer-is-active main {
+    transform: translateX(-3%);
+    filter: brightness(0.7) blur(1px);
+    transform-origin: center;
+}
+html.viewer-is-active #image-viewer {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto; /* 상호작용 가능하게 */
+}
+
 </style>
 
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>

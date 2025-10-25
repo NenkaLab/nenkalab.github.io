@@ -52,9 +52,9 @@
     let gestureHandler = null;
     let isFullscreen = false;
     let imageEffects = [];
-    let isTransitioning = false; // 이미지 전환(페이드) 중인지 여부
-
-    const VT_PREFIX = 'viewer-img-'; // View Transition 이름 접두사
+    let isTransitioning = false; // (수정) 애니메이션 및 이미지 전환(페이드) 플래그
+    
+    const ANIMATION_DURATION = 350; // (신규) CSS 애니메이션 시간과 일치
     
     /**
      * 뷰어 초기화
@@ -71,8 +71,6 @@
         
         articleImages.forEach((img, index) => {
             img.style.cursor = 'pointer';
-            // View Transition API를 위해 고유 이름 할당
-            img.style.viewTransitionName = `${VT_PREFIX}${index}`;
             img.addEventListener('click', () => openViewer(index));
         });
         
@@ -102,9 +100,6 @@
             imgEl.alt = articleImages[i].alt || '';
             imgEl.draggable = false;
             imgEl.oncontextmenu = () => false;
-            
-            // View Transition API 이름 준비
-            imgEl.style.viewTransitionName = `${VT_PREFIX}${i}`;
 
             zoomTarget.appendChild(imgEl);
             wrapper.appendChild(zoomTarget);
@@ -138,17 +133,22 @@
     }
 
     /**
-     * 모든 이벤트 리스너 설정
+     * (수정) 모든 이벤트 리스너 설정
      */
     function setupEventListeners() {
         closeBtn.addEventListener('click', closeViewer);
         prevBtn.addEventListener('click', showPrev);
         nextBtn.addEventListener('click', showNext);
 
-        viewer.addEventListener('click', showControls);
+        viewer.addEventListener('click', (e) => {
+            // 컨트롤이 아닌 뷰어 자체를 클릭했을 때
+            if (e.target === viewer) {
+                showControls();
+            }
+        });
         hideBtn.addEventListener('click', hideControls);
         
-        // 줌 버튼 (중앙 줌 버그 수정됨)
+        // ... (줌, 필터 버튼 등 나머지 리스너는 동일) ...
         zoomInBtn.addEventListener('click', () => {
             if (zoomController) {
                 const rect = viewerContainer.getBoundingClientRect();
@@ -212,15 +212,15 @@
             }
         });
         
-        // 뷰어 배경 클릭 시 (줌 리셋 또는 닫기)
+        // (수정) 뷰어 배경 클릭 시 줌 리셋 또는 닫기
         viewer.addEventListener('click', (e) => {
-            // .viewer-image-instance-wrapper 가 클릭됐을 때 (즉, 이미지 바깥의 빈 공간)
-            if (e.target.classList.contains('viewer-image-instance-wrapper')) {
+            // .viewer-image-instance-wrapper (이미지 바깥 영역) 또는 viewer-container 클릭 시
+            if (e.target.classList.contains('viewer-image-instance-wrapper') || e.target.id === 'viewer-container') {
                 if (zoomController && zoomController.getState().isZoomed) {
                     const scale = zoomController.resetZoom();
                     updateZoomDisplay(scale);
                 } else {
-                    closeViewer();
+                    closeViewer(); // (수정) 닫기 함수 호출
                 }
             }
         });
@@ -230,6 +230,9 @@
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+        
+        // (신규) popstate 리스너를 초기에 한 번만 등록
+        window.addEventListener('popstate', closeOnBack);
     }
     
     function updateFilterValue(key, value) {
@@ -237,20 +240,68 @@
         applyStoredEffect(viewerImages[currentIndex]);
     }
 
+    /**
+     * (신규) popstate 이벤트 핸들러 (뒤로가기 버튼)
+     */
     function closeOnBack() {
-        closeViewer();
+        // 뷰어가 활성화 상태일 때만 닫기 애니메이션 실행
+        if (document.documentElement.classList.contains('viewer-is-active')) {
+            _performCloseAnimation();
+        }
     }
+
+    /**
+     * (신규) 실제 닫기 애니메이션 및 정리 작업을 수행하는 내부 함수
+     */
+    function _performCloseAnimation() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        const currentWrapper = viewerZoomTargets[currentIndex]?.parentElement;
+        
+        // 1. 닫기 애니메이션 시작
+        document.documentElement.classList.remove('viewer-is-active');
+        
+        // 2. 애니메이션 시간(350ms) 후 정리 작업
+        setTimeout(() => {
+            document.body.style.overflow = '';
+            filterMenu.classList.add('hidden');
+            
+            if(currentWrapper) {
+                 currentWrapper.classList.remove('active'); // 현재 이미지 페이드 아웃
+            }
+    
+            if (zoomController) {
+                zoomController.destroy();
+                zoomController = null;
+            }
+            if (gestureHandler) {
+                gestureHandler.destroy();
+                gestureHandler = null;
+            }
+            if (isFullscreen) exitFullscreen();
+            
+            isTransitioning = false;
+        }, ANIMATION_DURATION);
+    }
+
     
     /**
-     * 뷰어 열기
+     * (수정) 뷰어 열기
      */
     function openViewer(index) {
         if (isTransitioning) return;
         currentIndex = index;
         showLoading();
-
-        location.hash = `image-viewer-${currentIndex}`;
-        window.addEventListener('popstate', closeOnBack);
+        
+        // (수정) popstate 리스너 등록을 setupEventListeners로 이동
+        // (신규) 뷰어 열기 전, 혹시 history state가 남아있으면(예: 비정상 종료) 교체
+        const state = { imageViewer: true };
+        if (history.state?.imageViewer) {
+            history.replaceState(state, '', '#viewer');
+        } else {
+            history.pushState(state, '', '#viewer');
+        }
         
         const currentWrapper = viewerZoomTargets[currentIndex].parentElement;
         const currentImage = viewerImages[currentIndex];
@@ -267,27 +318,20 @@
             applyStoredEffect(currentImage);
             updateViewer(); // 카운터, 버튼 업데이트
             
-            // View Transition API 적용
-            const transitionName = `${VT_PREFIX}${currentIndex}`;
-            // 썸네일과 뷰어 이미지의 transition-name이 일치하는지 확인
-            articleImages[currentIndex].style.viewTransitionName = transitionName;
-            currentImage.style.viewTransitionName = transitionName;
-
             const runOpenAnimation = () => {
-                viewer.classList.remove('hidden');
-                viewer.classList.add('flex');
+                // (수정) hidden 클래스 대신 애니메이션 클래스로 제어
                 document.body.style.overflow = 'hidden';
                 currentWrapper.classList.add('active'); // 페이드 인
+                
+                // (신규) 애니메이션 트리거
+                document.documentElement.classList.add('viewer-is-active');
+                
                 hideLoading();
             };
 
-            if (document.startViewTransition) {
-                document.startViewTransition(runOpenAnimation);
-            } else {
-                runOpenAnimation();
-            }
+            runOpenAnimation();
             
-            // (신규) 이전/다음 이미지 미리 로드
+            // 이전/다음 이미지 미리 로드
             preloadNeighbors();
         };
         
@@ -298,56 +342,22 @@
     }
     
     /**
-     * 뷰어 닫기
+     * (수정) 뷰어 닫기 (버튼/키보드용)
      */
     function closeViewer() {
         if (isTransitioning) return;
 
-        const currentWrapper = viewerZoomTargets[currentIndex].parentElement;
-        const currentImage = viewerImages[currentIndex];
-        
-        // View Transition API 적용
-        const transitionName = `${VT_PREFIX}${currentIndex}`;
-        articleImages[currentIndex].style.viewTransitionName = transitionName;
-        currentImage.style.viewTransitionName = transitionName;
-
-        const runCloseAnimation = () => {
-            viewer.classList.remove('flex');
-            viewer.classList.add('hidden');
-            document.body.style.overflow = '';
-            filterMenu.classList.add('hidden');
-            currentWrapper.classList.remove('active'); // 페이드 아웃
-        };
-
-        const cleanup = () => {
-            if (zoomController) {
-                zoomController.destroy();
-                zoomController = null;
-            }
-            if (gestureHandler) {
-                gestureHandler.destroy();
-                gestureHandler = null;
-            }
-            if (isFullscreen) exitFullscreen();
-            
-            // transition-name 초기화
-            currentImage.style.viewTransitionName = 'none';
-            articleImages[currentIndex].style.viewTransitionName = 'none';
-            
-            window.removeEventListener('popstate', closeOnBack);
-        };
-
-        if (document.startViewTransition) {
-            const transition = document.startViewTransition(runCloseAnimation);
-            transition.finished.then(cleanup);
+        // (수정) history.state를 확인하고, popstate를 유발하기 위해 history.back() 호출
+        if (history.state?.imageViewer) {
+            history.back();
         } else {
-            runCloseAnimation();
-            cleanup();
+            // history state가 없는 비정상적인 경우, 직접 닫기 실행
+            _performCloseAnimation();
         }
     }
     
     /**
-     * (신규) 이전/다음 이미지 미리 로드
+     * 이전/다음 이미지 미리 로드
      */
     function preloadNeighbors() {
         if (currentIndex > 0) {
@@ -375,6 +385,7 @@
      * (수정) 이전 이미지로 페이드
      */
     function showPrev() {
+        // (수정) isTransitioning 플래그 사용
         if (currentIndex > 0 && !isTransitioning && (!zoomController || !zoomController.getState().isZoomed)) {
             isTransitioning = true;
             
@@ -387,12 +398,7 @@
             
             // 2. 현재 래퍼 페이드 아웃
             const oldWrapper = viewerZoomTargets[currentIndex].parentElement;
-            const oldImage = viewerImages[currentIndex]; // (신규)
-            const oldArticleImage = articleImages[currentIndex]; // (신규)
             oldWrapper.classList.remove('active');
-            // (신규) View Transition 연결 해제
-            oldImage.style.viewTransitionName = 'none';
-            oldArticleImage.style.viewTransitionName = 'none';
             
             // 3. 인덱스 변경
             currentIndex--;
@@ -401,12 +407,6 @@
             const newWrapper = viewerZoomTargets[currentIndex].parentElement;
             const newImage = viewerImages[currentIndex];
             const newZoomTarget = viewerZoomTargets[currentIndex];
-            const newArticleImage = articleImages[currentIndex]; // (신규)
-            
-            // (신규) View Transition 연결
-            const newTransitionName = `${VT_PREFIX}${currentIndex}`;
-            newImage.style.viewTransitionName = newTransitionName;
-            newArticleImage.style.viewTransitionName = newTransitionName;
 
             // 5. 새 이미지 로드 (필요시) 및 컨트롤러 재초기화
             newImage.src = articleImages[currentIndex].src; // 이미 로드됐으면 캐시 사용
@@ -422,7 +422,7 @@
                 // 7. 이웃 미리 로드
                 preloadNeighbors();
                 
-                // 트랜지션 시간(200ms) 후 상태 해제
+                // (수정) 페이드 트랜지션 시간(200ms) 후 상태 해제
                 setTimeout(() => { isTransitioning = false; }, 200);
             };
             newImage.onerror = () => {
@@ -436,6 +436,7 @@
      * (수정) 다음 이미지로 페이드
      */
     function showNext() {
+        // (수정) isTransitioning 플래그 사용
         if (currentIndex < articleImages.length - 1 && !isTransitioning && (!zoomController || !zoomController.getState().isZoomed)) {
             isTransitioning = true;
             
@@ -446,24 +447,13 @@
             }
             
             const oldWrapper = viewerZoomTargets[currentIndex].parentElement;
-            const oldImage = viewerImages[currentIndex]; // (신규)
-            const oldArticleImage = articleImages[currentIndex]; // (신규)
             oldWrapper.classList.remove('active');
-            // (신규) View Transition 연결 해제
-            oldImage.style.viewTransitionName = 'none';
-            oldArticleImage.style.viewTransitionName = 'none';
             
             currentIndex++;
             
             const newWrapper = viewerZoomTargets[currentIndex].parentElement;
             const newImage = viewerImages[currentIndex];
             const newZoomTarget = viewerZoomTargets[currentIndex];
-            const newArticleImage = articleImages[currentIndex]; // (신규)
-            
-            // (신규) View Transition 연결
-            const newTransitionName = `${VT_PREFIX}${currentIndex}`;
-            newImage.style.viewTransitionName = newTransitionName;
-            newArticleImage.style.viewTransitionName = newTransitionName;
 
             newImage.src = articleImages[currentIndex].src;
             newImage.onload = () => {
@@ -476,6 +466,7 @@
                 
                 preloadNeighbors();
                 
+                // (수정) 페이드 트랜지션 시간(200ms) 후 상태 해제
                 setTimeout(() => { isTransitioning = false; }, 200);
             };
             newImage.onerror = () => {
@@ -486,7 +477,7 @@
     }
     
     /**
-     * (수정) 줌 컨트롤러 초기화
+     * 줌 컨트롤러 초기화
      */
     function initZoomController(zoomTarget, imageEl) {
         if (zoomController) zoomController.destroy();
@@ -499,13 +490,15 @@
     }
     
     /**
-     * (수정) 제스처 핸들러 초기화
+     * 제스처 핸들러 초기화
      */
     function initGestureHandler() {
         if (gestureHandler) gestureHandler.destroy();
         
         // 제스처는 뷰어 전체(배경 포함)에서 감지
         gestureHandler = new window.GestureHandler(viewer, {
+            // (신규) 줌 상태인지 확인하는 콜백 추가
+            isZoomed: () => zoomController && zoomController.getState().isZoomed,
             onDoubleTap: (point) => {
                 if (zoomController) {
                     const scale = zoomController.toggleZoom(point.x, point.y);
@@ -561,7 +554,7 @@
     }
     
     /**
-     * (수정) 현재 이미지의 효과를 UI 컨트롤에 로드
+     * 현재 이미지의 효과를 UI 컨트롤에 로드
      */
     function loadEffectsToUI() {
         const effect = imageEffects[currentIndex] || getDefaultEffects();
@@ -577,7 +570,7 @@
     }
     
     /**
-     * (수정) 지정된 이미지 요소에 현재 저장된 효과 적용
+     * 지정된 이미지 요소에 현재 저장된 효과 적용
      */
     function applyStoredEffect(imageElement) {
         if (!imageElement) return;
@@ -701,7 +694,7 @@
     }
     
     function handleKeyboard(e) {
-        if (viewer.classList.contains('hidden') || isTransitioning) return;
+        if (isTransitioning || !document.documentElement.classList.contains('viewer-is-active')) return;
 
         switch(e.key) {
             case 'Escape':
@@ -709,7 +702,7 @@
                     const scale = zoomController.resetZoom();
                     updateZoomDisplay(scale);
                 } else {
-                    closeViewer();
+                    closeViewer(); // (수정) 닫기 함수 호출
                 }
                 break;
             case 'ArrowLeft':
@@ -762,9 +755,8 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initImageViewer);
     } else {
-        initImageViewer();
+        initImageViewTagger();
     }
     
 })();
-
 
