@@ -289,7 +289,7 @@
                 <div class="w-full h-auto overflow-hidden bg-gray-100 dark:bg-zinc-700 aspect-video">
                     <img src="${linkData.image}" 
                          alt="${this.escapeHtml(linkData.title)}"
-                         class="w-full h-full object-cover dark:brightness-90"
+                         class="w-full h-full object-cover dark:brightness-90 !m-0"
                          onerror="this.parentElement.style.display='none'">
                 </div>
             ` : '';
