@@ -306,7 +306,7 @@
             onDrag: (data) => {
                 if (zoomController && zoomController.getState().isZoomed) {
                     zoomController.drag(data.x, data.y);
-                    viewerContainer.textContent = `x: ${data.x}, y: ${data.y}`;
+                    viewerCounter.textContent = `x: ${data.x}, y: ${data.y}`;
                     return true;
                 }
                 return false;
