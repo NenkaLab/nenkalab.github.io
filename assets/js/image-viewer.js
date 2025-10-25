@@ -12,6 +12,8 @@
     rotate: 0
   };
   let filtersState = {};
+  let currentRenderMode = 'default';
+  let currentQualityMode = 'performance';
 
   let activePointers = [];
   let lastTapTime = 0;
@@ -48,6 +50,7 @@
   const effectsBtn = document.getElementById('iv-effects-button');
   
   const effectsPopup = document.getElementById('iv-effects-popup');
+  const effectsCloseBtn = document.getElementById('iv-effects-close-btn');
   const effectsListEl = document.getElementById('iv-effects-list');
   const effectResetCurrentBtn = document.getElementById('iv-effect-reset-current');
   const effectApplyAllBtn = document.getElementById('iv-effect-apply-all');
@@ -73,7 +76,9 @@
     allImages = Array.from(proseImages).map(img => ({
       src: img.src,
       alt: img.alt,
-      filters: {}
+      filters: {},
+      renderMode: 'default',
+      qualityMode: 'performance'
     }));
 
     proseImages.forEach((img, index) => {
@@ -144,12 +149,16 @@
     if (forceReset || !imageData.transform) {
       imageData.transform = { zoom: 1, pan: { x: 0, y: 0 }, rotate: 0 };
       imageData.filters = imageData.filters || {};
+      imageData.renderMode = 'default';
+      imageData.qualityMode = 'performance';
     }
     
     transformState = { ...imageData.transform };
     filtersState = { ...imageData.filters };
+    currentRenderMode = imageData.renderMode || 'default';
+    currentQualityMode = imageData.qualityMode || 'performance';
     
-    applyAllTransforms();
+    applyRenderQuality();
     updateZoomUI();
   }
 
@@ -157,17 +166,38 @@
     if (!activeImgEl) return;
     
     const { zoom, pan, rotate } = transformState;
-    const filterString = Object.values(filtersState).join(' ');
+    let filterString = Object.values(filtersState).join(' ');
+    
+    if (currentRenderMode === 'vivid') {
+      filterString += ' saturate(1.2) contrast(1.1)';
+    }
     
     activeImgEl.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) rotate(${rotate}deg)`;
-    activeImgEl.style.filter = filterString || 'none';
+    activeImgEl.style.filter = filterString.trim() || 'none';
     
     wrapper.classList.toggle('is-zoomed', zoom > 1);
     
     if (allImages[currentIndex]) {
       allImages[currentIndex].transform = { ...transformState };
       allImages[currentIndex].filters = { ...filtersState };
+      allImages[currentIndex].renderMode = currentRenderMode;
+      allImages[currentIndex].qualityMode = currentQualityMode;
     }
+  }
+
+  function applyRenderQuality() {
+    let renderStyle = '';
+    if (currentRenderMode === 'pixelated') {
+        renderStyle = 'pixelated';
+    } else if (currentQualityMode === 'quality') {
+        renderStyle = 'auto';
+    } else {
+        renderStyle = 'crisp-edges';
+    }
+    img1.style.imageRendering = renderStyle;
+    img2.style.imageRendering = renderStyle;
+
+    applyAllTransforms();
   }
 
   function navigate(direction) {
@@ -192,12 +222,17 @@
     zoomPercentEl.textContent = `${Math.round(transformState.zoom * 100)}%`;
   }
 
-  function showControls() {
+  function showControls(keepVisible = false) {
     if (effectsPopup.style.display === 'block') return;
 
     isControlsVisible = true;
     viewer.classList.remove('iv-controls-hidden');
-    startControlsHideTimer();
+    
+    if (!keepVisible) {
+      startControlsHideTimer();
+    } else {
+      clearTimeout(controlsHideTimer);
+    }
   }
 
   function hideControls() {
@@ -274,6 +309,7 @@
     document.addEventListener('fullscreenchange', updateFullscreenIcon);
 
     effectsBtn.addEventListener('click', toggleEffectsPopup);
+    effectsCloseBtn.addEventListener('click', toggleEffectsPopup);
 
     wrapper.addEventListener('pointerdown', handlePointerDown);
     wrapper.addEventListener('pointermove', handlePointerMove);
@@ -285,8 +321,13 @@
       el.addEventListener('pointermove', (e) => {
         e.stopPropagation();
         if (isHoverDevice()) {
-          showControls();
+          showControls(true);
         }
+      });
+      el.addEventListener('pointerleave', (e) => {
+          if (isHoverDevice()) {
+              startControlsHideTimer();
+          }
       });
     });
   }
@@ -296,7 +337,11 @@
 
     switch (e.key) {
       case 'Escape':
-        closeViewer();
+        if (effectsPopup.style.display === 'block') {
+          toggleEffectsPopup();
+        } else {
+          closeViewer();
+        }
         break;
       case 'ArrowLeft':
         navigate(-1);
@@ -320,7 +365,7 @@
   }
   
   function handlePointerDown(e) {
-    if (e.target.closest('.iv-button, input[type="range"]')) return;
+    if (e.target.closest('.iv-button, .iv-option-btn, input[type="range"]')) return;
     e.preventDefault();
     
     try {
@@ -515,17 +560,45 @@
       setRotate(transformState.rotate + rotateAmount);
     } else {
       const zoomAmount = 1 + delta * 0.1;
-      setZoom(transformState.zoom * zoomAmount);
+      const newZoom = transformState.zoom * zoomAmount;
+      setZoom(newZoom, true, { x: e.clientX, y: e.clientY });
     }
     
     showControls();
   }
   
-  function setZoom(newZoom, updateUI = true) {
-    transformState.zoom = Math.max(0.1, Math.min(newZoom, 10));
+  function setZoom(newZoom, updateUI = true, origin = null) {
+    const zOld = transformState.zoom;
+    const zNew = Math.max(0.1, Math.min(newZoom, 10));
     
-    if (transformState.zoom === 1) {
+    if (zOld === zNew) return;
+    
+    const ratio = zNew / zOld;
+
+    transformState.zoom = zNew;
+    
+    if (zNew === 1) {
       transformState.pan = { x: 0, y: 0 };
+    } else {
+      let originX, originY;
+      if (origin && wrapper.clientWidth > 0) {
+          originX = origin.x;
+          originY = origin.y;
+      } else if (wrapper.clientWidth > 0) {
+          originX = wrapper.clientWidth / 2;
+          originY = wrapper.clientHeight / 2;
+      } else {
+          originX = window.innerWidth / 2;
+          originY = window.innerHeight / 2;
+      }
+      
+      const px = transformState.pan.x;
+      const py = transformState.pan.y;
+      const cx = wrapper.clientWidth / 2 || window.innerWidth / 2;
+      const cy = wrapper.clientHeight / 2 || window.innerHeight / 2;
+
+      transformState.pan.x = (originX - cx) * (1 - ratio) + px * ratio;
+      transformState.pan.y = (originY - cy) * (1 - ratio) + py * ratio;
     }
     
     if (updateUI) {
@@ -567,7 +640,7 @@
       
       slider.addEventListener('input', () => {
         let value = parseFloat(slider.value);
-        if (filterKey === 'blur') value = value.toFixed(1);
+        if (filterKey === 'blur') value = parseFloat(value.toFixed(1));
         
         valueEl.textContent = `${value}${props.unit}`;
         resetBtn.style.opacity = (value !== props.value) ? '1' : '0';
@@ -596,14 +669,44 @@
     
     effectApplyAllBtn.addEventListener('click', () => {
       const currentFilters = allImages[currentIndex].filters;
+      const currentRender = allImages[currentIndex].renderMode;
+      const currentQuality = allImages[currentIndex].qualityMode;
+
       allImages.forEach(img => {
         img.filters = { ...currentFilters };
+        img.renderMode = currentRender;
+        img.qualityMode = currentQuality;
       });
+      
+      updateEffectsOptionsUI();
+      applyRenderQuality();
     });
     
     effectResetAllBtn.addEventListener('click', () => {
-      allImages.forEach((img, i) => resetFilters(i));
+      allImages.forEach((img, i) => {
+        resetFilters(i);
+        img.renderMode = 'default';
+        img.qualityMode = 'performance';
+      });
       loadEffectsUI(currentIndex);
+      updateEffectsOptionsUI();
+      applyRenderQuality();
+    });
+
+    document.querySelectorAll('#iv-render-mode button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentRenderMode = btn.dataset.value;
+            updateEffectsOptionsUI();
+            applyRenderQuality();
+        });
+    });
+
+    document.querySelectorAll('#iv-quality-mode button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentQualityMode = btn.dataset.value;
+            updateEffectsOptionsUI();
+            applyRenderQuality();
+        });
     });
   }
 
@@ -611,6 +714,7 @@
     const isHidden = effectsPopup.style.display === 'none' || effectsPopup.style.display === '';
     if (isHidden) {
       loadEffectsUI(currentIndex);
+      updateEffectsOptionsUI();
       effectsPopup.style.display = 'block';
       clearTimeout(controlsHideTimer);
       viewer.classList.remove('iv-controls-hidden');
@@ -635,7 +739,7 @@
         const match = filterStr.match(/\(([^)]+)\)/);
         if (match) {
            let val = parseFloat(match[1]);
-           if (props.cssValue(100) === 1) val *= 100;
+           if (props.cssValue(100) === 1 && !filterStr.includes('%')) val *= 100;
            currentValue = val;
         }
       }
@@ -645,10 +749,28 @@
       const resetBtn = item.querySelector('.iv-effect-reset-btn');
 
       slider.value = currentValue;
-      if (filterKey === 'blur') currentValue = currentValue.toFixed(1);
-      valueEl.textContent = `${currentValue}${props.unit}`;
+      let displayValue = currentValue;
+      if (filterKey === 'blur') displayValue = parseFloat(displayValue.toFixed(1));
+      valueEl.textContent = `${displayValue}${props.unit}`;
       resetBtn.style.opacity = (parseFloat(slider.value) !== props.value) ? '1' : '0';
     });
+  }
+
+  function updateEffectsOptionsUI() {
+      document.querySelectorAll('#iv-render-mode button').forEach(btn => {
+          const isActive = btn.dataset.value === currentRenderMode;
+          btn.classList.toggle('iv-btn-active', isActive);
+          btn.classList.toggle('bg-blue-600', isActive);
+          btn.classList.toggle('bg-zinc-600', !isActive);
+          btn.classList.toggle('hover:bg-zinc-500', !isActive);
+      });
+      document.querySelectorAll('#iv-quality-mode button').forEach(btn => {
+          const isActive = btn.dataset.value === currentQualityMode;
+          btn.classList.toggle('iv-btn-active', isActive);
+          btn.classList.toggle('bg-blue-600', isActive);
+          btn.classList.toggle('bg-zinc-600', !isActive);
+          btn.classList.toggle('hover:bg-zinc-500', !isActive);
+      });
   }
   
   function resetFilters(index) {
@@ -661,3 +783,4 @@
   }
   
 })();
+
