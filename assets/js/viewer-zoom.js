@@ -1,4 +1,3 @@
-
 (function(window) {
     'use strict';
     
@@ -8,9 +7,9 @@
             this.image = image;
             this.options = Object.assign({
                 minScale: 1,
-                maxScale: 15,
+                maxScale: 10,
                 scaleStep: 0.5,
-                doubleTapScale: 5,
+                doubleTapScale: 3,
                 animationDuration: 200
             }, options);
             
@@ -59,9 +58,10 @@
                 const offsetX = centerX - rect.left - rect.width / 2;
                 const offsetY = centerY - rect.top - rect.height / 2;
                 
-                const scaleChange = newScale / this.scale;
-                this.translateX = centerX - rect.left - (centerX - rect.left - this.translateX) * scaleChange;
-                this.translateY = centerY - rect.top - (centerY - rect.top - this.translateY) * scaleChange;
+                const scaleRatio = newScale / this.scale;
+                
+                this.translateX = offsetX - (offsetX - this.translateX) * scaleRatio;
+                this.translateY = offsetY - (offsetY - this.translateY) * scaleRatio;
             }
             
             this.scale = newScale;
@@ -124,8 +124,11 @@
         drag(x, y) {
             if (!this.isDragging || this.scale <= this.options.minScale) return false;
             
-            this.translateX = this.lastTranslateX + (x - this.dragStartX);
-            this.translateY = this.lastTranslateY + (y - this.dragStartY);
+            const deltaX = x - this.dragStartX;
+            const deltaY = y - this.dragStartY;
+            
+            this.translateX = this.lastTranslateX + deltaX;
+            this.translateY = this.lastTranslateY + deltaY;
             
             this.constrainPan();
             this.updateTransform(false);
@@ -145,17 +148,21 @@
                 return;
             }
             
-            const rect = this.wrapper.getBoundingClientRect();
-            const imageRect = this.image.getBoundingClientRect();
+            const wrapperRect = this.wrapper.parentElement.getBoundingClientRect();
+            const imageNaturalWidth = this.image.naturalWidth || this.image.width;
+            const imageNaturalHeight = this.image.naturalHeight || this.image.height;
             
-            const scaledWidth = imageRect.width;
-            const scaledHeight = imageRect.height;
+            const displayWidth = Math.min(wrapperRect.width, imageNaturalWidth);
+            const displayHeight = Math.min(wrapperRect.height, imageNaturalHeight);
             
-            const maxTranslateX = Math.max(0, (scaledWidth - rect.width) / 2);
-            const maxTranslateY = Math.max(0, (scaledHeight - rect.height) / 2);
+            const scaledWidth = displayWidth * this.scale;
+            const scaledHeight = displayHeight * this.scale;
             
-            this.translateX = Math.max(-maxTranslateX, Math.min(maxTranslateX, this.translateX));
-            this.translateY = Math.max(-maxTranslateY, Math.min(maxTranslateY, this.translateY));
+            const maxX = Math.max(0, (scaledWidth - wrapperRect.width) / 2);
+            const maxY = Math.max(0, (scaledHeight - wrapperRect.height) / 2);
+            
+            this.translateX = Math.max(-maxX, Math.min(maxX, this.translateX));
+            this.translateY = Math.max(-maxY, Math.min(maxY, this.translateY));
         }
         
         rotate(degrees = 90) {

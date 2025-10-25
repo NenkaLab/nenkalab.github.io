@@ -1,4 +1,3 @@
-
 (function(window) {
     'use strict';
     
@@ -13,10 +12,16 @@
             this.startScale = 1;
             this.isPinching = false;
             this.isSwiping = false;
+            this.isDragging = false;
+            this.isMouseDown = false;
             this.swipeStartX = 0;
             this.swipeStartY = 0;
+            this.mouseStartX = 0;
+            this.mouseStartY = 0;
             this.swipeThreshold = 50;
+            this.dragThreshold = 5;
             this.doubleTapDelay = 300;
+            this.hasMoved = false;
             
             this.init();
         }
@@ -50,10 +55,13 @@
         
         handleTouchStart(e) {
             this.touches = Array.from(e.touches);
+            this.hasMoved = false;
             
             if (this.touches.length === 2) {
                 e.preventDefault();
                 this.isPinching = true;
+                this.isDragging = false;
+                this.isSwiping = false;
                 this.startDistance = this.getDistance(this.touches[0], this.touches[1]);
                 const center = this.getCenter(this.touches[0], this.touches[1]);
                 
@@ -77,6 +85,7 @@
             if (this.touches.length === 0) return;
             
             this.touches = Array.from(e.touches);
+            this.hasMoved = true;
             
             if (this.isPinching && this.touches.length === 2) {
                 e.preventDefault();
@@ -90,18 +99,25 @@
             } else if (this.touches.length === 1) {
                 const deltaX = this.touches[0].clientX - this.swipeStartX;
                 const deltaY = this.touches[0].clientY - this.swipeStartY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                if (distance > this.dragThreshold) {
+                    this.isDragging = true;
+                }
                 
                 if (this.callbacks.onDrag) {
-                    this.callbacks.onDrag({
+                    const shouldDrag = this.callbacks.onDrag({
                         x: this.touches[0].clientX,
                         y: this.touches[0].clientY,
                         deltaX: deltaX,
                         deltaY: deltaY
                     });
-                }
-                
-                if (Math.abs(deltaX) > this.swipeThreshold || Math.abs(deltaY) > this.swipeThreshold) {
-                    this.isSwiping = true;
+                    
+                    if (shouldDrag) {
+                        e.preventDefault();
+                    } else if (Math.abs(deltaX) > this.swipeThreshold || Math.abs(deltaY) > this.swipeThreshold) {
+                        this.isSwiping = true;
+                    }
                 }
             }
         }
@@ -112,24 +128,24 @@
                 if (this.callbacks.onPinchEnd) {
                     this.callbacks.onPinchEnd();
                 }
-            } else if (this.touches.length === 1) {
+            } else if (this.touches.length === 1 && !e.touches.length) {
                 const deltaX = this.touches[0].clientX - this.swipeStartX;
                 const deltaY = this.touches[0].clientY - this.swipeStartY;
                 
                 const now = Date.now();
-                if (now - this.lastTap < this.doubleTapDelay && !this.isSwiping) {
-                    if (this.callbacks.onDoubleTap) {
-                        this.callbacks.onDoubleTap({
-                            x: this.touches[0].clientX,
-                            y: this.touches[0].clientY
-                        });
+                if (!this.hasMoved || (Math.abs(deltaX) < this.dragThreshold && Math.abs(deltaY) < this.dragThreshold)) {
+                    if (now - this.lastTap < this.doubleTapDelay) {
+                        if (this.callbacks.onDoubleTap) {
+                            this.callbacks.onDoubleTap({
+                                x: this.touches[0].clientX,
+                                y: this.touches[0].clientY
+                            });
+                        }
+                        this.lastTap = 0;
+                    } else {
+                        this.lastTap = now;
                     }
-                    this.lastTap = 0;
-                } else {
-                    this.lastTap = now;
-                }
-                
-                if (this.isSwiping) {
+                } else if (this.isSwiping && !this.isDragging) {
                     if (Math.abs(deltaX) > Math.abs(deltaY)) {
                         if (deltaX > this.swipeThreshold && this.callbacks.onSwipeRight) {
                             this.callbacks.onSwipeRight();
@@ -146,14 +162,17 @@
             
             this.touches = Array.from(e.touches);
             this.isSwiping = false;
+            this.isDragging = false;
+            this.hasMoved = false;
         }
         
         handleMouseDown(e) {
-            if (e.button !== 0) return; 
+            if (e.button !== 0) return;
             
             this.isMouseDown = true;
             this.mouseStartX = e.clientX;
             this.mouseStartY = e.clientY;
+            this.hasMoved = false;
             
             if (this.callbacks.onDragStart) {
                 this.callbacks.onDragStart({
@@ -181,6 +200,11 @@
             
             const deltaX = e.clientX - this.mouseStartX;
             const deltaY = e.clientY - this.mouseStartY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            if (distance > this.dragThreshold) {
+                this.hasMoved = true;
+            }
             
             if (this.callbacks.onDrag) {
                 this.callbacks.onDrag({
@@ -198,6 +222,8 @@
             if (this.callbacks.onDragEnd) {
                 this.callbacks.onDragEnd();
             }
+            
+            this.hasMoved = false;
         }
         
         handleWheel(e) {
