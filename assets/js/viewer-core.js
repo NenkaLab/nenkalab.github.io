@@ -45,6 +45,16 @@
     let isFullscreen = false;
     let imageEffects = [];
     
+    // 슬라이드 관련 변수
+    let slideContainer = null;
+    let slideImages = {
+        prev: null,
+        current: null,
+        next: null
+    };
+    let isSliding = false;
+    let slideOffset = 0;
+    
     function initImageViewer() {
         const articleImages = document.querySelectorAll('.prose img');
         if (articleImages.length === 0) return;
@@ -57,7 +67,71 @@
             img.addEventListener('click', () => openViewer(index));
         });
         
+        setupSlideContainer();
         setupEventListeners();
+    }
+    
+    function setupSlideContainer() {
+        // 기존 이미지 컨테이너를 슬라이드 컨테이너로 변환
+        slideContainer = document.createElement('div');
+        slideContainer.className = 'slide-container';
+        slideContainer.style.cssText = `
+            display: flex;
+            width: 300%;
+            height: 100%;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        `;
+        
+        // 3개의 이미지 슬롯 생성
+        ['prev', 'current', 'next'].forEach(key => {
+            const slot = document.createElement('div');
+            slot.className = `slide-slot slide-${key}`;
+            slot.style.cssText = `
+                width: 33.333%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            `;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'viewer-image-wrapper zooming';
+            wrapper.style.cssText = `
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+                transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            `;
+            
+            const img = document.createElement('img');
+            img.className = 'viewer-image';
+            img.style.cssText = `
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                user-select: none;
+            `;
+            
+            wrapper.appendChild(img);
+            slot.appendChild(wrapper);
+            slideContainer.appendChild(slot);
+            
+            slideImages[key] = {
+                slot: slot,
+                wrapper: wrapper,
+                img: img
+            };
+        });
+        
+        // 기존 구조 대체
+        viewerContainer.innerHTML = '';
+        viewerContainer.appendChild(slideContainer);
+        
+        // 초기 위치 설정 (중앙)
+        slideContainer.style.transform = 'translateX(-33.333%)';
     }
     
     function getDefaultEffects() {
@@ -195,139 +269,252 @@
         window.addEventListener('popstate', closeOnBack);
         history.pushState({ imageViewer: true }, '', '#viewer');
         
-        const img = images[currentIndex];
-        const tempImage = new Image();
+        loadSlideImages();
         
-        tempImage.onload = () => {
-            viewerImage.src = tempImage.src;
-            viewerImage.alt = img.alt || '';
-            
-            updateViewer();
-            viewer.classList.remove('hidden');
-            viewer.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-            
-            initZoomController();
-            initGestureHandler();
-            loadEffectsToUI();
-            applyStoredEffect();
-            
-            hideLoading();
-        };
+        viewer.classList.remove('hidden');
+        viewer.classList.add('flex');
+        document.body.style.overflow = 'hidden';
         
-        tempImage.onerror = () => {
-            hideLoading();
-            console.error('이미지 로드 실패:', img.src);
-        };
+        updateViewer();
+        hideLoading();
         
-        tempImage.src = img.src;
+        initGestureHandler();
     }
     
-    function closeViewer() {
-        viewer.classList.remove('flex');
-        viewer.classList.add('hidden');
-        document.body.style.overflow = '';
-        filterMenu.classList.add('hidden');
+    function loadSlideImages() {
+        // 현재 이미지
+        const currentImg = images[currentIndex];
+        slideImages.current.img.src = currentImg.src;
+        slideImages.current.img.alt = currentImg.alt || '';
         
-        if (zoomController) {
-            zoomController.destroy();
-            zoomController = null;
+        // 이전 이미지
+        if (currentIndex > 0) {
+            const prevImg = images[currentIndex - 1];
+            slideImages.prev.img.src = prevImg.src;
+            slideImages.prev.img.alt = prevImg.alt || '';
+            slideImages.prev.slot.style.visibility = 'visible';
+        } else {
+            slideImages.prev.img.src = '';
+            slideImages.prev.slot.style.visibility = 'hidden';
         }
         
-        if (gestureHandler) {
-            gestureHandler.destroy();
-            gestureHandler = null;
+        // 다음 이미지
+        if (currentIndex < images.length - 1) {
+            const nextImg = images[currentIndex + 1];
+            slideImages.next.img.src = nextImg.src;
+            slideImages.next.img.alt = nextImg.alt || '';
+            slideImages.next.slot.style.visibility = 'visible';
+        } else {
+            slideImages.next.img.src = '';
+            slideImages.next.slot.style.visibility = 'hidden';
         }
         
-        if (isFullscreen) exitFullscreen();
+        // 슬라이드 위치 리셋
+        slideContainer.style.transition = 'none';
+        slideContainer.style.transform = 'translateX(-33.333%)';
+        slideOffset = 0;
         
-        window.removeEventListener('popstate', closeOnBack);
-        if (history.state && history.state.imageViewer) {
-            history.back();
-        }
-    }
-    
-    function updateViewer() {
-        if (images.length === 0) return;
-        
-        viewerCounter.textContent = `${currentIndex + 1} / ${images.length}`;
-        prevBtn.style.display = currentIndex > 0 ? 'flex' : 'none';
-        nextBtn.style.display = currentIndex < images.length - 1 ? 'flex' : 'none';
-        
-        if (zoomController) {
-            zoomController.reset();
-            updateZoomDisplay(1);
-        }
-    }
-    
-    function showPrev() {
-        if (currentIndex > 0 && (!zoomController || !zoomController.getState().isZoomed)) {
-            currentIndex--;
-            openViewer(currentIndex);
-        }
-    }
-    
-    function showNext() {
-        if (currentIndex < images.length - 1 && (!zoomController || !zoomController.getState().isZoomed)) {
-            currentIndex++;
-            openViewer(currentIndex);
-        }
-    }
-    
-    function initZoomController() {
-        if (zoomController) zoomController.destroy();
-        
-        zoomController = new window.ZoomController(viewerImageWrapper, viewerImage, {
-            minScale: 1, maxScale: 5, scaleStep: 0.5, doubleTapScale: 2.5
+        // 트랜지션 복원
+        requestAnimationFrame(() => {
+            slideContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         });
-        
-        updateZoomDisplay(1);
     }
     
     function initGestureHandler() {
-        if (gestureHandler) gestureHandler.destroy();
+        if (gestureHandler) {
+            gestureHandler.destroy();
+        }
         
-        gestureHandler = new window.GestureHandler(viewerContainer, {
+        if (zoomController) {
+            zoomController.destroy();
+        }
+        
+        zoomController = new ZoomController(
+            slideImages.current.wrapper,
+            slideImages.current.img
+        );
+        
+        gestureHandler = new GestureHandler(viewerContainer, {
             onDoubleTap: (point) => {
                 if (zoomController) {
                     const scale = zoomController.toggleZoom(point.x, point.y);
                     updateZoomDisplay(scale);
                 }
             },
-            onPinch: (scale, center) => {
+            
+            onPinchStart: (center) => {
                 if (zoomController) {
-                    const newScale = zoomController.pinchZoom(scale, center.x, center.y);
+                    // 핀치 시작
+                }
+            },
+            
+            onPinch: (scale, center, lastScale) => {
+                if (zoomController) {
+                    const newScale = zoomController.pinchZoom(scale, center, lastScale);
                     updateZoomDisplay(newScale);
                 }
             },
-            onDragStart: (point) => {
-                if (zoomController) zoomController.startDrag(point.x, point.y);
+            
+            onPinchEnd: () => {
+                if (zoomController) {
+                    // 핀치 종료
+                }
             },
-            onDrag: (data) => {
-                if (zoomController && zoomController.getState().isZoomed) {
-                    zoomController.drag(data.x, data.y);
-                    viewerCounter.textContent = `x: ${data.x}, y: ${data.y}`;
-                    return true;
+            
+            onDragStart: (point) => {
+                if (zoomController) {
+                    const started = zoomController.startDrag(point.x, point.y);
+                    return started; // true면 드래그, false면 슬라이드
                 }
                 return false;
             },
+            
+            onDrag: (data) => {
+                if (zoomController) {
+                    return zoomController.drag(data.x, data.y);
+                }
+                return false;
+            },
+            
             onDragEnd: () => {
-                if (zoomController) zoomController.endDrag();
+                if (zoomController) {
+                    zoomController.endDrag();
+                }
             },
-            onSwipeLeft: () => {
-                if (zoomController && !zoomController.getState().isZoomed) showNext();
+            
+            onSlide: (data) => {
+                if (!isSliding && zoomController && !zoomController.getState().isZoomed) {
+                    isSliding = true;
+                    
+                    // 슬라이드 오프셋 적용
+                    const containerWidth = viewerContainer.getBoundingClientRect().width;
+                    const progress = data.deltaX / containerWidth;
+                    const offset = -33.333 + (progress * 33.333);
+                    
+                    slideContainer.style.transition = 'none';
+                    slideContainer.style.transform = `translateX(${offset}%)`;
+                    slideOffset = data.deltaX;
+                }
             },
-            onSwipeRight: () => {
-                if (zoomController && !zoomController.getState().isZoomed) showPrev();
+            
+            onSlideEnd: (data) => {
+                if (isSliding) {
+                    const containerWidth = viewerContainer.getBoundingClientRect().width;
+                    const threshold = containerWidth * 0.3;
+                    const velocity = data.velocity;
+                    
+                    // 속도 또는 거리 기준으로 슬라이드 결정
+                    const shouldSlide = Math.abs(data.deltaX) > threshold || Math.abs(velocity) > 0.5;
+                    
+                    if (shouldSlide) {
+                        if (data.direction === 'right' && currentIndex > 0) {
+                            // 이전 이미지로
+                            slideContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                            slideContainer.style.transform = 'translateX(0)';
+                            
+                            setTimeout(() => {
+                                currentIndex--;
+                                loadSlideImages();
+                                updateViewer();
+                            }, 300);
+                        } else if (data.direction === 'left' && currentIndex < images.length - 1) {
+                            // 다음 이미지로
+                            slideContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                            slideContainer.style.transform = 'translateX(-66.666%)';
+                            
+                            setTimeout(() => {
+                                currentIndex++;
+                                loadSlideImages();
+                                updateViewer();
+                            }, 300);
+                        } else {
+                            // 원위치
+                            slideContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                            slideContainer.style.transform = 'translateX(-33.333%)';
+                        }
+                    } else {
+                        // 원위치
+                        slideContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                        slideContainer.style.transform = 'translateX(-33.333%)';
+                    }
+                    
+                    isSliding = false;
+                    slideOffset = 0;
+                }
             },
-            onWheel: (scale, point) => {
+            
+            onWheel: (scale, center) => {
                 if (zoomController) {
                     const currentScale = zoomController.getState().scale;
-                    const newScale = zoomController.setZoom(currentScale * scale, point.x, point.y);
+                    const newScale = currentScale * scale;
+                    zoomController.setZoom(newScale, center.x, center.y, false);
                     updateZoomDisplay(newScale);
                 }
             }
         });
+    }
+    
+    function closeViewer() {
+        viewer.classList.remove('flex');
+        viewer.classList.add('hidden');
+        document.body.style.overflow = '';
+        
+        if (gestureHandler) {
+            gestureHandler.destroy();
+            gestureHandler = null;
+        }
+        
+        if (zoomController) {
+            zoomController.destroy();
+            zoomController = null;
+        }
+
+        window.removeEventListener('popstate', closeOnBack);
+        
+        if (window.location.hash === '#viewer') {
+            history.back();
+        }
+    }
+    
+    function showPrev() {
+        if (currentIndex > 0 && !isSliding) {
+            slideContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            slideContainer.style.transform = 'translateX(0)';
+            
+            setTimeout(() => {
+                currentIndex--;
+                loadSlideImages();
+                updateViewer();
+            }, 300);
+        }
+    }
+    
+    function showNext() {
+        if (currentIndex < images.length - 1 && !isSliding) {
+            slideContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            slideContainer.style.transform = 'translateX(-66.666%)';
+            
+            setTimeout(() => {
+                currentIndex++;
+                loadSlideImages();
+                updateViewer();
+            }, 300);
+        }
+    }
+    
+    function updateViewer() {
+        viewerCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+        
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === images.length - 1;
+        
+        if (zoomController) {
+            zoomController.reset();
+            updateZoomDisplay(1);
+        }
+        
+        loadEffectsToUI();
+        applyStoredEffect();
     }
     
     function updateZoomDisplay(scale) {
@@ -345,11 +532,12 @@
             control.input.value = value;
         });
         
-        imageRenderingSelect.value = effect.rendering;
+        imageRenderingSelect.value = effect.rendering || 'auto';
     }
     
     function applyStoredEffect() {
         const effect = imageEffects[currentIndex];
+        const img = slideImages.current.img;
         
         const filters = [];
         if (effect.grayscale > 0) filters.push(`grayscale(${effect.grayscale}%)`);
@@ -361,8 +549,8 @@
         if (effect.blur > 0) filters.push(`blur(${effect.blur}px)`);
         if (effect.hue > 0) filters.push(`hue-rotate(${effect.hue}deg)`);
         
-        viewerImage.style.filter = filters.length > 0 ? filters.join(' ') : '';
-        viewerImage.style.imageRendering = effect.rendering;
+        img.style.filter = filters.length > 0 ? filters.join(' ') : '';
+        img.style.imageRendering = effect.rendering;
     }
     
     function applyEffectToAll() {

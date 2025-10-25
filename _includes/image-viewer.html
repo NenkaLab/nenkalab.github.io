@@ -216,6 +216,127 @@
     pointer-events: none;
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* 이미지 뷰어 슬라이드 및 줌 스타일 */
+
+/* 슬라이드 컨테이너 */
+.slide-container {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    will-change: transform;
+}
+
+/* 슬라이드 슬롯 */
+.slide-slot {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+/* 이미지 래퍼 - 줌 애니메이션 */
+.viewer-image-wrapper {
+    will-change: transform;
+}
+
+.viewer-image-wrapper.zooming {
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 이미지 */
+.viewer-image {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+    .slide-container {
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .viewer-image-wrapper.zooming {
+        transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+}
+
+/* iOS Safari 최적화 */
+@supports (-webkit-touch-callout: none) {
+    .slide-container,
+    .viewer-image-wrapper {
+        -webkit-transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        -webkit-perspective: 1000;
+    }
+}
+
+/* 하드웨어 가속 */
+.slide-container,
+.viewer-image-wrapper {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* 버튼 비활성화 스타일 */
+button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* 로딩 스피너 */
+.viewer-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+/* 제스처 힌트 (선택사항) */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.gesture-hint {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 줌 레벨 표시 */
+#viewer-zoom-level {
+    font-variant-numeric: tabular-nums;
+    min-width: 4rem;
+    text-align: center;
+}
+
+/* 네이티브 느낌의 스크롤 바운스 효과 (선택사항) */
+@supports (-webkit-overflow-scrolling: touch) {
+    .slide-container {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* 고해상도 디스플레이 최적화 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .viewer-image {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
 </style>
 
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>

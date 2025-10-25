@@ -23,6 +23,7 @@
             this.lastTranslateX = 0;
             this.lastTranslateY = 0;
             this.animationFrame = null;
+            this.lastPinchCenter = null;
             
             this.updateTransform();
         }
@@ -33,35 +34,38 @@
             }
             
             this.animationFrame = requestAnimationFrame(() => {
+                // 애니메이션 클래스 제어
                 if (animate) {
                     this.wrapper.classList.remove('zooming');
-                } else {
+                    void this.wrapper.offsetWidth; // 리플로우 강제
                     this.wrapper.classList.add('zooming');
+                } else {
+                    this.wrapper.classList.remove('zooming');
                 }
                 
                 const transform = `translate3d(${this.translateX}px, ${this.translateY}px, 0) scale(${this.scale}) rotate(${this.rotation}deg)`;
                 this.wrapper.style.transform = transform;
-                
-                if (animate) {
-                    setTimeout(() => {
-                        this.wrapper.classList.add('zooming');
-                    }, this.options.animationDuration);
-                }
+                this.wrapper.style.willChange = 'transform';
             });
         }
         
         setZoom(newScale, centerX, centerY, animate = true) {
             newScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, newScale));
             
-            if (centerX !== undefined && centerY !== undefined && this.scale > this.options.minScale) {
+            // 줌 중심점 계산
+            if (centerX !== undefined && centerY !== undefined) {
                 const rect = this.wrapper.getBoundingClientRect();
+                
+                // 컨테이너 중심점에서의 오프셋
                 const offsetX = centerX - rect.left - rect.width / 2;
                 const offsetY = centerY - rect.top - rect.height / 2;
                 
+                // 스케일 비율
                 const scaleRatio = newScale / this.scale;
                 
-                this.translateX = offsetX - (offsetX - this.translateX) * scaleRatio;
-                this.translateY = offsetY - (offsetY - this.translateY) * scaleRatio;
+                // 새로운 translate 계산 (줌 중심점 기준)
+                this.translateX = centerX - rect.left - rect.width / 2 - (centerX - rect.left - rect.width / 2 - this.translateX) * scaleRatio;
+                this.translateY = centerY - rect.top - rect.height / 2 - (centerY - rect.top - rect.height / 2 - this.translateY) * scaleRatio;
             }
             
             this.scale = newScale;
@@ -69,7 +73,6 @@
             if (this.scale === this.options.minScale) {
                 this.translateX = 0;
                 this.translateY = 0;
-                // this.rotation = 0;
             } else {
                 this.constrainPan();
             }
@@ -91,7 +94,6 @@
             this.scale = this.options.minScale;
             this.translateX = 0;
             this.translateY = 0;
-            // this.rotation = 0;
             this.updateTransform(animate);
             return this.scale;
         }
@@ -104,9 +106,34 @@
             }
         }
         
-        pinchZoom(scale, centerX, centerY) {
-            const newScale = this.scale * scale;
-            return this.setZoom(newScale, centerX, centerY, false);
+        pinchZoom(scale, center, lastScale) {
+            // 연속적인 핀치 줌
+            const scaleChange = scale / lastScale;
+            const newScale = this.scale * scaleChange;
+            
+            const clampedScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, newScale));
+            
+            if (clampedScale !== newScale) {
+                // 최대/최소 스케일에 도달
+                return this.scale;
+            }
+            
+            // 핀치 중심점 기준으로 줌
+            const rect = this.wrapper.getBoundingClientRect();
+            const offsetX = center.x - rect.left - rect.width / 2;
+            const offsetY = center.y - rect.top - rect.height / 2;
+            
+            // translate 조정 (핀치 중심점이 고정되도록)
+            this.translateX = offsetX - (offsetX - this.translateX) * scaleChange;
+            this.translateY = offsetY - (offsetY - this.translateY) * scaleChange;
+            
+            this.scale = clampedScale;
+            this.lastPinchCenter = center;
+            
+            this.constrainPan();
+            this.updateTransform(false);
+            
+            return this.scale;
         }
         
         startDrag(x, y) {
@@ -152,15 +179,30 @@
             const imageNaturalWidth = this.image.naturalWidth || this.image.width;
             const imageNaturalHeight = this.image.naturalHeight || this.image.height;
             
-            const displayWidth = Math.min(wrapperRect.width, imageNaturalWidth);
-            const displayHeight = Math.min(wrapperRect.height, imageNaturalHeight);
+            // 이미지의 실제 표시 크기 계산
+            const imageAspect = imageNaturalWidth / imageNaturalHeight;
+            const containerAspect = wrapperRect.width / wrapperRect.height;
+            
+            let displayWidth, displayHeight;
+            
+            if (imageAspect > containerAspect) {
+                // 이미지가 더 넓음 (가로가 기준)
+                displayWidth = Math.min(wrapperRect.width, imageNaturalWidth);
+                displayHeight = displayWidth / imageAspect;
+            } else {
+                // 이미지가 더 높음 (세로가 기준)
+                displayHeight = Math.min(wrapperRect.height, imageNaturalHeight);
+                displayWidth = displayHeight * imageAspect;
+            }
             
             const scaledWidth = displayWidth * this.scale;
             const scaledHeight = displayHeight * this.scale;
             
+            // 최대 이동 거리 계산
             const maxX = Math.max(0, (scaledWidth - wrapperRect.width) / 2);
             const maxY = Math.max(0, (scaledHeight - wrapperRect.height) / 2);
             
+            // 이동 제한
             this.translateX = Math.max(-maxX, Math.min(maxX, this.translateX));
             this.translateY = Math.max(-maxY, Math.min(maxY, this.translateY));
         }
@@ -184,8 +226,8 @@
             this.scale = this.options.minScale;
             this.translateX = 0;
             this.translateY = 0;
-            // this.rotation = 0;
             this.isDragging = false;
+            this.lastPinchCenter = null;
             this.updateTransform(false);
         }
         
@@ -193,6 +235,7 @@
             if (this.animationFrame) {
                 cancelAnimationFrame(this.animationFrame);
             }
+            this.wrapper.style.willChange = '';
         }
     }
     
