@@ -157,7 +157,7 @@
             chip.innerHTML = `
                 <img src="${faviconUrl}" 
                      alt="${this.escapeHtml(linkData.domain)}" 
-                     class="w-4 h-4 rounded flex-shrink-0"
+                     class="w-4 h-4 rounded flex-shrink-0 m-0"
                      onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath fill=%22%23999%22 d=%22M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z%22/%3E%3C/svg%3E'">
                 <span class="text-sm font-medium text-zinc-900 dark:text-zinc-100 whitespace-nowrap overflow-hidden text-ellipsis flex-1 min-w-0">${this.escapeHtml(this.truncate(linkData.title, 30))}</span>
                 <svg class="w-3 h-3 text-zinc-500 dark:text-zinc-400 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
