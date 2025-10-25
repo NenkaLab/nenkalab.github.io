@@ -184,7 +184,7 @@
             this.scale = this.options.minScale;
             this.translateX = 0;
             this.translateY = 0;
-            this.rotation = 0;
+            // this.rotation = 0;
             this.isDragging = false;
             this.updateTransform(false);
         }
