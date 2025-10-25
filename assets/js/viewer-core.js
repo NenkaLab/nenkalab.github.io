@@ -245,21 +245,47 @@
     
     function openViewer(index) {
         currentIndex = index;
-        showLoading();
-
+        
         window.addEventListener('popstate', closeOnBack);
         history.pushState({ imageViewer: true }, '', '#viewer');
         
+        showLoading();
         createImageStack();
         
-        viewer.classList.remove('hidden');
-        viewer.classList.add('flex');
-        document.body.style.overflow = 'hidden';
-        
-        updateViewer();
-        hideLoading();
-        
-        initGestureHandler();
+        // View Transition API 지원 확인
+        if (document.startViewTransition) {
+            // 원본 이미지에 View Transition 이름 설정
+            const sourceImg = images[currentIndex];
+            sourceImg.style.viewTransitionName = 'active-image';
+            
+            // 뷰어 이미지에도 같은 이름 설정
+            const targetItem = imageStack[currentIndex];
+            targetItem.wrapper.style.viewTransitionName = 'active-image';
+            
+            const transition = document.startViewTransition(() => {
+                viewer.classList.remove('hidden');
+                viewer.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            transition.finished.finally(() => {
+                // View Transition 이름 제거
+                sourceImg.style.viewTransitionName = '';
+                targetItem.wrapper.style.viewTransitionName = '';
+                hideLoading();
+                updateViewer();
+                initGestureHandler();
+            });
+        } else {
+            // 일반 전환 (View Transition 미지원)
+            viewer.classList.remove('hidden');
+            viewer.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            
+            hideLoading();
+            updateViewer();
+            initGestureHandler();
+        }
     }
     
     function createImageStack() {
@@ -269,7 +295,7 @@
         
         images.forEach((img, index) => {
             const wrapper = document.createElement('div');
-            wrapper.className = 'absolute inset-0 flex items-center justify-center transition-opacity duration-300';
+            wrapper.className = 'image-stack-item absolute inset-0 flex items-center justify-center';
             wrapper.style.pointerEvents = index === currentIndex ? 'auto' : 'none';
             wrapper.style.opacity = index === currentIndex ? '1' : '0';
             wrapper.style.visibility = index === currentIndex ? 'visible' : 'hidden';
@@ -308,18 +334,49 @@
         const oldItem = imageStack[currentIndex];
         const newItem = imageStack[newIndex];
         
-        oldItem.wrapper.style.pointerEvents = 'none';
-        oldItem.wrapper.style.zIndex = '1';
-        oldItem.wrapper.classList.add('opacity-0');
-        oldItem.wrapper.style.visibility = 'hidden';
-        
-        newItem.wrapper.style.pointerEvents = 'auto';
-        newItem.wrapper.style.zIndex = '10';
-        newItem.wrapper.classList.remove('opacity-0');
-        newItem.wrapper.style.visibility = 'visible';
-        
-        currentIndex = newIndex;
-        updateViewer();
+        // View Transition API 지원 확인
+        if (document.startViewTransition) {
+            // View Transition 이름 설정
+            oldItem.wrapper.style.viewTransitionName = 'image-old';
+            newItem.wrapper.style.viewTransitionName = 'image-new';
+            
+            const transition = document.startViewTransition(() => {
+                // 이전 이미지 숨김
+                oldItem.wrapper.style.pointerEvents = 'none';
+                oldItem.wrapper.style.zIndex = '1';
+                oldItem.wrapper.style.opacity = '0';
+                oldItem.wrapper.style.visibility = 'hidden';
+                
+                // 새 이미지 표시
+                newItem.wrapper.style.pointerEvents = 'auto';
+                newItem.wrapper.style.zIndex = '10';
+                newItem.wrapper.style.opacity = '1';
+                newItem.wrapper.style.visibility = 'visible';
+                
+                currentIndex = newIndex;
+            });
+            
+            transition.finished.finally(() => {
+                // View Transition 이름 제거
+                oldItem.wrapper.style.viewTransitionName = '';
+                newItem.wrapper.style.viewTransitionName = '';
+                updateViewer();
+            });
+        } else {
+            // 일반 전환 (View Transition 미지원)
+            oldItem.wrapper.style.pointerEvents = 'none';
+            oldItem.wrapper.style.zIndex = '1';
+            oldItem.wrapper.style.opacity = '0';
+            oldItem.wrapper.style.visibility = 'hidden';
+            
+            newItem.wrapper.style.pointerEvents = 'auto';
+            newItem.wrapper.style.zIndex = '10';
+            newItem.wrapper.style.opacity = '1';
+            newItem.wrapper.style.visibility = 'visible';
+            
+            currentIndex = newIndex;
+            updateViewer();
+        }
     }
     
     function initGestureHandler() {
@@ -419,25 +476,63 @@
     }
     
     function closeViewer() {
-        viewer.classList.remove('flex');
-        viewer.classList.add('hidden');
-        document.body.style.overflow = '';
-        
         if (gestureHandler) {
             gestureHandler.destroy();
             gestureHandler = null;
         }
         
-        zoomControllers.forEach(controller => controller.destroy());
-        zoomControllers.clear();
-        
-        imageStack = [];
-        viewerContainer.innerHTML = '';
-
-        window.removeEventListener('popstate', closeOnBack);
-        
-        if (window.location.hash === '#viewer') {
-            history.back();
+        // View Transition API 지원 확인
+        if (document.startViewTransition) {
+            const sourceImg = images[currentIndex];
+            const currentItem = imageStack[currentIndex];
+            
+            // View Transition 이름 설정
+            sourceImg.style.viewTransitionName = 'active-image';
+            if (currentItem) {
+                currentItem.wrapper.style.viewTransitionName = 'active-image';
+            }
+            
+            const transition = document.startViewTransition(() => {
+                viewer.classList.remove('flex');
+                viewer.classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            
+            transition.finished.finally(() => {
+                // View Transition 이름 제거
+                sourceImg.style.viewTransitionName = '';
+                if (currentItem) {
+                    currentItem.wrapper.style.viewTransitionName = '';
+                }
+                
+                // 정리
+                zoomControllers.forEach(controller => controller.destroy());
+                zoomControllers.clear();
+                imageStack = [];
+                viewerContainer.innerHTML = '';
+                
+                window.removeEventListener('popstate', closeOnBack);
+                
+                if (window.location.hash === '#viewer') {
+                    history.back();
+                }
+            });
+        } else {
+            // 일반 전환 (View Transition 미지원)
+            viewer.classList.remove('flex');
+            viewer.classList.add('hidden');
+            document.body.style.overflow = '';
+            
+            zoomControllers.forEach(controller => controller.destroy());
+            zoomControllers.clear();
+            imageStack = [];
+            viewerContainer.innerHTML = '';
+            
+            window.removeEventListener('popstate', closeOnBack);
+            
+            if (window.location.hash === '#viewer') {
+                history.back();
+            }
         }
     }
     
