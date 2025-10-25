@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 
+gem "faraday-retry"
 gem "jekyll", "~> 4.3"
 gem "webrick", "~> 1.8"
 gem "nokogiri", "~> 1.15"

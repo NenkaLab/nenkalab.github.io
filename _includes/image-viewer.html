@@ -12,7 +12,7 @@
                     <button id="viewer-filter-toggle" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="필터" title="이미지 효과">
                         <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">palette</span>
                     </button>
-                    <div id="viewer-filter-menu" class="absolute top-12 left-0 bg-zinc-900 rounded-lg shadow-xl hidden min-w-[320px] max-h-[50vh] overflow-y-auto z-20">
+                    <div id="viewer-filter-menu" class="absolute top-12 -left-[50%] bg-zinc-900 rounded-lg shadow-xl hidden min-w-[320px] max-h-[50vh] overflow-y-auto z-20">
                         <div class="sticky top-0 bg-zinc-900 border-b border-zinc-700 p-3 z-10">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-white text-sm font-semibold">이미지 효과</span>
@@ -164,14 +164,15 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
 #viewer-image-wrapper { 
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-    will-change: transform;
+    /* transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);  */
+    will-change: transform, filter;
     max-width: 100%;
     max-height: 100%;
 }
 #viewer-image-wrapper.zooming { transition: none; }
 #viewer-image { 
-    transition: filter 0.3s ease, image-rendering 0.1s;
+    /* transition: filter 0.3s ease, image-rendering 0.1s; */
+    will-change: filter, image-rendering;
     display: block;
 }
 #viewer-filter-menu { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.3) transparent; }
@@ -210,7 +211,10 @@
 }
 
 .control-hide.hide {
-    display: none!important;
+    will-change: opacity;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
 
