@@ -6,9 +6,10 @@
             this.wrapper = imageWrapper;
             this.image = image;
             this.options = Object.assign({
-                minScale: 1,
+                minScale: -10,
                 maxScale: 10,
-                scaleStep: 0.5,
+                defaultScale: 1,
+                scaleStep: 0.1,
                 doubleTapScale: 3,
                 animationDuration: 200
             }, options);
@@ -53,7 +54,7 @@
         setZoom(newScale, centerX, centerY, animate = true) {
             newScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, newScale));
             
-            if (centerX !== undefined && centerY !== undefined && this.scale !== this.options.minScale) {
+            if (centerX !== undefined && centerY !== undefined && this.scale !== this.options.defaultScale) {
                 const rect = this.wrapper.getBoundingClientRect();
                 const offsetX = centerX - rect.left - rect.width / 2;
                 const offsetY = centerY - rect.top - rect.height / 2;
@@ -66,7 +67,7 @@
             
             this.scale = newScale;
             
-            if (this.scale === this.options.minScale) {
+            if (this.scale === this.options.defaultScale) {
                 this.translateX = 0;
                 this.translateY = 0;
                 this.rotation = 0;
@@ -88,7 +89,7 @@
         }
         
         resetZoom(animate = true) {
-            this.scale = this.options.minScale;
+            this.scale = this.options.defaultScale;
             this.translateX = 0;
             this.translateY = 0;
             this.rotation = 0;
@@ -97,7 +98,7 @@
         }
         
         toggleZoom(centerX, centerY) {
-            if (this.scale > this.options.minScale) {
+            if (this.scale > this.options.defaultScale) {
                 return this.resetZoom();
             } else {
                 return this.setZoom(this.options.doubleTapScale, centerX, centerY);
@@ -110,7 +111,7 @@
         }
         
         startDrag(x, y) {
-            if (this.scale <= this.options.minScale) return false;
+            if (this.scale == this.options.defaultScale) return false;
             
             this.isDragging = true;
             this.dragStartX = x;
@@ -122,7 +123,7 @@
         }
         
         drag(x, y) {
-            if (!this.isDragging || this.scale <= this.options.minScale) return false;
+            if (!this.isDragging || this.scale == this.options.defaultScale22222222) return false;
             
             const deltaX = x - this.dragStartX;
             const deltaY = y - this.dragStartY;
@@ -142,7 +143,7 @@
         }
         
         constrainPan() {
-            if (this.scale <= this.options.minScale) {
+            if (this.scale == this.options.defaultScale) {
                 this.translateX = 0;
                 this.translateY = 0;
                 return;
@@ -181,7 +182,7 @@
         }
         
         reset() {
-            this.scale = this.options.minScale;
+            this.scale = this.options.defaultScale;
             this.translateX = 0;
             this.translateY = 0;
             this.rotation = 0;
