@@ -280,16 +280,16 @@
 
         createPopup(linkData) {
             const popup = document.createElement('div');
-            popup.className = 'link-preview-popup absolute bottom-full left-0 mb-3 w-80 max-w-[90vw] bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-2xl overflow-hidden opacity-0 invisible translate-y-2 scale-95 transition-all duration-200 ease-out z-[1000] pointer-events-none cursor-auto';
+            popup.className = 'link-preview-popup absolute bottom-full left-0 mb-3 w-80 max-w-[90vw] bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-2xl overflow-hidden opacity-0 invisible translate-y-2 scale-95 transition-all duration-200 ease-out z-150 pointer-events-none cursor-auto';
             popup.setAttribute('role', 'tooltip');
 
             const hasImage = linkData.image && linkData.image.length > 0;
 
             const imageHTML = hasImage ? `
-                <div class="w-full h-auto overflow-hidden bg-gray-100 dark:bg-zinc-700 aspect-video">
+                <div class="w-full h-auto overflow-hidden bg-gray-100 dark:bg-zinc-700 aspect-16/9">
                     <img src="${linkData.image}" 
                          alt="${this.escapeHtml(linkData.title)}"
-                         class="w-full h-full object-cover dark:brightness-90 !m-0 aspect-video"
+                         class="w-full h-full object-cover dark:brightness-90 !m-0 aspect-16/9"
                          onerror="this.parentElement.style.display='none'">
                 </div>
             ` : '';
