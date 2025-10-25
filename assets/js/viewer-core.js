@@ -249,8 +249,8 @@
         currentIndex = index;
         showLoading();
 
+        location.hash = `image-viewer-${currentIndex}`;
         window.addEventListener('popstate', closeOnBack);
-        history.pushState({ imageViewer: true }, '', '#viewer');
         
         const currentWrapper = viewerZoomTargets[currentIndex].parentElement;
         const currentImage = viewerImages[currentIndex];
@@ -335,9 +335,6 @@
             articleImages[currentIndex].style.viewTransitionName = 'none';
             
             window.removeEventListener('popstate', closeOnBack);
-            if (history.state && history.state.imageViewer) {
-                history.back();
-            }
         };
 
         if (document.startViewTransition) {
@@ -390,7 +387,12 @@
             
             // 2. 현재 래퍼 페이드 아웃
             const oldWrapper = viewerZoomTargets[currentIndex].parentElement;
+            const oldImage = viewerImages[currentIndex]; // (신규)
+            const oldArticleImage = articleImages[currentIndex]; // (신규)
             oldWrapper.classList.remove('active');
+            // (신규) View Transition 연결 해제
+            oldImage.style.viewTransitionName = 'none';
+            oldArticleImage.style.viewTransitionName = 'none';
             
             // 3. 인덱스 변경
             currentIndex--;
@@ -399,7 +401,13 @@
             const newWrapper = viewerZoomTargets[currentIndex].parentElement;
             const newImage = viewerImages[currentIndex];
             const newZoomTarget = viewerZoomTargets[currentIndex];
+            const newArticleImage = articleImages[currentIndex]; // (신규)
             
+            // (신규) View Transition 연결
+            const newTransitionName = `${VT_PREFIX}${currentIndex}`;
+            newImage.style.viewTransitionName = newTransitionName;
+            newArticleImage.style.viewTransitionName = newTransitionName;
+
             // 5. 새 이미지 로드 (필요시) 및 컨트롤러 재초기화
             newImage.src = articleImages[currentIndex].src; // 이미 로드됐으면 캐시 사용
             newImage.onload = () => {
@@ -438,14 +446,25 @@
             }
             
             const oldWrapper = viewerZoomTargets[currentIndex].parentElement;
+            const oldImage = viewerImages[currentIndex]; // (신규)
+            const oldArticleImage = articleImages[currentIndex]; // (신규)
             oldWrapper.classList.remove('active');
+            // (신규) View Transition 연결 해제
+            oldImage.style.viewTransitionName = 'none';
+            oldArticleImage.style.viewTransitionName = 'none';
             
             currentIndex++;
             
             const newWrapper = viewerZoomTargets[currentIndex].parentElement;
             const newImage = viewerImages[currentIndex];
             const newZoomTarget = viewerZoomTargets[currentIndex];
+            const newArticleImage = articleImages[currentIndex]; // (신규)
             
+            // (신규) View Transition 연결
+            const newTransitionName = `${VT_PREFIX}${currentIndex}`;
+            newImage.style.viewTransitionName = newTransitionName;
+            newArticleImage.style.viewTransitionName = newTransitionName;
+
             newImage.src = articleImages[currentIndex].src;
             newImage.onload = () => {
                 initZoomController(newZoomTarget, newImage);
@@ -747,4 +766,5 @@
     }
     
 })();
+
 
