@@ -1,18 +1,18 @@
 <div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-[1000] hidden items-center justify-center">
-    <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent p-4 z-10">
+    <div class="control-hide absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent p-4 z-10">
         <div class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center gap-2">
                 <button id="viewer-download" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="다운로드" title="다운로드">
-                    <span class="material-symbols-outlined text-white text-2xl">download</span>
+                    <span class="material-symbols-outlined text-white hover:text-zinc-900 text-2xl">download</span>
                 </button>
                 <button id="viewer-share" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="공유" title="공유">
-                    <span class="material-symbols-outlined text-white text-2xl">share</span>
+                    <span class="material-symbols-outlined text-white hover:text-zinc-900 text-2xl">share</span>
                 </button>
                 <div class="relative">
                     <button id="viewer-filter-toggle" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="필터" title="이미지 효과">
-                        <span class="material-symbols-outlined text-white text-2xl">palette</span>
+                        <span class="material-symbols-outlined text-white hover:text-zinc-900 text-2xl">palette</span>
                     </button>
-                    <div id="viewer-filter-menu" class="absolute top-12 left-0 bg-zinc-900 rounded-lg shadow-xl hidden min-w-[320px] max-h-[70vh] overflow-y-auto z-20">
+                    <div id="viewer-filter-menu" class="absolute top-12 left-0 bg-zinc-900 rounded-lg shadow-xl hidden min-w-[320px] max-h-[50vh] overflow-y-auto z-20">
                         <div class="sticky top-0 bg-zinc-900 border-b border-zinc-700 p-3 z-10">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-white text-sm font-semibold">이미지 효과</span>
@@ -112,47 +112,50 @@
             
             <div class="flex items-center gap-2">
                 <button id="viewer-rotate" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="회전" title="90° 회전">
-                    <span class="material-symbols-outlined text-white text-2xl">rotate_right</span>
+                    <span class="material-symbols-outlined text-white hover:text-zinc-900 text-2xl">rotate_right</span>
                 </button>
                 <button id="viewer-fullscreen" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="전체화면" title="전체화면">
-                    <span class="material-symbols-outlined text-white text-2xl">fullscreen</span>
+                    <span class="material-symbols-outlined text-white hover:text-zinc-900 text-2xl">fullscreen</span>
+                </button>
+                <button id="viewer-hide-controls" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="전체화면" title="전체화면">
+                    <span class="material-symbols-outlined text-white hover:text-zinc-900 hover:text-zinc-900 text-2xl">visibility_off</span>
                 </button>
                 <button id="viewer-close" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="닫기" title="닫기 (ESC)">
-                    <span class="material-symbols-outlined text-white text-2xl">close</span>
+                    <span class="material-symbols-outlined text-white hover:text-zinc-900 text-2xl">close</span>
                 </button>
             </div>
         </div>
     </div>
     
-    <button id="viewer-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10" aria-label="이전 이미지" title="이전 (←)">
-        <span class="material-symbols-outlined text-white text-3xl">chevron_left</span>
+    <button id="viewer-prev" class="control-hide absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10" aria-label="이전 이미지" title="이전 (←)">
+        <span class="material-symbols-outlined text-white hover:text-zinc-900 text-3xl">chevron_left</span>
     </button>
     
-    <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden p-8">
-        <div id="viewer-image-wrapper" class="relative flex items-center justify-center" style="touch-action: none;">
+    <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden">
+        <div id="viewer-image-wrapper" class="relative w-full h-full flex items-center justify-center" style="touch-action: none;">
             <img id="viewer-image" src="" alt="" class="w-auto h-auto max-w-full max-h-full object-contain select-none" draggable="false">
         </div>
     </div>
     
-    <button id="viewer-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10" aria-label="다음 이미지" title="다음 (→)">
-        <span class="material-symbols-outlined text-white text-3xl">chevron_right</span>
+    <button id="viewer-next" class="control-hide absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10" aria-label="다음 이미지" title="다음 (→)">
+        <span class="material-symbols-outlined text-white hover:text-zinc-900 text-3xl">chevron_right</span>
     </button>
     
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full flex items-center gap-4 z-10">
+    <div class="control-hide absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full flex items-center gap-4 z-10">
         <button id="viewer-zoom-out" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors" aria-label="축소" title="축소">
-            <span class="material-symbols-outlined text-white text-xl">zoom_out</span>
+            <span class="material-symbols-outlined text-white hover:text-zinc-900 text-xl">zoom_out</span>
         </button>
         <span id="viewer-zoom-level" class="text-white text-sm min-w-[60px] text-center">100%</span>
         <button id="viewer-zoom-in" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors" aria-label="확대" title="확대">
-            <span class="material-symbols-outlined text-white text-xl">zoom_in</span>
+            <span class="material-symbols-outlined text-white hover:text-zinc-900 text-xl">zoom_in</span>
         </button>
         <div class="w-px h-6 bg-white/30"></div>
         <button id="viewer-zoom-reset" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors" aria-label="초기화" title="줌 초기화">
-            <span class="material-symbols-outlined text-white text-xl">fit_screen</span>
+            <span class="material-symbols-outlined text-white hover:text-zinc-900 text-xl">fit_screen</span>
         </button>
     </div>
     
-    <div id="viewer-loading" class="absolute inset-0 flex items-center justify-center bg-black/50 hidden z-20">
+    <div id="viewer-loading" class="control-hide absolute inset-0 flex items-center justify-center bg-black/50 hidden z-20">
         <div class="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
     </div>
 </div>
@@ -203,7 +206,34 @@
     border-radius: 4px;
     background: #374151;
 }
+
+.control-hide.hide {
+    opacity: 0;
+    pointer-events: none!important;
+    transition: opacity 0.3s ease;
+}
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const viewer = document.getElementById('viewer-container');
+        const hideControlsBtn = document.getElementById('viewer-hide-controls');
+        let hideControlsTimeout;
+
+        function showControls() {
+            const controls = viewer.querySelectorAll('.control-hide');
+            controls.forEach(control => control.classList.remove('hide'));
+        }
+
+        function hideControls() {
+            const controls = viewer.querySelectorAll('.control-hide');
+            controls.forEach(control => control.classList.add('hide'));
+        }
+
+        viewer.addEventListener('click', showControls);
+        hideControlsBtn.addEventListener('click', hideControls);
+    });
+</script>
 
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-zoom.js' | relative_url }}" defer></script>

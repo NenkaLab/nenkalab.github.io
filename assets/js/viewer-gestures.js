@@ -6,18 +6,13 @@
             this.element = element;
             this.callbacks = callbacks || {};
             
-            this.touches = [];
+            this.pointers = new Map();
             this.lastTap = 0;
             this.startDistance = 0;
-            this.startScale = 1;
             this.isPinching = false;
-            this.isSwiping = false;
             this.isDragging = false;
-            this.isMouseDown = false;
             this.swipeStartX = 0;
             this.swipeStartY = 0;
-            this.mouseStartX = 0;
-            this.mouseStartY = 0;
             this.swipeThreshold = 50;
             this.dragThreshold = 5;
             this.doubleTapDelay = 300;
@@ -27,78 +22,99 @@
         }
         
         init() {
-            this.element.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
-            this.element.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-            this.element.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
-            this.element.addEventListener('touchcancel', this.handleTouchEnd.bind(this), { passive: false });
+            this.element.style.touchAction = 'none';
             
-            this.element.addEventListener('mousedown', this.handleMouseDown.bind(this));
-            this.element.addEventListener('mousemove', this.handleMouseMove.bind(this));
-            this.element.addEventListener('mouseup', this.handleMouseUp.bind(this));
-            this.element.addEventListener('mouseleave', this.handleMouseUp.bind(this));
+            this.element.addEventListener('pointerdown', this.handlePointerDown.bind(this));
+            this.element.addEventListener('pointermove', this.handlePointerMove.bind(this));
+            this.element.addEventListener('pointerup', this.handlePointerUp.bind(this));
+            this.element.addEventListener('pointercancel', this.handlePointerUp.bind(this));
             
             this.element.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
         }
         
-        getDistance(touch1, touch2) {
-            const dx = touch2.clientX - touch1.clientX;
-            const dy = touch2.clientY - touch1.clientY;
+        getDistance(pointer1, pointer2) {
+            const dx = pointer2.clientX - pointer1.clientX;
+            const dy = pointer2.clientY - pointer1.clientY;
             return Math.sqrt(dx * dx + dy * dy);
         }
         
-        getCenter(touch1, touch2) {
+        getCenter(pointer1, pointer2) {
             return {
-                x: (touch1.clientX + touch2.clientX) / 2,
-                y: (touch1.clientY + touch2.clientY) / 2
+                x: (pointer1.clientX + pointer2.clientX) / 2,
+                y: (pointer1.clientY + pointer2.clientY) / 2
             };
         }
         
-        handleTouchStart(e) {
-            this.touches = Array.from(e.touches);
+        handlePointerDown(e) {
+            this.pointers.set(e.pointerId, {
+                clientX: e.clientX,
+                clientY: e.clientY,
+                pointerId: e.pointerId
+            });
+            
             this.hasMoved = false;
             
-            if (this.touches.length === 2) {
+            if (this.pointers.size === 2) {
                 e.preventDefault();
+                const pointers = Array.from(this.pointers.values());
                 this.isPinching = true;
                 this.isDragging = false;
-                this.isSwiping = false;
-                this.startDistance = this.getDistance(this.touches[0], this.touches[1]);
-                const center = this.getCenter(this.touches[0], this.touches[1]);
+                this.startDistance = this.getDistance(pointers[0], pointers[1]);
+                const center = this.getCenter(pointers[0], pointers[1]);
                 
                 if (this.callbacks.onPinchStart) {
                     this.callbacks.onPinchStart(center);
                 }
-            } else if (this.touches.length === 1) {
-                this.swipeStartX = this.touches[0].clientX;
-                this.swipeStartY = this.touches[0].clientY;
+            } else if (this.pointers.size === 1) {
+                this.swipeStartX = e.clientX;
+                this.swipeStartY = e.clientY;
                 
                 if (this.callbacks.onDragStart) {
                     this.callbacks.onDragStart({
-                        x: this.swipeStartX,
-                        y: this.swipeStartY
+                        x: e.clientX,
+                        y: e.clientY
                     });
+                }
+                
+                const now = Date.now();
+                if (now - this.lastTap < this.doubleTapDelay) {
+                    if (this.callbacks.onDoubleTap) {
+                        this.callbacks.onDoubleTap({
+                            x: e.clientX,
+                            y: e.clientY
+                        });
+                    }
+                    this.lastTap = 0;
+                } else {
+                    this.lastTap = now;
                 }
             }
         }
         
-        handleTouchMove(e) {
-            if (this.touches.length === 0) return;
+        handlePointerMove(e) {
+            if (!this.pointers.has(e.pointerId)) return;
             
-            this.touches = Array.from(e.touches);
+            this.pointers.set(e.pointerId, {
+                clientX: e.clientX,
+                clientY: e.clientY,
+                pointerId: e.pointerId
+            });
+            
             this.hasMoved = true;
             
-            if (this.isPinching && this.touches.length === 2) {
+            if (this.isPinching && this.pointers.size === 2) {
                 e.preventDefault();
-                const currentDistance = this.getDistance(this.touches[0], this.touches[1]);
+                const pointers = Array.from(this.pointers.values());
+                const currentDistance = this.getDistance(pointers[0], pointers[1]);
                 const scale = currentDistance / this.startDistance;
-                const center = this.getCenter(this.touches[0], this.touches[1]);
+                const center = this.getCenter(pointers[0], pointers[1]);
                 
                 if (this.callbacks.onPinch) {
                     this.callbacks.onPinch(scale, center);
                 }
-            } else if (this.touches.length === 1) {
-                const deltaX = this.touches[0].clientX - this.swipeStartX;
-                const deltaY = this.touches[0].clientY - this.swipeStartY;
+            } else if (this.pointers.size === 1 && !this.isPinching) {
+                const deltaX = e.clientX - this.swipeStartX;
+                const deltaY = e.clientY - this.swipeStartY;
                 const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
                 
                 if (distance > this.dragThreshold) {
@@ -106,50 +122,40 @@
                 }
                 
                 if (this.callbacks.onDrag) {
-                    const shouldDrag = this.callbacks.onDrag({
-                        x: this.touches[0].clientX,
-                        y: this.touches[0].clientY,
+                    const shouldPrevent = this.callbacks.onDrag({
+                        x: e.clientX,
+                        y: e.clientY,
                         deltaX: deltaX,
                         deltaY: deltaY
                     });
                     
-                    if (shouldDrag) {
+                    if (shouldPrevent) {
                         e.preventDefault();
-                    } else if (Math.abs(deltaX) > this.swipeThreshold || Math.abs(deltaY) > this.swipeThreshold) {
-                        this.isSwiping = true;
                     }
                 }
             }
         }
         
-        handleTouchEnd(e) {
-            if (this.isPinching) {
+        handlePointerUp(e) {
+            const pointer = this.pointers.get(e.pointerId);
+            
+            if (!pointer) return;
+            
+            if (this.isPinching && this.pointers.size === 2) {
                 this.isPinching = false;
                 if (this.callbacks.onPinchEnd) {
                     this.callbacks.onPinchEnd();
                 }
-            } else if (this.touches.length === 1 && !e.touches.length) {
-                const deltaX = this.touches[0].clientX - this.swipeStartX;
-                const deltaY = this.touches[0].clientY - this.swipeStartY;
+            } else if (this.pointers.size === 1 && !this.isPinching) {
+                const deltaX = e.clientX - this.swipeStartX;
+                const deltaY = e.clientY - this.swipeStartY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
                 
-                const now = Date.now();
-                if (!this.hasMoved || (Math.abs(deltaX) < this.dragThreshold && Math.abs(deltaY) < this.dragThreshold)) {
-                    if (now - this.lastTap < this.doubleTapDelay) {
-                        if (this.callbacks.onDoubleTap) {
-                            this.callbacks.onDoubleTap({
-                                x: this.touches[0].clientX,
-                                y: this.touches[0].clientY
-                            });
-                        }
-                        this.lastTap = 0;
-                    } else {
-                        this.lastTap = now;
-                    }
-                } else if (this.isSwiping && !this.isDragging) {
-                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                        if (deltaX > this.swipeThreshold && this.callbacks.onSwipeRight) {
+                if (this.isDragging && distance > this.dragThreshold) {
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > this.swipeThreshold) {
+                        if (deltaX > 0 && this.callbacks.onSwipeRight) {
                             this.callbacks.onSwipeRight();
-                        } else if (deltaX < -this.swipeThreshold && this.callbacks.onSwipeLeft) {
+                        } else if (deltaX < 0 && this.callbacks.onSwipeLeft) {
                             this.callbacks.onSwipeLeft();
                         }
                     }
@@ -160,70 +166,13 @@
                 }
             }
             
-            this.touches = Array.from(e.touches);
-            this.isSwiping = false;
+            this.pointers.delete(e.pointerId);
             this.isDragging = false;
             this.hasMoved = false;
-        }
-        
-        handleMouseDown(e) {
-            if (e.button !== 0) return;
             
-            this.isMouseDown = true;
-            this.mouseStartX = e.clientX;
-            this.mouseStartY = e.clientY;
-            this.hasMoved = false;
-            
-            if (this.callbacks.onDragStart) {
-                this.callbacks.onDragStart({
-                    x: e.clientX,
-                    y: e.clientY
-                });
+            if (this.pointers.size < 2) {
+                this.isPinching = false;
             }
-            
-            const now = Date.now();
-            if (now - this.lastTap < this.doubleTapDelay) {
-                if (this.callbacks.onDoubleTap) {
-                    this.callbacks.onDoubleTap({
-                        x: e.clientX,
-                        y: e.clientY
-                    });
-                }
-                this.lastTap = 0;
-            } else {
-                this.lastTap = now;
-            }
-        }
-        
-        handleMouseMove(e) {
-            if (!this.isMouseDown) return;
-            
-            const deltaX = e.clientX - this.mouseStartX;
-            const deltaY = e.clientY - this.mouseStartY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            
-            if (distance > this.dragThreshold) {
-                this.hasMoved = true;
-            }
-            
-            if (this.callbacks.onDrag) {
-                this.callbacks.onDrag({
-                    x: e.clientX,
-                    y: e.clientY,
-                    deltaX: deltaX,
-                    deltaY: deltaY
-                });
-            }
-        }
-        
-        handleMouseUp(e) {
-            this.isMouseDown = false;
-            
-            if (this.callbacks.onDragEnd) {
-                this.callbacks.onDragEnd();
-            }
-            
-            this.hasMoved = false;
         }
         
         handleWheel(e) {
@@ -243,6 +192,7 @@
         }
         
         destroy() {
+            this.pointers.clear();
         }
     }
     
