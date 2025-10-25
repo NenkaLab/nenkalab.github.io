@@ -70,7 +70,6 @@
   function initImageViewer() {
     if (!viewer) return;
     
-    // 스태킹 컨텍스트 문제를 해결하기 위해 뷰어를 body의 직계 자식으로 이동시킵니다.
     document.body.appendChild(viewer);
 
     const proseImages = document.querySelectorAll('.post.prose img');
@@ -111,9 +110,11 @@
     updateFullscreenIcon();
 
     document.addEventListener('keydown', handleKeyDown);
+    history.pushState({ iv: "viewer" }, "", "#iv-viewer");
+    window.addEventListener('popstate', handlePopstate);
   }
 
-  function closeViewer() {
+  function closeViewer(fromPopstate = false) {
     if (!isViewerOpen) return;
     isViewerOpen = false;
 
@@ -131,7 +132,17 @@
     
     effectsPopup.style.display = 'none';
     document.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('popstate', handlePopstate);
     resetAllPointers();
+
+    if (!fromPopstate) {
+      const state = history.state;
+      if (state?.iv === "effects") {
+        history.go(-2);
+      } else if (state?.iv === "viewer") {
+        history.back();
+      }
+    }
   }
 
   function loadCurrentImage(forceReset = false) {
@@ -312,7 +323,7 @@
     document.addEventListener('fullscreenchange', updateFullscreenIcon);
 
     effectsBtn.addEventListener('click', toggleEffectsPopup);
-    effectsCloseBtn.addEventListener('click', toggleEffectsPopup);
+    effectsCloseBtn.addEventListener('click', () => toggleEffectsPopup(false));
 
     wrapper.addEventListener('pointerdown', handlePointerDown);
     wrapper.addEventListener('pointermove', handlePointerMove);
@@ -367,6 +378,26 @@
     }
   }
   
+  function handlePopstate(e) {
+    if (!isViewerOpen) {
+      window.removeEventListener('popstate', handlePopstate);
+      return;
+    }
+    const state = e.state;
+    const popupOpen = effectsPopup.style.display === 'block';
+
+    if (state?.iv === "viewer") { // Back from effects to viewer
+      if (popupOpen) {
+        toggleEffectsPopup(true); // Close popup
+      }
+    } else if (state === null || !state?.iv) { // Back from viewer/effects to page
+      if (popupOpen) {
+        toggleEffectsPopup(true); // Close popup
+      }
+      closeViewer(true); // Close viewer
+    }
+  }
+
   function handlePointerDown(e) {
     if (e.target.closest('.iv-button, .iv-option-btn, input[type="range"]')) return;
     e.preventDefault();
@@ -716,7 +747,7 @@
     });
   }
 
-  function toggleEffectsPopup() {
+  function toggleEffectsPopup(fromPopstate = false) {
     const isHidden = effectsPopup.style.display === 'none' || effectsPopup.style.display === '';
     if (isHidden) {
       loadEffectsUI(currentIndex);
@@ -724,9 +755,15 @@
       effectsPopup.style.display = 'block';
       clearTimeout(controlsHideTimer);
       viewer.classList.remove('iv-controls-hidden');
+      if (!fromPopstate) {
+        history.pushState({ iv: "effects" }, "", "#iv-effects");
+      }
     } else {
       effectsPopup.style.display = 'none';
       startControlsHideTimer();
+      if (!fromPopstate && history.state?.iv === "effects") {
+        history.back();
+      }
     }
   }
   
