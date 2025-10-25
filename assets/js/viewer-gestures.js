@@ -1,51 +1,60 @@
 (function(window) {
     'use strict';
     
+    /**
+     * 포인터 이벤트(터치, 마우스, 펜)를 감지하여 제스처 콜백을 실행하는 클래스
+     */
     class GestureHandler {
         constructor(element, callbacks) {
             this.element = element;
             this.callbacks = callbacks || {};
             
-            this.pointers = new Map();
+            this.pointers = new Map(); // 활성 포인터 저장
             this.lastTap = 0;
             this.startDistance = 0;
-            this.lastScale = 1;
+            this.lastDistance = 0; // (수정) 부드러운 핀치줌을 위해 추가
+            this.lastTwist = 0; // (신규) 펜 회전을 위해 추가
+            
             this.isPinching = false;
             this.isDragging = false;
-            this.isSliding = false;
+            
             this.swipeStartX = 0;
             this.swipeStartY = 0;
-            this.swipeThreshold = 50;
-            this.dragThreshold = 10;
-            this.doubleTapDelay = 300;
-            this.hasMoved = false;
-            this.slideStartX = 0;
-            this.slideDirection = null;
-            this.velocityTracker = [];
-            this.lastMoveTime = 0;
+            
+            this.swipeThreshold = 50; // 스와이프로 인정할 최소 거리
+            this.dragThreshold = 5;   // 드래그로 인정할 최소 거리
+            this.doubleTapDelay = 300; // 더블탭 딜레이
             
             this.init();
         }
         
+        /**
+         * 이벤트 리스너 초기화
+         */
         init() {
+            // 'touch-action: none'으로 설정하여 브라우저 기본 터치 동작(스크롤, 줌)을 막음
             this.element.style.touchAction = 'none';
-            this.element.style.userSelect = 'none';
-            this.element.style.webkitUserSelect = 'none';
             
             this.element.addEventListener('pointerdown', this.handlePointerDown.bind(this));
             this.element.addEventListener('pointermove', this.handlePointerMove.bind(this));
             this.element.addEventListener('pointerup', this.handlePointerUp.bind(this));
-            this.element.addEventListener('pointercancel', this.handlePointerCancel.bind(this));
+            this.element.addEventListener('pointercancel', this.handlePointerUp.bind(this));
             
             this.element.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
         }
         
+        /**
+         * 두 포인터 사이의 거리 계산
+         */
         getDistance(pointer1, pointer2) {
             const dx = pointer2.clientX - pointer1.clientX;
             const dy = pointer2.clientY - pointer1.clientY;
             return Math.sqrt(dx * dx + dy * dy);
         }
         
+        /**
+         * 두 포인터의 중심점 계산
+         */
         getCenter(pointer1, pointer2) {
             return {
                 x: (pointer1.clientX + pointer2.clientX) / 2,
@@ -53,219 +62,187 @@
             };
         }
         
-        getVelocity() {
-            if (this.velocityTracker.length < 2) return 0;
-            
-            const recent = this.velocityTracker.slice(-5);
-            const first = recent[0];
-            const last = recent[recent.length - 1];
-            
-            const dt = last.time - first.time;
-            if (dt === 0) return 0;
-            
-            const dx = last.x - first.x;
-            return dx / dt;
-        }
-        
+        /**
+         * 포인터 다운 이벤트 핸들러
+         */
         handlePointerDown(e) {
+            // 포인터 정보 저장
             this.pointers.set(e.pointerId, {
                 clientX: e.clientX,
                 clientY: e.clientY,
-                pointerId: e.pointerId,
-                startX: e.clientX,
-                startY: e.clientY
+                pointerId: e.pointerId
             });
             
-            this.hasMoved = false;
-            this.velocityTracker = [];
+            // (신규) 펜 타입일 경우 초기 회전값 저장
+            if (e.pointerType === 'pen') {
+                this.lastTwist = e.twist || 0;
+            }
             
             if (this.pointers.size === 2) {
-                // 핀치 줌 시작
+                // 포인터가 2개 = 핀치 시작
                 e.preventDefault();
                 const pointers = Array.from(this.pointers.values());
                 this.isPinching = true;
-                this.isDragging = false;
-                this.isSliding = false;
+                this.isDragging = false; // 핀치 중에는 드래그 중지
                 this.startDistance = this.getDistance(pointers[0], pointers[1]);
-                this.lastScale = 1;
-                const center = this.getCenter(pointers[0], pointers[1]);
+                this.lastDistance = this.startDistance; // (수정) lastDistance 초기화
                 
                 if (this.callbacks.onPinchStart) {
-                    this.callbacks.onPinchStart(center);
+                    this.callbacks.onPinchStart(this.getCenter(pointers[0], pointers[1]));
                 }
             } else if (this.pointers.size === 1) {
+                // 포인터가 1개 = 드래그 또는 탭 시작
+                this.isDragging = false; // (수정) 드래그 상태 초기화
                 this.swipeStartX = e.clientX;
                 this.swipeStartY = e.clientY;
-                this.slideStartX = e.clientX;
-                this.lastMoveTime = Date.now();
+                
+                // 드래그 시작 콜백 (줌 상태가 아니어도 호출됨)
+                if (this.callbacks.onDragStart) {
+                    this.callbacks.onDragStart({ x: e.clientX, y: e.clientY });
+                }
                 
                 // 더블탭 감지
                 const now = Date.now();
                 if (now - this.lastTap < this.doubleTapDelay) {
-                    e.preventDefault();
                     if (this.callbacks.onDoubleTap) {
-                        this.callbacks.onDoubleTap({
-                            x: e.clientX,
-                            y: e.clientY
-                        });
+                        this.callbacks.onDoubleTap({ x: e.clientX, y: e.clientY });
                     }
-                    this.lastTap = 0;
+                    this.lastTap = 0; // 더블탭 성공 시 리셋
                 } else {
                     this.lastTap = now;
                 }
             }
         }
         
+        /**
+         * 포인터 무브 이벤트 핸들러
+         */
         handlePointerMove(e) {
             if (!this.pointers.has(e.pointerId)) return;
             
-            const oldPointer = this.pointers.get(e.pointerId);
-            
+            // 포인터 정보 업데이트
             this.pointers.set(e.pointerId, {
                 clientX: e.clientX,
                 clientY: e.clientY,
-                pointerId: e.pointerId,
-                startX: oldPointer.startX,
-                startY: oldPointer.startY
+                pointerId: e.pointerId
             });
             
-            const moveDistance = Math.sqrt(
-                Math.pow(e.clientX - oldPointer.startX, 2) + 
-                Math.pow(e.clientY - oldPointer.startY, 2)
-            );
-            
-            if (moveDistance > this.dragThreshold) {
-                this.hasMoved = true;
-            }
-            
-            // 속도 추적
-            const now = Date.now();
-            this.velocityTracker.push({
-                x: e.clientX,
-                time: now
-            });
-            if (this.velocityTracker.length > 10) {
-                this.velocityTracker.shift();
+            // (신규) 펜 회전 감지
+            if (e.pointerType === 'pen' && e.twist !== undefined) {
+                const deltaTwist = e.twist - (this.lastTwist || 0);
+                
+                // 약 2도 (0.03 rad) 이상 변경 시 콜백
+                if (Math.abs(deltaTwist) > 0.03) {
+                    if (this.callbacks.onPenRotate) {
+                        this.callbacks.onPenRotate(deltaTwist, { x: e.clientX, y: e.clientY });
+                    }
+                    this.lastTwist = e.twist;
+                }
             }
             
             if (this.isPinching && this.pointers.size === 2) {
-                // 핀치 줌
+                // 핀치 줌 로직
                 e.preventDefault();
                 const pointers = Array.from(this.pointers.values());
                 const currentDistance = this.getDistance(pointers[0], pointers[1]);
-                const scale = currentDistance / this.startDistance;
+                
+                // (수정) 이전 거리 대비 스케일 계산 (부드러운 줌)
+                const scale = currentDistance / this.lastDistance; 
                 const center = this.getCenter(pointers[0], pointers[1]);
                 
                 if (this.callbacks.onPinch) {
-                    this.callbacks.onPinch(scale, center, this.lastScale);
+                    this.callbacks.onPinch(scale, center);
                 }
                 
-                this.lastScale = scale;
+                this.lastDistance = currentDistance; // (수정) 마지막 거리 업데이트
+                
             } else if (this.pointers.size === 1 && !this.isPinching) {
+                // 드래그 로직
                 const deltaX = e.clientX - this.swipeStartX;
                 const deltaY = e.clientY - this.swipeStartY;
                 const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
                 
-                if (distance > this.dragThreshold && !this.isDragging && !this.isSliding) {
-                    // 드래그 또는 슬라이드 시작
-                    if (this.callbacks.onDragStart) {
-                        const canDrag = this.callbacks.onDragStart({
-                            x: e.clientX,
-                            y: e.clientY
-                        });
-                        
-                        if (canDrag) {
-                            this.isDragging = true;
-                        } else {
-                            // 줌이 안되어있으면 슬라이드
-                            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                                this.isSliding = true;
-                                this.slideDirection = deltaX > 0 ? 'right' : 'left';
-                            }
-                        }
-                    }
+                // (수정) 드래그 임계값 넘어야 드래그 상태로 변경
+                if (!this.isDragging && distance > this.dragThreshold) {
+                    this.isDragging = true;
                 }
                 
-                if (this.isDragging) {
-                    // 드래그
-                    if (this.callbacks.onDrag) {
-                        const shouldPrevent = this.callbacks.onDrag({
-                            x: e.clientX,
-                            y: e.clientY,
-                            deltaX: deltaX,
-                            deltaY: deltaY
-                        });
-                        
-                        if (shouldPrevent) {
-                            e.preventDefault();
-                        }
-                    }
-                } else if (this.isSliding) {
-                    // 슬라이드
-                    e.preventDefault();
-                    if (this.callbacks.onSlide) {
-                        this.callbacks.onSlide({
-                            deltaX: e.clientX - this.slideStartX,
-                            direction: this.slideDirection
-                        });
+                // (수정) 드래그 상태일 때만 onDrag 콜백 호출
+                if (this.isDragging && this.callbacks.onDrag) {
+                    const shouldPrevent = this.callbacks.onDrag({
+                        x: e.clientX,
+                        y: e.clientY,
+                        deltaX: deltaX,
+                        deltaY: deltaY
+                    });
+                    
+                    // onDrag 콜백이 true를 반환하면 (예: 줌 패닝) 기본 스크롤 방지
+                    if (shouldPrevent) {
+                        e.preventDefault();
                     }
                 }
             }
         }
         
+        /**
+         * 포인터 업/캔슬 이벤트 핸들러
+         */
         handlePointerUp(e) {
-            const pointer = this.pointers.get(e.pointerId);
-            
-            if (!pointer) return;
+            if (!this.pointers.has(e.pointerId)) return;
             
             if (this.isPinching && this.pointers.size === 2) {
+                // 핀치 종료
                 this.isPinching = false;
+                this.lastDistance = 0; // (수정) 리셋
                 if (this.callbacks.onPinchEnd) {
                     this.callbacks.onPinchEnd();
                 }
             } else if (this.pointers.size === 1 && !this.isPinching) {
-                if (this.isSliding) {
-                    // 슬라이드 종료
-                    const velocity = this.getVelocity();
-                    const deltaX = e.clientX - this.slideStartX;
-                    
-                    if (this.callbacks.onSlideEnd) {
-                        this.callbacks.onSlideEnd({
-                            deltaX: deltaX,
-                            velocity: velocity,
-                            direction: this.slideDirection
-                        });
+                // 드래그 또는 스와이프 종료
+                const deltaX = e.clientX - this.swipeStartX;
+                const deltaY = e.clientY - this.swipeStartY;
+                
+                if (this.isDragging) {
+                    // 드래그 상태였다면 스와이프 감지
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > this.swipeThreshold) {
+                        if (deltaX > 0 && this.callbacks.onSwipeRight) {
+                            this.callbacks.onSwipeRight();
+                        } else if (deltaX < 0 && this.callbacks.onSwipeLeft) {
+                            this.callbacks.onSwipeLeft();
+                        }
                     }
-                } else if (this.isDragging) {
-                    // 드래그 종료
-                    if (this.callbacks.onDragEnd) {
-                        this.callbacks.onDragEnd();
-                    }
+                }
+                
+                // 드래그 종료 콜백 (항상 호출)
+                if (this.callbacks.onDragEnd) {
+                    this.callbacks.onDragEnd();
                 }
             }
             
+            // 포인터 제거 및 상태 리셋
             this.pointers.delete(e.pointerId);
             this.isDragging = false;
-            this.isSliding = false;
-            this.slideDirection = null;
-            this.hasMoved = false;
-            this.velocityTracker = [];
             
             if (this.pointers.size < 2) {
                 this.isPinching = false;
+                this.lastDistance = 0; // (수정) 리셋
+            }
+            
+            if (this.pointers.size === 0) {
+                this.lastTwist = 0; // (신규) 펜 회전 리셋
             }
         }
         
-        handlePointerCancel(e) {
-            this.handlePointerUp(e);
-        }
-        
+        /**
+         * 휠 이벤트 핸들러 (마우스 휠 줌)
+         */
         handleWheel(e) {
+            // Ctrl 또는 Meta(Cmd) 키와 함께 휠을 돌릴 때만 줌
             if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
                 
                 const delta = -e.deltaY;
-                const scale = delta > 0 ? 1.1 : 0.9;
+                const scale = delta > 0 ? 1.05 : 1 / 1.05; // 5%씩 줌
                 
                 if (this.callbacks.onWheel) {
                     this.callbacks.onWheel(scale, {
@@ -276,17 +253,13 @@
             }
         }
         
-        reset() {
-            this.pointers.clear();
-            this.isPinching = false;
-            this.isDragging = false;
-            this.isSliding = false;
-            this.hasMoved = false;
-            this.velocityTracker = [];
-        }
-        
+        /**
+         * 핸들러 파괴 (메모리 정리)
+         */
         destroy() {
-            this.reset();
+            // 이벤트 리스너 제거 (필요 시)
+            // 여기서는 core.js의 closeViewer에서 null로 만드는 것으로 대체
+            this.pointers.clear();
         }
     }
     

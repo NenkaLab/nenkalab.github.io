@@ -1,4 +1,5 @@
 <div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-[1000] hidden items-center justify-center">
+    <!-- Top Controls -->
     <div class="control-hide absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent p-4 z-10">
         <div class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center gap-2">
@@ -12,6 +13,7 @@
                     <button id="viewer-filter-toggle" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="필터" title="이미지 효과">
                         <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">palette</span>
                     </button>
+                    <!-- Filter Menu (unchanged) -->
                     <div id="viewer-filter-menu" class="absolute top-12 -left-[50%] bg-zinc-900 rounded-lg shadow-xl hidden min-w-[320px] max-h-[50vh] overflow-y-auto z-20">
                         <div class="sticky top-0 bg-zinc-900 border-b border-zinc-700 p-3 z-10">
                             <div class="flex items-center justify-between mb-2">
@@ -22,6 +24,7 @@
                         </div>
                         
                         <div class="p-3 space-y-4">
+                            <!-- Filter Controls (unchanged) -->
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Grayscale</label>
@@ -29,7 +32,6 @@
                                 </div>
                                 <input type="range" id="filter-grayscale" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="100" value="0">
                             </div>
-                            
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Sepia</label>
@@ -37,7 +39,6 @@
                                 </div>
                                 <input type="range" id="filter-sepia" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="100" value="0">
                             </div>
-                            
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Invert</label>
@@ -45,7 +46,6 @@
                                 </div>
                                 <input type="range" id="filter-invert" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="100" value="0">
                             </div>
-                            
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Saturate</label>
@@ -53,7 +53,6 @@
                                 </div>
                                 <input type="range" id="filter-saturate" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="300" value="100">
                             </div>
-                            
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Contrast</label>
@@ -61,7 +60,6 @@
                                 </div>
                                 <input type="range" id="filter-contrast" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="300" value="100">
                             </div>
-                            
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Brightness</label>
@@ -69,7 +67,6 @@
                                 </div>
                                 <input type="range" id="filter-brightness" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="300" value="100">
                             </div>
-                            
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Blur</label>
@@ -77,7 +74,6 @@
                                 </div>
                                 <input type="range" id="filter-blur" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="25" step="0.01" value="0">
                             </div>
-                            
                             <div class="filter-control">
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="text-white text-sm">Hue Rotate</label>
@@ -110,6 +106,7 @@
                 <span id="viewer-counter"></span>
             </div>
             
+            <!-- Top Right Controls (unchanged) -->
             <div class="flex items-center gap-2">
                 <button id="viewer-rotate" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="회전" title="90° 회전">
                     <span class="material-symbols-outlined text-white group-hover:text-zinc-900 text-2xl">rotate_right</span>
@@ -127,20 +124,48 @@
         </div>
     </div>
     
+    <!-- Prev Button -->
     <button id="viewer-prev" class="control-hide absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white bg-opacity-10 hover:bg-opacity-100 transition-colors z-10" aria-label="이전 이미지" title="이전 (←)">
         <span class="material-symbols-outlined text-zinc-900 text-3xl">chevron_left</span>
     </button>
     
+    <!-- MODIFIED: Image container for sliding -->
     <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden">
-        <div id="viewer-image-wrapper" class="relative w-full h-full flex items-center justify-center">
-            <img id="viewer-image" src="" alt="" class="w-auto h-auto max-w-full max-h-full object-contain select-none" draggable="false" oncontextmenu="return false;" />
+        <!-- This is the slider track -->
+        <div id="viewer-slider-track" class="absolute top-0 left-0 w-full h-full flex" style="transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform;">
+            
+            <!-- Slide for Previous Image -->
+            <div id="viewer-slide-prev" class="relative w-full h-full flex-shrink-0 flex items-center justify-center p-4">
+                <div class="viewer-image-wrapper">
+                    <img id="viewer-image-prev" src="" alt="" class="viewer-image" draggable="false" oncontextmenu="return false;" />
+                </div>
+            </div>
+            
+            <!-- Slide for Current Image -->
+            <div id="viewer-slide-current" class="relative w-full h-full flex-shrink-0 flex items-center justify-center p-4">
+                <!-- This wrapper is for zooming -->
+                <div id="viewer-image-wrapper" class="viewer-image-wrapper">
+                    <img id="viewer-image" src="" alt="" class="viewer-image" draggable="false" oncontextmenu="return false;" />
+                </div>
+            </div>
+            
+            <!-- Slide for Next Image -->
+            <div id="viewer-slide-next" class="relative w-full h-full flex-shrink-0 flex items-center justify-center p-4">
+                <div class="viewer-image-wrapper">
+                    <img id="viewer-image-next" src="" alt="" class="viewer-image" draggable="false" oncontextmenu="return false;" />
+                </div>
+            </div>
+            
         </div>
     </div>
+    <!-- END MODIFIED -->
     
+    <!-- Next Button -->
     <button id="viewer-next" class="control-hide absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white bg-opacity-10 hover:bg-opacity-100 transition-colors z-10" aria-label="다음 이미지" title="다음 (→)">
         <span class="material-symbols-outlined text-zinc-900 text-3xl">chevron_right</span>
     </button>
     
+    <!-- Bottom Controls (unchanged) -->
     <div class="control-hide absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full flex items-center gap-4 z-10">
         <button id="viewer-zoom-out" class="w-8 h-8 flex items-center justify-center group hover:bg-white/10 rounded-full transition-colors" aria-label="축소" title="축소">
             <span class="material-symbols-outlined text-white text-xl">zoom_out</span>
@@ -155,32 +180,62 @@
         </button>
     </div>
     
+    <!-- Loading Spinner -->
     <div id="viewer-loading" class="control-hide absolute inset-0 flex items-center justify-center bg-black/50 hidden z-20">
         <div class="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
     </div>
 </div>
 
+<!-- MODIFIED: Styles -->
 <style>
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
-#viewer-image-wrapper { 
+
+/* Style for the slider track */
+#viewer-slider-track.no-transition {
+    transition: none;
+}
+
+/* This is now the zoom target wrapper */
+.viewer-image-wrapper { 
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
     will-change: transform, filter;
-    max-width: 100%;
-    max-height: 100%;
+    /* Use flex properties from parent slide */
+    width: 100%; 
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Reset max-width/height from old ID */
+    max-width: none;
+    max-height: none;
 }
-#viewer-image-wrapper.zooming { transition: none; }
-#viewer-image { 
+.viewer-image-wrapper.zooming { 
+    transition: none; 
+}
+
+/* This is now the style for all 3 images */
+.viewer-image { 
     transition: filter 0.1s ease, image-rendering 0.1s;
     will-change: filter, image-rendering;
     display: block;
+    /* Tailwind classes equivalent */
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    user-select: none;
 }
+
+/* Filter Menu scrollbar (unchanged) */
 #viewer-filter-menu { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.3) transparent; }
 #viewer-filter-menu::-webkit-scrollbar { width: 8px; }
 #viewer-filter-menu::-webkit-scrollbar-track { background: transparent; }
 #viewer-filter-menu::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.3); border-radius: 4px; }
 #viewer-filter-menu::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.5); }
 
+/* Slider styles (unchanged) */
 .slider::-webkit-slider-thumb {
     appearance: none;
     width: 16px;
@@ -210,132 +265,12 @@
     background: #374151;
 }
 
+/* Control hide (unchanged) */
 .control-hide.hide {
     will-change: opacity;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* 이미지 뷰어 슬라이드 및 줌 스타일 */
-
-/* 슬라이드 컨테이너 */
-.slide-container {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    will-change: transform;
-}
-
-/* 슬라이드 슬롯 */
-.slide-slot {
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
-}
-
-/* 이미지 래퍼 - 줌 애니메이션 */
-.viewer-image-wrapper {
-    will-change: transform;
-}
-
-.viewer-image-wrapper.zooming {
-    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* 이미지 */
-.viewer-image {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
-    pointer-events: none;
-}
-
-/* 터치 디바이스 최적화 */
-@media (hover: none) and (pointer: coarse) {
-    .slide-container {
-        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    
-    .viewer-image-wrapper.zooming {
-        transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-}
-
-/* iOS Safari 최적화 */
-@supports (-webkit-touch-callout: none) {
-    .slide-container,
-    .viewer-image-wrapper {
-        -webkit-transform: translateZ(0);
-        -webkit-backface-visibility: hidden;
-        -webkit-perspective: 1000;
-    }
-}
-
-/* 하드웨어 가속 */
-.slide-container,
-.viewer-image-wrapper {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-}
-
-/* 버튼 비활성화 스타일 */
-button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-/* 로딩 스피너 */
-.viewer-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-}
-
-/* 제스처 힌트 (선택사항) */
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-
-.gesture-hint {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* 줌 레벨 표시 */
-#viewer-zoom-level {
-    font-variant-numeric: tabular-nums;
-    min-width: 4rem;
-    text-align: center;
-}
-
-/* 네이티브 느낌의 스크롤 바운스 효과 (선택사항) */
-@supports (-webkit-overflow-scrolling: touch) {
-    .slide-container {
-        -webkit-overflow-scrolling: touch;
-    }
-}
-
-/* 고해상도 디스플레이 최적화 */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .viewer-image {
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
-    }
 }
 </style>
 
