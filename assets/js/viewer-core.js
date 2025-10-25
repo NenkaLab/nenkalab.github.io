@@ -22,9 +22,20 @@
     
     const filterToggleBtn = document.getElementById('viewer-filter-toggle');
     const filterMenu = document.getElementById('viewer-filter-menu');
-    const filterOptions = document.querySelectorAll('.filter-option');
     const applyToAllBtn = document.getElementById('viewer-apply-to-all');
     const resetEffectsBtn = document.getElementById('viewer-reset-effects');
+    const imageRenderingSelect = document.getElementById('image-rendering');
+    
+    const filterControls = {
+        grayscale: { slider: document.getElementById('filter-grayscale'), input: document.getElementById('filter-grayscale-input'), default: 0 },
+        sepia: { slider: document.getElementById('filter-sepia'), input: document.getElementById('filter-sepia-input'), default: 0 },
+        invert: { slider: document.getElementById('filter-invert'), input: document.getElementById('filter-invert-input'), default: 0 },
+        saturate: { slider: document.getElementById('filter-saturate'), input: document.getElementById('filter-saturate-input'), default: 100 },
+        contrast: { slider: document.getElementById('filter-contrast'), input: document.getElementById('filter-contrast-input'), default: 100 },
+        brightness: { slider: document.getElementById('filter-brightness'), input: document.getElementById('filter-brightness-input'), default: 100 },
+        blur: { slider: document.getElementById('filter-blur'), input: document.getElementById('filter-blur-input'), default: 0 },
+        hue: { slider: document.getElementById('filter-hue'), input: document.getElementById('filter-hue-input'), default: 0 }
+    };
     
     let images = [];
     let currentIndex = 0;
@@ -38,7 +49,7 @@
         if (articleImages.length === 0) return;
         
         images = Array.from(articleImages);
-        imageEffects = images.map(() => ({ filter: 'none', blend: 'normal' }));
+        imageEffects = images.map(() => getDefaultEffects());
         
         images.forEach((img, index) => {
             img.style.cursor = 'pointer';
@@ -46,6 +57,20 @@
         });
         
         setupEventListeners();
+    }
+    
+    function getDefaultEffects() {
+        return {
+            grayscale: 0,
+            sepia: 0,
+            invert: 0,
+            saturate: 100,
+            contrast: 100,
+            brightness: 100,
+            blur: 0,
+            hue: 0,
+            rendering: 'auto'
+        };
     }
     
     function setupEventListeners() {
@@ -56,7 +81,7 @@
         zoomInBtn.addEventListener('click', () => {
             if (zoomController) {
                 const rect = viewerContainer.getBoundingClientRect();
-                const scale = zoomController.zoomIn(rect.width / 2, rect.height / 2);
+                const scale = zoomController.zoomIn(rect.left + rect.width / 2, rect.top + rect.height / 2);
                 updateZoomDisplay(scale);
             }
         });
@@ -64,7 +89,7 @@
         zoomOutBtn.addEventListener('click', () => {
             if (zoomController) {
                 const rect = viewerContainer.getBoundingClientRect();
-                const scale = zoomController.zoomOut(rect.width / 2, rect.height / 2);
+                const scale = zoomController.zoomOut(rect.left + rect.width / 2, rect.top + rect.height / 2);
                 updateZoomDisplay(scale);
             }
         });
@@ -89,13 +114,27 @@
             filterMenu.classList.toggle('hidden');
         });
         
-        filterOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const type = option.dataset.type;
-                const value = option.dataset.value;
-                applyEffect(type, value);
-                updateFilterUI();
+        Object.keys(filterControls).forEach(key => {
+            const control = filterControls[key];
+            
+            control.slider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                control.input.value = value;
+                updateFilterValue(key, value);
             });
+            
+            control.input.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                    control.slider.value = value;
+                    updateFilterValue(key, value);
+                }
+            });
+        });
+        
+        imageRenderingSelect.addEventListener('change', (e) => {
+            imageEffects[currentIndex].rendering = e.target.value;
+            applyStoredEffect();
         });
         
         applyToAllBtn.addEventListener('click', applyEffectToAll);
@@ -125,6 +164,11 @@
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     }
     
+    function updateFilterValue(key, value) {
+        imageEffects[currentIndex][key] = value;
+        applyStoredEffect();
+    }
+    
     function openViewer(index) {
         currentIndex = index;
         showLoading();
@@ -143,6 +187,7 @@
             
             initZoomController();
             initGestureHandler();
+            loadEffectsToUI();
             applyStoredEffect();
             
             hideLoading();
@@ -234,7 +279,9 @@
             onDrag: (data) => {
                 if (zoomController && zoomController.getState().isZoomed) {
                     zoomController.drag(data.x, data.y);
+                    return true;
                 }
+                return false;
             },
             onDragEnd: () => {
                 if (zoomController) zoomController.endDrag();
@@ -247,11 +294,8 @@
             },
             onWheel: (scale, point) => {
                 if (zoomController) {
-                    const rect = viewerContainer.getBoundingClientRect();
-                    const centerX = point.x || rect.width / 2;
-                    const centerY = point.y || rect.height / 2;
                     const currentScale = zoomController.getState().scale;
-                    const newScale = zoomController.setZoom(currentScale * scale, centerX, centerY);
+                    const newScale = zoomController.setZoom(currentScale * scale, point.x, point.y);
                     updateZoomDisplay(newScale);
                 }
             }
@@ -263,30 +307,34 @@
         zoomLevelDisplay.textContent = `${percentage}%`;
     }
     
-    function applyEffect(type, value) {
+    function loadEffectsToUI() {
         const effect = imageEffects[currentIndex];
         
-        if (type === 'filter') {
-            effect.filter = value;
-        } else if (type === 'blend') {
-            effect.blend = value;
-        }
+        Object.keys(filterControls).forEach(key => {
+            const control = filterControls[key];
+            const value = effect[key];
+            control.slider.value = value;
+            control.input.value = value;
+        });
         
-        applyStoredEffect();
+        imageRenderingSelect.value = effect.rendering;
     }
     
     function applyStoredEffect() {
         const effect = imageEffects[currentIndex];
         
-        if (effect.filter === 'none') {
-            viewerImage.style.filter = '';
-        } else {
-            viewerImage.style.filter = effect.filter;
-        }
+        const filters = [];
+        if (effect.grayscale > 0) filters.push(`grayscale(${effect.grayscale}%)`);
+        if (effect.sepia > 0) filters.push(`sepia(${effect.sepia}%)`);
+        if (effect.invert > 0) filters.push(`invert(${effect.invert}%)`);
+        if (effect.saturate !== 100) filters.push(`saturate(${effect.saturate}%)`);
+        if (effect.contrast !== 100) filters.push(`contrast(${effect.contrast}%)`);
+        if (effect.brightness !== 100) filters.push(`brightness(${effect.brightness}%)`);
+        if (effect.blur > 0) filters.push(`blur(${effect.blur}px)`);
+        if (effect.hue > 0) filters.push(`hue-rotate(${effect.hue}deg)`);
         
-        viewerImage.style.mixBlendMode = effect.blend;
-        
-        updateFilterUI();
+        viewerImage.style.filter = filters.length > 0 ? filters.join(' ') : '';
+        viewerImage.style.imageRendering = effect.rendering;
     }
     
     function applyEffectToAll() {
@@ -296,44 +344,26 @@
             imageEffects[i] = { ...currentEffect };
         }
         
-        const message = document.createElement('div');
-        message.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        message.textContent = '현재 효과가 모든 이미지에 적용되었습니다';
-        document.body.appendChild(message);
-        
-        setTimeout(() => {
-            message.remove();
-        }, 2000);
+        showToast('현재 효과가 모든 이미지에 적용되었습니다', 'success');
     }
     
     function resetEffects() {
-        imageEffects[currentIndex] = { filter: 'none', blend: 'normal' };
+        imageEffects[currentIndex] = getDefaultEffects();
+        loadEffectsToUI();
         applyStoredEffect();
-        
-        const message = document.createElement('div');
-        message.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        message.textContent = '효과가 초기화되었습니다';
-        document.body.appendChild(message);
-        
-        setTimeout(() => {
-            message.remove();
-        }, 2000);
+        showToast('효과가 초기화되었습니다', 'info');
     }
     
-    function updateFilterUI() {
-        const effect = imageEffects[currentIndex];
+    function showToast(message, type) {
+        const bgColor = type === 'success' ? 'bg-green-600' : 'bg-blue-600';
+        const toast = document.createElement('div');
+        toast.className = `fixed top-20 left-1/2 -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-[1001]`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
         
-        filterOptions.forEach(option => {
-            const type = option.dataset.type;
-            const value = option.dataset.value;
-            
-            if ((type === 'filter' && effect.filter === value) ||
-                (type === 'blend' && effect.blend === value)) {
-                option.style.backgroundColor = 'rgba(59, 130, 246, 0.3)';
-            } else {
-                option.style.backgroundColor = '';
-            }
-        });
+        setTimeout(() => {
+            toast.remove();
+        }, 2000);
     }
     
     async function downloadImage() {
@@ -462,7 +492,7 @@
             case '=':
                 if (zoomController) {
                     const rect = viewerContainer.getBoundingClientRect();
-                    const scale = zoomController.zoomIn(rect.width / 2, rect.height / 2);
+                    const scale = zoomController.zoomIn(rect.left + rect.width / 2, rect.top + rect.height / 2);
                     updateZoomDisplay(scale);
                 }
                 break;
@@ -470,7 +500,7 @@
             case '_':
                 if (zoomController) {
                     const rect = viewerContainer.getBoundingClientRect();
-                    const scale = zoomController.zoomOut(rect.width / 2, rect.height / 2);
+                    const scale = zoomController.zoomOut(rect.left + rect.width / 2, rect.top + rect.height / 2);
                     updateZoomDisplay(scale);
                 }
                 break;

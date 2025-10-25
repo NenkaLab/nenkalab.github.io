@@ -1,72 +1,103 @@
-<div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden items-center justify-center">
+<div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-[1000] hidden items-center justify-center">
     <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent p-4 z-10">
         <div class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center gap-2">
-                <button id="viewer-download" 
-                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors"
-                        aria-label="다운로드" title="다운로드">
+                <button id="viewer-download" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="다운로드" title="다운로드">
                     <span class="material-symbols-outlined text-white text-2xl">download</span>
                 </button>
-                <button id="viewer-share" 
-                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors"
-                        aria-label="공유" title="공유">
+                <button id="viewer-share" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="공유" title="공유">
                     <span class="material-symbols-outlined text-white text-2xl">share</span>
                 </button>
                 <div class="relative">
-                    <button id="viewer-filter-toggle" 
-                            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors"
-                            aria-label="필터" title="이미지 효과">
+                    <button id="viewer-filter-toggle" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="필터" title="이미지 효과">
                         <span class="material-symbols-outlined text-white text-2xl">palette</span>
                     </button>
-                    <div id="viewer-filter-menu" class="absolute top-12 left-0 bg-gray-900 rounded-lg shadow-xl hidden min-w-[280px] max-h-[70vh] overflow-y-auto z-20">
-                        <div class="sticky top-0 bg-gray-900 border-b border-gray-700 p-3 z-10">
+                    <div id="viewer-filter-menu" class="absolute top-12 left-0 bg-zinc-900 rounded-lg shadow-xl hidden min-w-[320px] max-h-[70vh] overflow-y-auto z-20">
+                        <div class="sticky top-0 bg-zinc-900 border-b border-zinc-700 p-3 z-10">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-white text-sm font-semibold">이미지 효과</span>
-                                <button id="viewer-apply-to-all" 
-                                        class="px-3 py-1 text-xs bg-blue-600/30 hover:bg-blue-600/50 text-white rounded transition-colors"
-                                        title="현재 효과를 모든 이미지에 적용">전체 적용</button>
+                                <button id="viewer-apply-to-all" class="px-3 py-1 text-xs bg-blue-600/30 hover:bg-blue-600/50 text-white rounded transition-colors" title="현재 효과를 모든 이미지에 적용">전체 적용</button>
                             </div>
-                            <div class="text-xs text-gray-400">효과는 각 이미지별로 저장됩니다</div>
+                            <div class="text-xs text-zinc-400">효과는 각 이미지별로 저장됩니다</div>
                         </div>
                         
-                        <div class="p-2">
-                            <div class="text-xs text-gray-500 font-semibold px-2 py-1 mb-1">CSS Filter</div>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="none">원본</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="grayscale(100%)">흑백</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="sepia(100%)">세피아</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="invert(100%)">반전</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="saturate(200%)">채도 증가</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="contrast(150%)">대비 증가</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="brightness(120%)">밝기 증가</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="brightness(80%)">밝기 감소</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="blur(3px)">블러</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="hue-rotate(90deg)">색조 90°</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="filter" data-value="hue-rotate(180deg)">색조 180°</button>
+                        <div class="p-3 space-y-4">
+                            <div class="filter-control">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-white text-sm">Grayscale</label>
+                                    <input type="number" id="filter-grayscale-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="100" value="0">
+                                </div>
+                                <input type="range" id="filter-grayscale" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="100" value="0">
+                            </div>
+                            
+                            <div class="filter-control">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-white text-sm">Sepia</label>
+                                    <input type="number" id="filter-sepia-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="100" value="0">
+                                </div>
+                                <input type="range" id="filter-sepia" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="100" value="0">
+                            </div>
+                            
+                            <div class="filter-control">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-white text-sm">Invert</label>
+                                    <input type="number" id="filter-invert-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="100" value="0">
+                                </div>
+                                <input type="range" id="filter-invert" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="100" value="0">
+                            </div>
+                            
+                            <div class="filter-control">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-white text-sm">Saturate</label>
+                                    <input type="number" id="filter-saturate-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="300" value="100">
+                                </div>
+                                <input type="range" id="filter-saturate" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="300" value="100">
+                            </div>
+                            
+                            <div class="filter-control">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-white text-sm">Contrast</label>
+                                    <input type="number" id="filter-contrast-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="300" value="100">
+                                </div>
+                                <input type="range" id="filter-contrast" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="300" value="100">
+                            </div>
+                            
+                            <div class="filter-control">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-white text-sm">Brightness</label>
+                                    <input type="number" id="filter-brightness-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="300" value="100">
+                                </div>
+                                <input type="range" id="filter-brightness" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="300" value="100">
+                            </div>
+                            
+                            <div class="filter-control">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-white text-sm">Blur</label>
+                                    <input type="number" id="filter-blur-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="10" step="0.1" value="0">
+                                </div>
+                                <input type="range" id="filter-blur" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="10" step="0.1" value="0">
+                            </div>
+                            
+                            <div class="filter-control">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-white text-sm">Hue Rotate</label>
+                                    <input type="number" id="filter-hue-input" class="w-16 px-2 py-1 text-xs bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500" min="0" max="360" value="0">
+                                </div>
+                                <input type="range" id="filter-hue" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider" min="0" max="360" value="0">
+                            </div>
                         </div>
                         
-                        <div class="p-2 border-t border-gray-700">
-                            <div class="text-xs text-gray-500 font-semibold px-2 py-1 mb-1">Mix Blend Mode</div>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="normal">Normal</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="multiply">Multiply</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="screen">Screen</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="overlay">Overlay</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="darken">Darken</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="lighten">Lighten</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="color-dodge">Color Dodge</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="color-burn">Color Burn</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="hard-light">Hard Light</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="soft-light">Soft Light</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="difference">Difference</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="exclusion">Exclusion</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="hue">Hue</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="saturation">Saturation</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="color">Color</button>
-                            <button class="filter-option w-full px-4 py-2 text-left text-white hover:bg-white/10 rounded transition-colors text-sm" data-type="blend" data-value="luminosity">Luminosity</button>
+                        <div class="p-3 border-t border-zinc-700">
+                            <div class="text-xs text-zinc-500 font-semibold mb-2">Image Rendering</div>
+                            <select id="image-rendering" class="w-full px-3 py-2 bg-zinc-800 text-white rounded border border-zinc-700 focus:outline-none focus:border-blue-500 text-sm">
+                                <option value="auto">Auto (기본)</option>
+                                <option value="crisp-edges">Crisp Edges (선명)</option>
+                                <option value="pixelated">Pixelated (픽셀화)</option>
+                            </select>
                         </div>
                         
-                        <div class="p-2 border-t border-gray-700">
-                            <button id="viewer-reset-effects" 
-                                    class="w-full px-4 py-2 text-center text-white bg-red-600/20 hover:bg-red-600/30 rounded transition-colors text-sm">
+                        <div class="p-3 border-t border-zinc-700">
+                            <button id="viewer-reset-effects" class="w-full px-4 py-2 text-center text-white bg-red-600/20 hover:bg-red-600/30 rounded transition-colors text-sm">
                                 <span class="material-symbols-outlined text-base align-middle mr-1">restart_alt</span>
                                 효과 초기화
                             </button>
@@ -80,56 +111,43 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <button id="viewer-rotate" 
-                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors"
-                        aria-label="회전" title="90° 회전">
+                <button id="viewer-rotate" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="회전" title="90° 회전">
                     <span class="material-symbols-outlined text-white text-2xl">rotate_right</span>
                 </button>
-                <button id="viewer-fullscreen" 
-                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors"
-                        aria-label="전체화면" title="전체화면">
+                <button id="viewer-fullscreen" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="전체화면" title="전체화면">
                     <span class="material-symbols-outlined text-white text-2xl">fullscreen</span>
                 </button>
-                <button id="viewer-close" 
-                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors"
-                        aria-label="닫기" title="닫기 (ESC)">
+                <button id="viewer-close" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="닫기" title="닫기 (ESC)">
                     <span class="material-symbols-outlined text-white text-2xl">close</span>
                 </button>
             </div>
         </div>
     </div>
     
-    <button id="viewer-prev" 
-            class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10"
-            aria-label="이전 이미지" title="이전 (←)">
+    <button id="viewer-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10" aria-label="이전 이미지" title="이전 (←)">
         <span class="material-symbols-outlined text-white text-3xl">chevron_left</span>
     </button>
     
-    <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden">
-        <div id="viewer-image-wrapper" class="relative" style="touch-action: none;">
-            <img id="viewer-image" src="" alt="" class="max-w-full max-h-full object-contain select-none" draggable="false">
+    <div id="viewer-container" class="relative w-full h-full flex items-center justify-center overflow-hidden p-8">
+        <div id="viewer-image-wrapper" class="relative flex items-center justify-center" style="touch-action: none;">
+            <img id="viewer-image" src="" alt="" class="w-auto h-auto max-w-full max-h-full object-contain select-none" draggable="false">
         </div>
     </div>
     
-    <button id="viewer-next" 
-            class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10"
-            aria-label="다음 이미지" title="다음 (→)">
+    <button id="viewer-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 transition-colors z-10" aria-label="다음 이미지" title="다음 (→)">
         <span class="material-symbols-outlined text-white text-3xl">chevron_right</span>
     </button>
     
     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full flex items-center gap-4 z-10">
-        <button id="viewer-zoom-out" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
-                aria-label="축소" title="축소">
+        <button id="viewer-zoom-out" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors" aria-label="축소" title="축소">
             <span class="material-symbols-outlined text-white text-xl">zoom_out</span>
         </button>
         <span id="viewer-zoom-level" class="text-white text-sm min-w-[60px] text-center">100%</span>
-        <button id="viewer-zoom-in" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
-                aria-label="확대" title="확대">
+        <button id="viewer-zoom-in" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors" aria-label="확대" title="확대">
             <span class="material-symbols-outlined text-white text-xl">zoom_in</span>
         </button>
         <div class="w-px h-6 bg-white/30"></div>
-        <button id="viewer-zoom-reset" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
-                aria-label="초기화" title="줌 초기화">
+        <button id="viewer-zoom-reset" class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors" aria-label="초기화" title="줌 초기화">
             <span class="material-symbols-outlined text-white text-xl">fit_screen</span>
         </button>
     </div>
@@ -142,14 +160,49 @@
 <style>
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
-#viewer-image-wrapper { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+#viewer-image-wrapper { 
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    will-change: transform;
+    max-width: 100%;
+    max-height: 100%;
+}
 #viewer-image-wrapper.zooming { transition: none; }
-#viewer-image { transition: filter 0.3s ease, mix-blend-mode 0.3s ease, transform 0.3s ease; }
+#viewer-image { 
+    transition: filter 0.3s ease, image-rendering 0.1s;
+    display: block;
+}
 #viewer-filter-menu { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.3) transparent; }
 #viewer-filter-menu::-webkit-scrollbar { width: 8px; }
 #viewer-filter-menu::-webkit-scrollbar-track { background: transparent; }
 #viewer-filter-menu::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.3); border-radius: 4px; }
 #viewer-filter-menu::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.5); }
+
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+}
+.slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: none;
+}
+.slider::-webkit-slider-runnable-track {
+    height: 8px;
+    border-radius: 4px;
+    background: #374151;
+}
+.slider::-moz-range-track {
+    height: 8px;
+    border-radius: 4px;
+    background: #374151;
+}
 </style>
 
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>
