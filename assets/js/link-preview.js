@@ -157,7 +157,7 @@
             chip.innerHTML = `
                 <img src="${faviconUrl}" 
                      alt="${this.escapeHtml(linkData.domain)}" 
-                     class="w-4 h-4 rounded flex-shrink-0 m-0"
+                     class="w-4 h-4 rounded flex-shrink-0 !m-0"
                      onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath fill=%22%23999%22 d=%22M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z%22/%3E%3C/svg%3E'">
                 <span class="text-sm font-medium text-zinc-900 dark:text-zinc-100 whitespace-nowrap overflow-hidden text-ellipsis flex-1 min-w-0">${this.escapeHtml(this.truncate(linkData.title, 30))}</span>
                 <svg class="w-3 h-3 text-zinc-500 dark:text-zinc-400 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -280,13 +280,13 @@
 
         createPopup(linkData) {
             const popup = document.createElement('div');
-            popup.className = 'link-preview-popup absolute bottom-full left-0 mb-3 w-80 max-w-[90vw] bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-2xl overflow-hidden opacity-0 invisible translate-y-2 scale-95 transition-all duration-200 ease-out z-[1000] pointer-events-none';
+            popup.className = 'link-preview-popup absolute bottom-full left-0 mb-3 w-80 max-w-[90vw] bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-2xl overflow-hidden opacity-0 invisible translate-y-2 scale-95 transition-all duration-200 ease-out z-[1000] pointer-events-none cursor-auto';
             popup.setAttribute('role', 'tooltip');
 
             const hasImage = linkData.image && linkData.image.length > 0;
 
             const imageHTML = hasImage ? `
-                <div class="w-full h-40 overflow-hidden bg-gray-100 dark:bg-zinc-700">
+                <div class="w-full h-auto overflow-hidden bg-gray-100 dark:bg-zinc-700 aspect-video">
                     <img src="${linkData.image}" 
                          alt="${this.escapeHtml(linkData.title)}"
                          class="w-full h-full object-cover dark:brightness-90"
@@ -310,7 +310,7 @@
                         </svg>
                         <span class="truncate">${this.escapeHtml(linkData.domain)}</span>
                     </div>
-                    <a href="${this.escapeHtml(linkData.url)}" target="_blank" rel="noopener noreferrer" class="popup-link inline-flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/30">
+                    <a href="${this.escapeHtml(linkData.url)}" target="_blank" rel="noopener noreferrer" class="popup-link inline-flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 !text-white text-sm font-medium rounded-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/30">
                         방문하기
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
