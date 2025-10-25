@@ -289,7 +289,7 @@
                 <div class="w-full h-auto overflow-hidden bg-gray-100 dark:bg-zinc-700 aspect-video">
                     <img src="${linkData.image}" 
                          alt="${this.escapeHtml(linkData.title)}"
-                         class="w-full h-full object-cover dark:brightness-90 !m-0"
+                         class="w-full h-full object-cover dark:brightness-90 !m-0 aspect-video"
                          onerror="this.parentElement.style.display='none'">
                 </div>
             ` : '';
@@ -301,7 +301,7 @@
             popup.innerHTML = `
                 ${imageHTML}
                 <div class="p-4">
-                    <h4 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 leading-snug mb-2 overflow-hidden" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${this.escapeHtml(linkData.title)}</h4>
+                    <h4 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 leading-snug mb-2 overflow-hidden mt-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${this.escapeHtml(linkData.title)}</h4>
                     ${descriptionHTML}
                     <div class="flex items-center gap-1.5 mb-3 text-xs text-zinc-500 dark:text-zinc-400">
                         <svg class="flex-shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
