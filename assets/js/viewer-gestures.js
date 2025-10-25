@@ -7,93 +7,110 @@
             this.callbacks = callbacks || {};
             
             this.pointers = new Map();
-            this.lastTap = 0;
-            this.startDistance = 0;
-            this.isPinching = false;
+            this.pointerType = null;
+            this.isZooming = false;
+            this.isRotating = false;
             this.isDragging = false;
-            this.dragHandled = false; // (신규) 드래그가 onDrag 콜백에 의해 처리되었는지 여부
-            this.swipeStartX = 0;
-            this.swipeStartY = 0;
-            this.swipeThreshold = 50; // 스와이프로 인정할 최소 픽셀
-            this.dragThreshold = 5; // 드래그로 인정할 최소 픽셀
+            this.lastTap = 0;
             this.doubleTapDelay = 300;
-            this.hasMoved = false;
-
-            // (신규) 펜 회전(twist) 상태
-            this.lastPenTwist = 0;
-            this.penTwistThreshold = 10; // 펜 회전 민감도 (도)
+            
+            this.startDistance = 0;
+            this.currentDistance = 0;
+            this.lastDistance = 0;
+            
+            this.startAngle = 0;
+            this.currentAngle = 0;
+            this.lastAngle = 0;
+            
+            this.dragStartX = 0;
+            this.dragStartY = 0;
+            this.lastDragX = 0;
+            this.lastDragY = 0;
+            
+            this.velocityTracker = [];
+            this.dragThreshold = 10;
+            this.rotationThreshold = 5;
+            this.isPenButtonPressed = false;
             
             this.init();
         }
         
         init() {
             this.element.style.touchAction = 'none';
+            this.element.style.userSelect = 'none';
             
-            // (수정) bind(this)를 변수에 저장하여 removeEventListener에서 동일한 참조 사용
-            this.boundHandlePointerDown = this.handlePointerDown.bind(this);
-            this.boundHandlePointerMove = this.handlePointerMove.bind(this);
-            this.boundHandlePointerUp = this.handlePointerUp.bind(this);
-            this.boundHandleWheel = this.handleWheel.bind(this);
-
-            this.element.addEventListener('pointerdown', this.boundHandlePointerDown);
-            this.element.addEventListener('pointermove', this.boundHandlePointerMove);
-            this.element.addEventListener('pointerup', this.boundHandlePointerUp);
-            this.element.addEventListener('pointercancel', this.boundHandlePointerUp);
-            
-            this.element.addEventListener('wheel', this.boundHandleWheel, { passive: false });
+            this.element.addEventListener('pointerdown', this.handlePointerDown.bind(this));
+            this.element.addEventListener('pointermove', this.handlePointerMove.bind(this));
+            this.element.addEventListener('pointerup', this.handlePointerUp.bind(this));
+            this.element.addEventListener('pointercancel', this.handlePointerCancel.bind(this));
+            this.element.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
+            this.element.addEventListener('dblclick', this.handleDoubleClick.bind(this));
         }
         
-        getDistance(pointer1, pointer2) {
-            const dx = pointer2.clientX - pointer1.clientX;
-            const dy = pointer2.clientY - pointer1.clientY;
+        getDistance(p1, p2) {
+            const dx = p2.clientX - p1.clientX;
+            const dy = p2.clientY - p1.clientY;
             return Math.sqrt(dx * dx + dy * dy);
         }
         
-        getCenter(pointer1, pointer2) {
+        getAngle(p1, p2) {
+            return Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * 180 / Math.PI;
+        }
+        
+        getCenter(p1, p2) {
             return {
-                x: (pointer1.clientX + pointer2.clientX) / 2,
-                y: (pointer1.clientY + pointer2.clientY) / 2
+                x: (p1.clientX + p2.clientX) / 2,
+                y: (p1.clientY + p2.clientY) / 2
             };
         }
         
+        normalizeAngle(angle) {
+            while (angle > 180) angle -= 360;
+            while (angle < -180) angle += 360;
+            return angle;
+        }
+        
         handlePointerDown(e) {
+            this.pointerType = e.pointerType;
+            this.isPenButtonPressed = e.buttons === 32;
+            
             this.pointers.set(e.pointerId, {
+                id: e.pointerId,
                 clientX: e.clientX,
                 clientY: e.clientY,
-                pointerId: e.pointerId
+                startX: e.clientX,
+                startY: e.clientY,
+                type: e.pointerType
             });
             
-            this.hasMoved = false;
-            this.dragHandled = false; // 드래그 핸들 플래그 초기화
+            this.velocityTracker = [];
             
-            if (e.pointerType === 'pen') {
-                this.lastPenTwist = e.twist; // (신규) 펜 시작 각도 저장
-            }
-
-            if (this.pointers.size === 2) {
+            if (this.pointers.size === 2 && this.pointerType === 'touch') {
                 e.preventDefault();
                 const pointers = Array.from(this.pointers.values());
-                this.isPinching = true;
-                this.isDragging = false; // 핀치 시 드래그 중지
+                
                 this.startDistance = this.getDistance(pointers[0], pointers[1]);
+                this.lastDistance = this.startDistance;
+                this.currentDistance = this.startDistance;
+                
+                this.startAngle = this.getAngle(pointers[0], pointers[1]);
+                this.lastAngle = this.startAngle;
+                this.currentAngle = this.startAngle;
+                
                 const center = this.getCenter(pointers[0], pointers[1]);
                 
                 if (this.callbacks.onPinchStart) {
                     this.callbacks.onPinchStart(center);
                 }
             } else if (this.pointers.size === 1) {
-                this.swipeStartX = e.clientX;
-                this.swipeStartY = e.clientY;
-                
-                if (this.callbacks.onDragStart) {
-                    this.callbacks.onDragStart({
-                        x: e.clientX,
-                        y: e.clientY
-                    });
-                }
+                this.dragStartX = e.clientX;
+                this.dragStartY = e.clientY;
+                this.lastDragX = e.clientX;
+                this.lastDragY = e.clientY;
                 
                 const now = Date.now();
                 if (now - this.lastTap < this.doubleTapDelay) {
+                    e.preventDefault();
                     if (this.callbacks.onDoubleTap) {
                         this.callbacks.onDoubleTap({
                             x: e.clientX,
@@ -110,141 +127,246 @@
         handlePointerMove(e) {
             if (!this.pointers.has(e.pointerId)) return;
             
-            const originalPointer = this.pointers.get(e.pointerId);
-            const dx = e.clientX - originalPointer.clientX;
-            const dy = e.clientY - originalPointer.clientY;
-            
-            if (Math.abs(dx) > this.dragThreshold || Math.abs(dy) > this.dragThreshold) {
-                this.hasMoved = true;
-            }
-
+            const oldPointer = this.pointers.get(e.pointerId);
             this.pointers.set(e.pointerId, {
+                ...oldPointer,
                 clientX: e.clientX,
-                clientY: e.clientY,
-                pointerId: e.pointerId
+                clientY: e.clientY
             });
             
-            if (this.isPinching && this.pointers.size === 2) {
+            const now = Date.now();
+            this.velocityTracker.push({
+                x: e.clientX,
+                y: e.clientY,
+                time: now
+            });
+            if (this.velocityTracker.length > 10) {
+                this.velocityTracker.shift();
+            }
+            
+            if (this.pointers.size === 2 && this.pointerType === 'touch') {
                 e.preventDefault();
                 const pointers = Array.from(this.pointers.values());
-                const currentDistance = this.getDistance(pointers[0], pointers[1]);
-                const scale = currentDistance / this.startDistance;
+                
+                this.currentDistance = this.getDistance(pointers[0], pointers[1]);
+                const scale = this.currentDistance / this.lastDistance;
+                
+                this.currentAngle = this.getAngle(pointers[0], pointers[1]);
+                let angleDelta = this.normalizeAngle(this.currentAngle - this.lastAngle);
+                
                 const center = this.getCenter(pointers[0], pointers[1]);
                 
-                if (this.callbacks.onPinch) {
-                    this.callbacks.onPinch(scale, center);
+                if (this.callbacks.onPinch && Math.abs(scale - 1) > 0.001) {
+                    this.callbacks.onPinch({
+                        scale: scale,
+                        center: center,
+                        distance: this.currentDistance,
+                        startDistance: this.startDistance
+                    });
                 }
-            } else if (this.pointers.size === 1 && !this.isPinching) {
-                const deltaX = e.clientX - this.swipeStartX;
-                const deltaY = e.clientY - this.swipeStartY;
                 
-                if (this.hasMoved) { // (수정) dragThreshold 이상 움직였을 때만
-                    this.isDragging = true;
+                if (this.callbacks.onRotate && Math.abs(angleDelta) > 0.1) {
+                    this.callbacks.onRotate({
+                        angle: angleDelta,
+                        totalAngle: this.normalizeAngle(this.currentAngle - this.startAngle),
+                        center: center
+                    });
+                }
+                
+                this.lastDistance = this.currentDistance;
+                this.lastAngle = this.currentAngle;
+                
+                this.isZooming = true;
+                this.isRotating = true;
+            } else if (this.pointers.size === 1 && this.pointerType === 'pen') {
+                const pointer = this.pointers.get(e.pointerId);
+                const dx = e.clientX - pointer.startX;
+                const dy = e.clientY - pointer.startY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (this.isPenButtonPressed && distance > this.dragThreshold) {
+                    e.preventDefault();
+                    
+                    if (!this.isRotating && this.callbacks.onPenRotateStart) {
+                        this.callbacks.onPenRotateStart({ x: e.clientX, y: e.clientY });
+                        this.isRotating = true;
+                    }
+                    
+                    if (this.callbacks.onPenRotate) {
+                        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                        this.callbacks.onPenRotate({
+                            angle: angle,
+                            center: { x: e.clientX, y: e.clientY }
+                        });
+                    }
+                } else if (!this.isPenButtonPressed && distance > this.dragThreshold) {
+                    if (!this.isDragging) {
+                        const canDrag = this.callbacks.onDragStart ? 
+                            this.callbacks.onDragStart({ x: e.clientX, y: e.clientY }) : 
+                            false;
+                        
+                        if (canDrag) {
+                            this.isDragging = true;
+                        } else {
+                            if (this.callbacks.onPenZoom) {
+                                const centerX = this.element.getBoundingClientRect().left + this.element.getBoundingClientRect().width / 2;
+                                const centerY = this.element.getBoundingClientRect().top + this.element.getBoundingClientRect().height / 2;
+                                const scale = 1 + dy * 0.01;
+                                
+                                this.callbacks.onPenZoom({
+                                    scale: scale,
+                                    center: { x: centerX, y: centerY }
+                                });
+                            }
+                        }
+                    }
+                    
+                    if (this.isDragging && this.callbacks.onDrag) {
+                        this.callbacks.onDrag({
+                            x: e.clientX,
+                            y: e.clientY,
+                            deltaX: e.clientX - this.lastDragX,
+                            deltaY: e.clientY - this.lastDragY
+                        });
+                    }
+                    
+                    this.lastDragX = e.clientX;
+                    this.lastDragY = e.clientY;
+                }
+            } else if (this.pointers.size === 1) {
+                const pointer = this.pointers.get(e.pointerId);
+                const dx = e.clientX - pointer.startX;
+                const dy = e.clientY - pointer.startY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > this.dragThreshold && !this.isDragging) {
+                    const canDrag = this.callbacks.onDragStart ? 
+                        this.callbacks.onDragStart({ x: e.clientX, y: e.clientY }) : 
+                        false;
+                    
+                    this.isDragging = canDrag;
                 }
                 
                 if (this.isDragging && this.callbacks.onDrag) {
                     const shouldPrevent = this.callbacks.onDrag({
                         x: e.clientX,
                         y: e.clientY,
-                        deltaX: deltaX,
-                        deltaY: deltaY
+                        deltaX: e.clientX - this.lastDragX,
+                        deltaY: e.clientY - this.lastDragY,
+                        totalDeltaX: e.clientX - this.dragStartX,
+                        totalDeltaY: e.clientY - this.dragStartY
                     });
                     
                     if (shouldPrevent) {
-                        this.dragHandled = true; // (신규) 줌/패닝이 드래그를 처리했음
                         e.preventDefault();
                     }
                 }
-            }
-            
-            // (신규) 펜 회전(Twist) 지원
-            if (e.pointerType === 'pen' && e.twist !== this.lastPenTwist && this.callbacks.onPenRotate) {
-                e.preventDefault();
-                const deltaTwist = e.twist - this.lastPenTwist;
                 
-                // 각도 랩 어라운드 처리 (e.g., 359 -> 1)
-                let normalizedDelta = deltaTwist;
-                if (Math.abs(deltaTwist) > 180) {
-                    normalizedDelta = deltaTwist > 0 ? deltaTwist - 360 : deltaTwist + 360;
-                }
-
-                if (Math.abs(normalizedDelta) > this.penTwistThreshold) {
-                    this.callbacks.onPenRotate(normalizedDelta, { x: e.clientX, y: e.clientY });
-                    this.lastPenTwist = e.twist; // 각도 업데이트
-                }
+                this.lastDragX = e.clientX;
+                this.lastDragY = e.clientY;
             }
         }
         
         handlePointerUp(e) {
             const pointer = this.pointers.get(e.pointerId);
-            
             if (!pointer) return;
             
-            if (this.isPinching && this.pointers.size === 2) {
-                this.isPinching = false;
+            if (this.pointers.size === 2) {
                 if (this.callbacks.onPinchEnd) {
                     this.callbacks.onPinchEnd();
                 }
-            } else if (this.pointers.size === 1 && !this.isPinching) {
-                const deltaX = e.clientX - this.swipeStartX;
-                const deltaY = e.clientY - this.swipeStartY;
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                
-                // (수정) 줌/패닝이 드래그를 처리하지 않았을 때만 스와이프 검사
-                if (this.isDragging && !this.dragHandled && distance > this.swipeThreshold) {
-                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                        if (deltaX > 0 && this.callbacks.onSwipeRight) {
-                            this.callbacks.onSwipeRight();
-                        } else if (deltaX < 0 && this.callbacks.onSwipeLeft) {
-                            this.callbacks.onSwipeLeft();
-                        }
+            } else if (this.pointers.size === 1) {
+                if (this.isDragging) {
+                    const velocity = this.getVelocity();
+                    
+                    if (this.callbacks.onDragEnd) {
+                        this.callbacks.onDragEnd({
+                            velocityX: velocity.x,
+                            velocityY: velocity.y,
+                            totalDeltaX: e.clientX - this.dragStartX,
+                            totalDeltaY: e.clientY - this.dragStartY
+                        });
                     }
                 }
                 
-                if (this.callbacks.onDragEnd) {
-                    this.callbacks.onDragEnd();
+                if (this.isRotating && this.callbacks.onPenRotateEnd) {
+                    this.callbacks.onPenRotateEnd();
                 }
             }
             
             this.pointers.delete(e.pointerId);
             this.isDragging = false;
-            this.hasMoved = false; // hasMoved도 초기화
-            this.dragHandled = false; // dragHandled 초기화
-            
-            if (this.pointers.size < 2) {
-                this.isPinching = false;
-            }
+            this.isZooming = false;
+            this.isRotating = false;
+            this.isPenButtonPressed = false;
+            this.velocityTracker = [];
+        }
+        
+        handlePointerCancel(e) {
+            this.handlePointerUp(e);
         }
         
         handleWheel(e) {
+            e.preventDefault();
+            
             if (e.ctrlKey || e.metaKey) {
-                e.preventDefault();
-                
-                const delta = -e.deltaY;
-                const scale = delta > 0 ? 1.1 : 0.9;
-                
+                if (this.callbacks.onWheelRotate) {
+                    const delta = -e.deltaY;
+                    const angleDelta = delta * 0.5;
+                    
+                    this.callbacks.onWheelRotate({
+                        angle: angleDelta,
+                        center: { x: e.clientX, y: e.clientY }
+                    });
+                }
+            } else {
                 if (this.callbacks.onWheel) {
-                    this.callbacks.onWheel(scale, {
-                        x: e.clientX,
-                        y: e.clientY
+                    const delta = -e.deltaY;
+                    const scale = delta > 0 ? 1.1 : 0.9;
+                    
+                    this.callbacks.onWheel({
+                        scale: scale,
+                        center: { x: e.clientX, y: e.clientY }
                     });
                 }
             }
         }
         
-        destroy() {
-            // (신규) 이벤트 리스너 제거
-            this.element.removeEventListener('pointerdown', this.boundHandlePointerDown);
-            this.element.removeEventListener('pointermove', this.boundHandlePointerMove);
-            this.element.removeEventListener('pointerup', this.boundHandlePointerUp);
-            this.element.removeEventListener('pointercancel', this.boundHandlePointerUp);
-            this.element.removeEventListener('wheel', this.boundHandleWheel);
+        handleDoubleClick(e) {
+            // pointerdown에서 이미 처리됨
+        }
+        
+        getVelocity() {
+            if (this.velocityTracker.length < 2) return { x: 0, y: 0 };
             
+            const recent = this.velocityTracker.slice(-5);
+            const first = recent[0];
+            const last = recent[recent.length - 1];
+            
+            const dt = last.time - first.time;
+            if (dt === 0) return { x: 0, y: 0 };
+            
+            return {
+                x: (last.x - first.x) / dt,
+                y: (last.y - first.y) / dt
+            };
+        }
+        
+        reset() {
             this.pointers.clear();
+            this.isDragging = false;
+            this.isZooming = false;
+            this.isRotating = false;
+            this.velocityTracker = [];
+        }
+        
+        destroy() {
+            this.reset();
+            this.element.style.touchAction = '';
+            this.element.style.userSelect = '';
         }
     }
     
     window.GestureHandler = GestureHandler;
     
 })(window);
-
