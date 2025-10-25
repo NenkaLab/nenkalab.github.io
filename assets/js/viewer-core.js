@@ -755,7 +755,7 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initImageViewer);
     } else {
-        initImageViewTagger();
+        initImageViewer();
     }
     
 })();
