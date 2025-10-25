@@ -104,6 +104,7 @@
 
     currentIndex = index;
     viewer.style.display = 'flex';
+    viewer.style.touchAction = 'none'; // 브라우저 기본 터치 동작(줌, 스크롤) 비활성화
     
     document.body.style.overflow = 'hidden';
 
@@ -129,6 +130,7 @@
     }
 
     viewer.style.display = 'none';
+    viewer.style.touchAction = ''; // 브라우저 기본 터치 동작 활성화
     document.body.style.overflow = '';
     
     img1.style.opacity = 0;
