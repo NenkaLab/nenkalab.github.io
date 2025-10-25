@@ -69,6 +69,9 @@
 
   function initImageViewer() {
     if (!viewer) return;
+    
+    // 스태킹 컨텍스트 문제를 해결하기 위해 뷰어를 body의 직계 자식으로 이동시킵니다.
+    document.body.appendChild(viewer);
 
     const proseImages = document.querySelectorAll('.post.prose img');
     if (proseImages.length === 0) return;
@@ -594,11 +597,14 @@
       
       const px = transformState.pan.x;
       const py = transformState.pan.y;
-      const cx = wrapper.clientWidth / 2 || window.innerWidth / 2;
-      const cy = wrapper.clientHeight / 2 || window.innerHeight / 2;
+      
+      // 뷰포트 중심을 기준으로 한 pan 값으로 변환
+      const panXFromCenter = px + (wrapper.clientWidth / 2 || window.innerWidth / 2);
+      const panYFromCenter = py + (wrapper.clientHeight / 2 || window.innerHeight / 2);
 
-      transformState.pan.x = (originX - cx) * (1 - ratio) + px * ratio;
-      transformState.pan.y = (originY - cy) * (1 - ratio) + py * ratio;
+      // 줌 중심(origin)을 기준으로 pan 값을 재계산
+      transformState.pan.x = (panXFromCenter - originX) * ratio + originX - (wrapper.clientWidth / 2 || window.innerWidth / 2);
+      transformState.pan.y = (panYFromCenter - originY) * ratio + originY - (wrapper.clientHeight / 2 || window.innerHeight / 2);
     }
     
     if (updateUI) {
