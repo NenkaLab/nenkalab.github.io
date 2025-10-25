@@ -54,7 +54,7 @@
     let imageEffects = [];
     let isTransitioning = false; // (수정) 애니메이션 및 이미지 전환(페이드) 플래그
     
-    const ANIMATION_DURATION = 350; // (신규) CSS 애니메이션 시간과 일치
+    const FADE_DURATION = 200; // (신규) CSS 페이드 시간과 일치
     
     /**
      * 뷰어 초기화
@@ -244,8 +244,8 @@
      * (신규) popstate 이벤트 핸들러 (뒤로가기 버튼)
      */
     function closeOnBack() {
-        // 뷰어가 활성화 상태일 때만 닫기 애니메이션 실행
-        if (document.documentElement.classList.contains('viewer-is-active')) {
+        // (수정) 'hidden' 클래스로 뷰어 활성화 상태 체크
+        if (!viewer.classList.contains('hidden')) {
             _performCloseAnimation();
         }
     }
@@ -259,18 +259,20 @@
 
         const currentWrapper = viewerZoomTargets[currentIndex]?.parentElement;
         
-        // 1. 닫기 애니메이션 시작
-        document.documentElement.classList.remove('viewer-is-active');
-        
-        // 2. 애니메이션 시간(350ms) 후 정리 작업
+        // 1. 닫기 애니메이션 시작 (페이드 아웃)
+        if(currentWrapper) {
+             currentWrapper.classList.remove('active');
+        }
+
+        // 2. 페이드 아웃 시간(200ms) 후 정리 작업
         setTimeout(() => {
+            // (수정) 뷰어 숨김 처리
+            viewer.classList.remove('flex');
+            viewer.classList.add('hidden');
+            
             document.body.style.overflow = '';
             filterMenu.classList.add('hidden');
             
-            if(currentWrapper) {
-                 currentWrapper.classList.remove('active'); // 현재 이미지 페이드 아웃
-            }
-    
             if (zoomController) {
                 zoomController.destroy();
                 zoomController = null;
@@ -282,7 +284,7 @@
             if (isFullscreen) exitFullscreen();
             
             isTransitioning = false;
-        }, ANIMATION_DURATION);
+        }, FADE_DURATION); // CSS transition 시간과 일치
     }
 
     
@@ -319,14 +321,25 @@
             updateViewer(); // 카운터, 버튼 업데이트
             
             const runOpenAnimation = () => {
-                // (수정) hidden 클래스 대신 애니메이션 클래스로 제어
+                // (수정) hidden 클래스 제거, flex 추가
                 document.body.style.overflow = 'hidden';
-                currentWrapper.classList.add('active'); // 페이드 인
+                viewer.classList.remove('hidden');
+                viewer.classList.add('flex');
                 
-                // (신규) 애니메이션 트리거
-                document.documentElement.classList.add('viewer-is-active');
+                // (수정) 래퍼 페이드 인
+                // requestAnimationFrame을 사용해 flex 변경 후 opacity 변경이 적용되도록 함
+                requestAnimationFrame(() => {
+                    currentWrapper.classList.add('active'); 
+                });
+                
+                // (수정) Android 애니메이션 클래스 제거
                 
                 hideLoading();
+
+                // (수정) 페이드 인 완료 후 transition 해제
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, FADE_DURATION);
             };
 
             runOpenAnimation();
@@ -338,6 +351,7 @@
         currentImage.onerror = () => {
             hideLoading();
             console.error('이미지 로드 실패:', articleImages[currentIndex].src);
+            isTransitioning = false; // (신규) 에러 시 플래그 해제
         };
     }
     
@@ -423,7 +437,7 @@
                 preloadNeighbors();
                 
                 // (수정) 페이드 트랜지션 시간(200ms) 후 상태 해제
-                setTimeout(() => { isTransitioning = false; }, 200);
+                setTimeout(() => { isTransitioning = false; }, FADE_DURATION);
             };
             newImage.onerror = () => {
                 console.error('이미지 로드 실패:', articleImages[currentIndex].src);
@@ -467,7 +481,7 @@
                 preloadNeighbors();
                 
                 // (수정) 페이드 트랜지션 시간(200ms) 후 상태 해제
-                setTimeout(() => { isTransitioning = false; }, 200);
+                setTimeout(() => { isTransitioning = false; }, FADE_DURATION);
             };
             newImage.onerror = () => {
                 console.error('이미지 로드 실패:', articleImages[currentIndex].src);
@@ -694,7 +708,8 @@
     }
     
     function handleKeyboard(e) {
-        if (isTransitioning || !document.documentElement.classList.contains('viewer-is-active')) return;
+        // (수정) 'hidden' 클래스로 뷰어 활성화 상태 체크
+        if (isTransitioning || viewer.classList.contains('hidden')) return;
 
         switch(e.key) {
             case 'Escape':
@@ -755,7 +770,7 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initImageViewer);
     } else {
-        initImageViewer();
+        initImageViewer(); // (수정) initImageViewTagger -> initImageViewer
     }
     
 })();

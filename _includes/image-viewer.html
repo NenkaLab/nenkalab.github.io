@@ -1,7 +1,7 @@
-<!-- (수정) 'hidden' 클래스 제거, CSS로 초기 상태 제어 -->
-<div id="image-viewer" class="fixed inset-0 bg-black bg-opacity-95 z-[1000] flex items-center justify-center">
+<!-- (수정) 'hidden' 클래스를 다시 추가하고, 'flex'는 JS가 제어하도록 제거 -->
+<div id="image-viewer" class="fixed inset-0 backdrop-blur-2xl bg-black bg-opacity-95 z-1000 hidden items-center justify-center">
     <!-- Top Controls -->
-    <div class="control-hide absolute top-0 left-0 right-0 bg-gradient-to-b from-black/50 to-transparent p-4 z-10">
+    <div class="control-hide absolute top-0 left-0 right-0 bg-linear-to-b from-black/50 to-transparent p-4 z-10">
         <div class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center gap-2">
                 <button id="viewer-download" class="w-10 h-10 flex items-center justify-center rounded-full group hover:bg-white hover:bg-opacity-10 transition-colors" aria-label="다운로드" title="다운로드">
@@ -168,7 +168,6 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
 
-/* ... (기존 .viewer-image-instance-wrapper, .viewer-zoom-target 등 스타일) ... */
 .viewer-image-instance-wrapper {
     position: absolute;
     top: 0;
@@ -253,41 +252,10 @@
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* (신규) Android Activity 스타일 애니메이션 
-  - 본문 콘텐츠가 <main> 태그로 감싸져 있다고 가정합니다.
-  - 아닐 경우, 'main' 셀렉터를 실제 콘텐츠 래퍼로 변경해주세요. (예: '#content')
-*/
-main {
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-                filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform, filter;
-}
-
-#image-viewer {
-    /* (수정) 'hidden' 클래스 대신 opacity/pointer-events로 제어 */
-    opacity: 0;
-    transform: translateX(5%);
-    pointer-events: none; 
-    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: opacity, transform;
-}
-
-/* 뷰어 활성화 상태 */
-html.viewer-is-active main {
-    transform: translateX(-3%);
-    filter: brightness(0.7) blur(1px);
-    transform-origin: center;
-}
-html.viewer-is-active #image-viewer {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto; /* 상호작용 가능하게 */
-}
-
 </style>
 
 <script src="{{ '/assets/js/viewer-gestures.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-zoom.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/viewer-core.js' | relative_url }}" defer></script>
+
 
