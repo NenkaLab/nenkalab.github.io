@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hashAlgorithm = document.getElementById('hashAlgorithm');
     const autoHash = document.getElementById('autoHash');
     const hashMode = document.getElementById('hashMode');
+    const charEncoding = document.getElementById('charEncoding');
     const hmacOptions = document.getElementById('hmacOptions');
     const hmacKey = document.getElementById('hmacKey');
     const pbkdf2Options = document.getElementById('pbkdf2Options');
@@ -22,6 +23,66 @@ document.addEventListener('DOMContentLoaded', () => {
         name: 'HashHelper',
         storeName: 'history'
     });
+    
+    function encodingSetup() {
+        const groups = EncodingHelper.allSupportedEncodings.reduce((acc, enc) => {
+            (acc[enc.group] = acc[enc.group] || []).push(enc);
+            return acc;
+        }, {});
+
+        charEncoding.innerHTML = '';
+
+        const groupOrder = [
+            'Unicode', 
+            'Western European', 
+            'Binary/Data', 
+            'Asian', 
+            'Windows', 
+            'ISO-8859', 
+            'IBM/DOS', 
+            'Macintosh', 
+            'KOI8', 
+            'Miscellaneous'
+        ];
+        
+        groupOrder.forEach(groupName => {
+            const encodingsInGroup = groups[groupName];
+            if (!encodingsInGroup) return; 
+
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = groupName; 
+
+            encodingsInGroup.forEach(enc => {
+                const option = document.createElement('option');
+                option.value = enc.value;
+                option.textContent = `  ${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`.trim();
+                optgroup.appendChild(option);
+            });
+
+            charEncoding.appendChild(optgroup);
+            
+            delete groups[groupName];
+        });
+        
+        const remainingGroupNames = Object.keys(groups);
+        if (remainingGroupNames.length > 0) {
+            const unknownOptgroup = document.createElement('optgroup');
+            unknownOptgroup.label = '알 수 없음'; 
+
+            remainingGroupNames.forEach(groupName => {
+                const encodingsInGroup = groups[groupName];
+                
+                encodingsInGroup.forEach(enc => {
+                    const option = document.createElement('option');
+                    option.value = enc.value;
+                    option.textContent = `  ${enc.label} ${enc.support === 'native' ? '' : '(iconv)'}`.trim();
+                    unknownOptgroup.appendChild(option);
+                });
+            });
+            
+            charEncoding.appendChild(unknownOptgroup);
+        }
+    }
 
     // 모드 변경 처리
     hashMode.addEventListener('change', () => {
@@ -46,17 +107,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             let hashResult;
+
+            let enc = EncodingHelper.bytesToString(
+                EncodingHelper.stringToBytes(text, charEncoding.value), 
+                'utf-8'
+            );
             
             if (mode === 'hash') {
-                hashResult = HashHelper.calculateHash(text, algorithm);
+                hashResult = HashHelper.calculateHash(enc, algorithm);
             } else if (mode === 'hmac') {
                 const key = hmacKey.value || '';
-                hashResult = HashHelper.calculateHMAC(text, key, algorithm);
+                hashResult = HashHelper.calculateHMAC(enc, key, algorithm);
             } else if (mode === 'pbkdf2') {
                 const salt = pbkdf2Salt.value || 'salt';
                 const iterations = parseInt(pbkdf2Iterations.value) || 10000;
                 const keySize = parseInt(pbkdf2KeySize.value) || 8;
-                hashResult = HashHelper.calculatePBKDF2(text, salt, iterations, keySize, algorithm);
+                hashResult = HashHelper.calculatePBKDF2(enc, salt, iterations, keySize, algorithm);
             }
             
             outputText.value = hashResult;
@@ -156,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fullInput: input,
             fullOutput: output,
             algorithm: algorithm,
+            charEncoding: charEncoding.value,
             mode: mode,
             timestamp: timestamp,
         };
@@ -187,7 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
                      data-input="${escapeHtml(entry.fullInput)}"
                      data-output="${escapeHtml(entry.fullOutput)}"
                      data-algorithm="${escapeHtml(entry.algorithm)}"
-                     data-mode="${escapeHtml(entry.mode || 'hash')}">
+                     data-mode="${escapeHtml(entry.mode || 'hash')}"
+                     data-char-encoding="${escapeHtml(entry.charEncoding)}">
                     
                     <div class="flex items-start justify-between gap-4 mb-2">
                         <div class="flex-1 min-w-0">
@@ -213,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     outputText.value = item.dataset.output;
                     hashAlgorithm.value = item.dataset.algorithm;
                     hashMode.value = item.dataset.mode || 'hash';
+                    charEncoding.value = item.dataset.charEncoding || 'utf-8';
                     
                     // 모드에 따라 옵션 표시
                     const mode = item.dataset.mode || 'hash';
@@ -277,5 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    encodingSetup();
     loadHistory();
 });
