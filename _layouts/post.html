@@ -123,4 +123,12 @@ layout: default
 
 {% include image-viewer.html %}
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('article:has(.post) hr').forEach(hr => {
+            hr.className = 'my-8 border-zinc-200 dark:border-zinc-700';
+        });
+    });
+</script>
+
 <script src="{{ '/assets/js/link-preview.js' | relative_url }}" defer></script>
