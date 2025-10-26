@@ -90,7 +90,13 @@ document.addEventListener('DOMContentLoaded', () => {
         hmacOptions.classList.toggle('hidden', mode !== 'hmac');
         pbkdf2Options.classList.toggle('hidden', mode !== 'pbkdf2');
         
-        if (autoHash.checked || outputText.value) {
+        if (autoHash.checked && outputText.value) {
+            performHash();
+        }
+    });
+
+    charEncoding.addEventListener('change', () => {
+        if (autoHash.checked && outputText.value) {
             performHash();
         }
     });
@@ -310,10 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     hashBtn.addEventListener('click', () => {
         performHash();
-        if (!autoHash.checked) {
-            const mode = hashMode.value;
-            saveToHistory(inputText.value, outputText.value, hashAlgorithm.value, mode);
-        }
+        const mode = hashMode.value;
+        saveToHistory(inputText.value, outputText.value, hashAlgorithm.value, mode);
     });
 
     copyBtn.addEventListener('click', copyToClipboard);
@@ -325,14 +329,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    let debInputTimeout = undefined;
     inputText.addEventListener('input', () => {
         if (autoHash.checked) {
             performHash();
+
+            if (debInputTimeout != undefined) clearTimeout(debInputTimeout);
+            debInputTimeout = setTimeout(() => {
+                const mode = hashMode.value;
+                saveToHistory(inputText.value, outputText.value, hashAlgorithm.value, mode);
+                debInputTimeout = undefined;
+            }, 5000);
         }
     });
 
     hashAlgorithm.addEventListener('change', () => {
-        if (autoHash.checked || outputText.value) {
+        if (autoHash.checked && outputText.value) {
             performHash();
         }
     });
@@ -340,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // HMAC/PBKDF2 옵션 변경 시 재계산
     [hmacKey, pbkdf2Salt, pbkdf2Iterations, pbkdf2KeySize].forEach(el => {
         el.addEventListener('input', () => {
-            if (autoHash.checked || outputText.value) {
+            if (autoHash.checked && outputText.value) {
                 performHash();
             }
         });
