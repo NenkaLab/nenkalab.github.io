@@ -1,11 +1,17 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const inputText = document.getElementById('inputText');
     const hashBtn = document.getElementById('hashBtn');
     const outputText = document.getElementById('outputText');
     const copyBtn = document.getElementById('copyBtn');
-    const shaVersion = document.getElementById('shaVersion');
+    const hashAlgorithm = document.getElementById('hashAlgorithm');
     const autoHash = document.getElementById('autoHash');
+    const hashMode = document.getElementById('hashMode');
+    const hmacOptions = document.getElementById('hmacOptions');
+    const hmacKey = document.getElementById('hmacKey');
+    const pbkdf2Options = document.getElementById('pbkdf2Options');
+    const pbkdf2Salt = document.getElementById('pbkdf2Salt');
+    const pbkdf2Iterations = document.getElementById('pbkdf2Iterations');
+    const pbkdf2KeySize = document.getElementById('pbkdf2KeySize');
     const historyList = document.getElementById('historyList');
     const clearHistory = document.getElementById('clearHistory');
     
@@ -13,13 +19,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let historySaveTimeout;
 
     localforage.config({
-        name: 'ShaHasher',
+        name: 'HashHelper',
         storeName: 'history'
+    });
+
+    // 모드 변경 처리
+    hashMode.addEventListener('change', () => {
+        const mode = hashMode.value;
+        hmacOptions.classList.toggle('hidden', mode !== 'hmac');
+        pbkdf2Options.classList.toggle('hidden', mode !== 'pbkdf2');
+        
+        if (autoHash.checked || outputText.value) {
+            performHash();
+        }
     });
 
     function performHash() {
         const text = inputText.value;
-        const version = shaVersion.value;
+        const algorithm = hashAlgorithm.value;
+        const mode = hashMode.value;
 
         if (!text) {
             outputText.value = '';
@@ -27,13 +45,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const hashResult = ShaHelper.calculateHash(text, version);
+            let hashResult;
+            
+            if (mode === 'hash') {
+                hashResult = HashHelper.calculateHash(text, algorithm);
+            } else if (mode === 'hmac') {
+                const key = hmacKey.value || '';
+                hashResult = HashHelper.calculateHMAC(text, key, algorithm);
+            } else if (mode === 'pbkdf2') {
+                const salt = pbkdf2Salt.value || 'salt';
+                const iterations = parseInt(pbkdf2Iterations.value) || 10000;
+                const keySize = parseInt(pbkdf2KeySize.value) || 8;
+                hashResult = HashHelper.calculatePBKDF2(text, salt, iterations, keySize, algorithm);
+            }
+            
             outputText.value = hashResult;
 
             if (autoHash.checked) {
                 clearTimeout(historySaveTimeout);
                 historySaveTimeout = setTimeout(() => {
-                    saveToHistory(text, hashResult, version);
+                    saveToHistory(text, hashResult, algorithm, mode);
                 }, 1000); 
             }
 
@@ -82,22 +113,55 @@ document.addEventListener('DOMContentLoaded', () => {
         return date.toLocaleDateString('ko-KR');
     }
 
-    async function saveToHistory(input, output, version) {
+    function getAlgorithmLabel(algo) {
+        const labels = {
+            'md5': 'MD5',
+            'sha1': 'SHA-1', 'sha-1': 'SHA-1',
+            'sha224': 'SHA-224', 'sha-224': 'SHA-224',
+            'sha256': 'SHA-256', 'sha-256': 'SHA-256',
+            'sha384': 'SHA-384', 'sha-384': 'SHA-384',
+            'sha512': 'SHA-512', 'sha-512': 'SHA-512',
+            'sha3-224': 'SHA3-224', 'sha3-256': 'SHA3-256',
+            'sha3-384': 'SHA3-384', 'sha3-512': 'SHA3-512',
+            'keccak224': 'Keccak-224', 'keccak-224': 'Keccak-224',
+            'keccak256': 'Keccak-256', 'keccak-256': 'Keccak-256',
+            'keccak384': 'Keccak-384', 'keccak-384': 'Keccak-384',
+            'keccak512': 'Keccak-512', 'keccak-512': 'Keccak-512',
+            'shake128': 'SHAKE128', 'shake256': 'SHAKE256',
+            'ripemd160': 'RIPEMD-160', 'ripemd-160': 'RIPEMD-160',
+            'blake2b': 'BLAKE2b-512', 'blake2b-512': 'BLAKE2b-512',
+            'blake2b-256': 'BLAKE2b-256',
+            'blake2s': 'BLAKE2s-256', 'blake2s-256': 'BLAKE2s-256'
+        };
+        return labels[algo.toLowerCase()] || algo.toUpperCase();
+    }
+
+    function getModeLabel(mode) {
+        const labels = {
+            'hash': 'Hash',
+            'hmac': 'HMAC',
+            'pbkdf2': 'PBKDF2'
+        };
+        return labels[mode] || mode;
+    }
+
+    async function saveToHistory(input, output, algorithm, mode) {
         if (!input || !output) return;
 
         const timestamp = Date.now();
         const entry = {
             id: timestamp,
-            input: input.substring(0, 100), // 미리보기용
-            output: output.substring(0, 100), // 미리보기용
-            fullInput: input, // 복원용
-            fullOutput: output, // 복원용
-            version: version,
+            input: input.substring(0, 100),
+            output: output.substring(0, 100),
+            fullInput: input,
+            fullOutput: output,
+            algorithm: algorithm,
+            mode: mode,
             timestamp: timestamp,
         };
 
         try {
-            await localforage.setItem(`sha_history_${timestamp}`, entry);
+            await localforage.setItem(`hash_complete_history_${timestamp}`, entry);
             loadHistory(); 
         } catch (e) {
             console.error("히스토리 저장 실패:", e);
@@ -107,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadHistory() {
         try {
             const keys = await localforage.keys();
-            const historyKeys = keys.filter(k => k.startsWith('sha_history_')).sort().reverse();
+            const historyKeys = keys.filter(k => k.startsWith('hash_complete_history_')).sort().reverse();
             
             if (historyKeys.length === 0) {
                 historyList.innerHTML = '<p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-8">아직 변환 기록이 없습니다</p>';
@@ -115,26 +179,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const entries = await Promise.all(
-                historyKeys.slice(0, 10).map(k => localforage.getItem(k)) // 최근 10개
+                historyKeys.slice(0, 10).map(k => localforage.getItem(k))
             );
 
             historyList.innerHTML = entries.filter(Boolean).map(entry => `
                 <div class="p-4 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 hover:border-green-400 dark:hover:border-green-500 transition-colors cursor-pointer"
                      data-input="${escapeHtml(entry.fullInput)}"
                      data-output="${escapeHtml(entry.fullOutput)}"
-                     data-version="${escapeHtml(entry.version)}">
+                     data-algorithm="${escapeHtml(entry.algorithm)}"
+                     data-mode="${escapeHtml(entry.mode || 'hash')}">
                     
                     <div class="flex items-start justify-between gap-4 mb-2">
                         <div class="flex-1 min-w-0">
                             <div class="text-sm text-zinc-600 dark:text-zinc-400 truncate mb-1">
                                 입력: ${escapeHtml(entry.input)}${entry.input.length > 100 ? '...' : ''}
                             </div>
-                            <div class="text-xs text-zinc-500 dark:text-zinc-500 truncate">
+                            <div class="text-xs text-zinc-500 dark:text-zinc-500 truncate font-mono">
                                 출력: ${escapeHtml(entry.output)}${entry.output.length > 100 ? '...' : ''}
                             </div>
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
-                            <span class="text-xs font-semibold text-green-600 dark:text-green-500">${escapeHtml(entry.version.toUpperCase())}</span>
+                            <span class="text-xs font-semibold text-purple-600 dark:text-purple-400">${escapeHtml(getModeLabel(entry.mode || 'hash'))}</span>
+                            <span class="text-xs font-semibold text-green-600 dark:text-green-500">${escapeHtml(getAlgorithmLabel(entry.algorithm))}</span>
                             <span class="text-xs text-zinc-400 dark:text-zinc-600">${formatTime(entry.timestamp)}</span>
                         </div>
                     </div>
@@ -145,7 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.addEventListener('click', () => {
                     inputText.value = item.dataset.input;
                     outputText.value = item.dataset.output;
-                    shaVersion.value = item.dataset.version;
+                    hashAlgorithm.value = item.dataset.algorithm;
+                    hashMode.value = item.dataset.mode || 'hash';
+                    
+                    // 모드에 따라 옵션 표시
+                    const mode = item.dataset.mode || 'hash';
+                    hmacOptions.classList.toggle('hidden', mode !== 'hmac');
+                    pbkdf2Options.classList.toggle('hidden', mode !== 'pbkdf2');
                 });
             });
         } catch (e) {
@@ -154,11 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function clearAllHistory() {
-        if (!confirm('모든 SHA 변환 기록을 삭제하시겠습니까?')) return;
+        if (!confirm('모든 해시 변환 기록을 삭제하시겠습니까?')) return;
         
         try {
             const keys = await localforage.keys();
-            const historyKeys = keys.filter(k => k.startsWith('sha_history_'));
+            const historyKeys = keys.filter(k => k.startsWith('hash_complete_history_'));
             
             await Promise.all(historyKeys.map(k => localforage.removeItem(k)));
             loadHistory(); 
@@ -170,12 +242,12 @@ document.addEventListener('DOMContentLoaded', () => {
     hashBtn.addEventListener('click', () => {
         performHash();
         if (!autoHash.checked) {
-            saveToHistory(inputText.value, outputText.value, shaVersion.value);
+            const mode = hashMode.value;
+            saveToHistory(inputText.value, outputText.value, hashAlgorithm.value, mode);
         }
     });
 
     copyBtn.addEventListener('click', copyToClipboard);
-
     clearHistory.addEventListener('click', clearAllHistory);
 
     autoHash.addEventListener('change', () => {
@@ -190,6 +262,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    hashAlgorithm.addEventListener('change', () => {
+        if (autoHash.checked || outputText.value) {
+            performHash();
+        }
+    });
+
+    // HMAC/PBKDF2 옵션 변경 시 재계산
+    [hmacKey, pbkdf2Salt, pbkdf2Iterations, pbkdf2KeySize].forEach(el => {
+        el.addEventListener('input', () => {
+            if (autoHash.checked || outputText.value) {
+                performHash();
+            }
+        });
+    });
+
     loadHistory();
 });
-

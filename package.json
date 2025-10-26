@@ -6,11 +6,10 @@
   "scripts": {
     "pcss:input": "postcss ./assets/css/input.css -o ./assets/css/output.css",
     "build:css": "npm run pcss:input",
-
-    "bify:sha": "browserify assets/js/build/sha.js -s ShaHelper -o assets/js/sha.js",
-    "bify:sha-file": "browserify assets/js/build/sha-file.js -s FileShaHelper -o assets/js/sha-file.js",
+    "bify:hash": "browserify assets/js/build/hash.js -s HashHelper -o assets/js/hash.js",
+    "bify:hash-file": "browserify assets/js/build/hash-file.js -s FileHashHelper -o assets/js/hash-file.js",
     "bify:encoding": "browserify assets/js/build/encoding.js -s EncodingHelper -o assets/js/encoding.js",
-    "build:js": "npm run bify:sha && npm run bify:sha-file && npm run bify:encoding"
+    "build:js": "npm run bify:hash && npm run bify:hash-file && npm run bify:encoding"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
@@ -19,14 +18,18 @@
     "@tailwindcss/postcss": "^4.1.15",
     "@tailwindcss/typography": "^0.5.10",
     "autoprefixer": "^10.4.0",
+    "blakejs": "^1.2.1",
     "browserify": "^17.0.1",
     "buffer": "^6.0.3",
+    "create-hash": "^1.2.0",
     "crypto-js": "^4.2.0",
     "cssnano": "^7.0.6",
     "iconv-lite": "^0.7.0",
+    "js-sha3": "^0.9.3",
     "postcss": "^8.4.49",
     "postcss-cli": "^11.0.0",
-    "tailwindcss": "^4.1.15"
+    "tailwindcss": "^4.1.15",
+    "xxhashjs": "^0.2.2"
   },
   "author": "NenkaLab",
   "license": "ISC"
