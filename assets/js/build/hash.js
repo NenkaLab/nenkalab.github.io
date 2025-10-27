@@ -123,10 +123,10 @@ function calculateHash(bytes, algorithm) {
         // ========== 비암호학적 해시 (체크섬/고속) ==========
         case 'xxhash32':
         case 'xxh32':
-            return xxhash.h32(bytes, 0).toString(16).padStart(8, '0');
+            return xxhash.h32(Buffer.from(bytes), 0).toString(16).padStart(8, '0');
         case 'xxhash64':
         case 'xxh64':
-            return xxhash.h64(bytes, 0).toString(16).padStart(16, '0');
+            return xxhash.h64(Buffer.from(bytes), 0).toString(16).padStart(16, '0');
             
         default:
             // 기본값: SHA-256
