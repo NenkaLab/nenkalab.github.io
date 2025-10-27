@@ -94,9 +94,9 @@ layout: default
             <a href="{{ url.link | relative_url }}" {% if url.inline %}{%else%}target="_blank" rel="noopener noreferrer"{% endif %}
                class="flex items-center gap-2 px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-sm">
                 {% if url.favicon %}
-                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.favicon }}&size=64" alt="{{ url.label }} 아이콘" />
+                <img class="inline-block text-lg max-w-20 w-full" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.favicon }}&size=64" alt="{{ url.label }} 아이콘" />
                 {% else %}
-                <img class="inline-block text-lg" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.link | relative_url }}&size=64" alt="{{ url.label }} 아이콘" />
+                <img class="inline-block text-lg max-w-20 w-full" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.link | relative_url }}&size=64" alt="{{ url.label }} 아이콘" />
                 {% endif %}
                 <span class="text-zinc-700 dark:text-zinc-300">{{ url.label }}</span>
             </a>
