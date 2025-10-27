@@ -67,6 +67,7 @@ urls:
   - key: "utils"
     label: "Utils"
     link: "/utils"
+    favicon: https://zabocho.dev
     inline: true
   - key: "github"
     label: "GitHub"
