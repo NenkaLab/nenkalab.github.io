@@ -1,6 +1,6 @@
 :root {
-    --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-heading: "Paperlogy", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-body: "Pretendard", Tossface, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-heading: "Paperlogy", Tossface, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body {
