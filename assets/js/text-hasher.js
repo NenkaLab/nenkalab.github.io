@@ -114,10 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             let hashResult;
 
-            let enc = EncodingHelper.bytesToString(
-                EncodingHelper.stringToBytes(text, charEncoding.value), 
-                'utf-8'
-            );
+            let enc = EncodingHelper.stringToBytes(text, charEncoding.value);
             
             if (mode === 'hash') {
                 hashResult = HashHelper.calculateHash(enc, algorithm);
