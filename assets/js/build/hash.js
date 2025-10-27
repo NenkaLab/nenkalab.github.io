@@ -175,7 +175,10 @@ function calculateHMAC(bytes, key, algorithm) {
             hmac = CryptoJS.HmacRIPEMD160(words, key);
             break;
         default:
+            // not supported, default to SHA256
             hmac = CryptoJS.HmacSHA256(words, key);
+            return `[${algorithm} is not supported, default to SHA256]\n` 
+                + hmac.toString(CryptoJS.enc.Hex);
     }
     
     return hmac.toString(CryptoJS.enc.Hex);
@@ -192,6 +195,7 @@ function calculateHMAC(bytes, key, algorithm) {
  */
 function calculatePBKDF2(password, salt, iterations, keySize, algorithm) {
     let hasher;
+    let defaultMessage = ``;
     
     switch (algorithm.toLowerCase()) {
         case 'sha1':
@@ -207,6 +211,7 @@ function calculatePBKDF2(password, salt, iterations, keySize, algorithm) {
             hasher = CryptoJS.algo.SHA512;
             break;
         default:
+            defaultMessage = `[${algorithm} is not supported, default to SHA256]\n`;
             hasher = CryptoJS.algo.SHA256;
     }
 
@@ -218,7 +223,7 @@ function calculatePBKDF2(password, salt, iterations, keySize, algorithm) {
         hasher: hasher
     });
     
-    return key.toString(CryptoJS.enc.Hex);
+    return defaultMessage + key.toString(CryptoJS.enc.Hex);
 }
 
 /**
