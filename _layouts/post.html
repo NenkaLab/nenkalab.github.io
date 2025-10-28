@@ -104,6 +104,7 @@ layout: default
         </div>
     </nav>
     
+    {% if page.use_giscus_comment %}
     <!-- 댓글 (Giscus) -->
     <div class="mt-16">
         <script src="https://giscus.app/client.js"
@@ -123,6 +124,7 @@ layout: default
                 async>
         </script>
     </div>
+    {% endif %}
 </article>
 
 {% include image-viewer.html %}
