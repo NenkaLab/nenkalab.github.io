@@ -5,8 +5,6 @@ date: 2025-10-28 12:00:00 +0900
 permalink: /policy
 ---
 
-## **개인정보보호정책 및 라이선스**
-
 본 문서는 **Zabocho ([https://zabocho.dev](https://zabocho.dev))**(이하 '본 사이트')를 방문하시는 사용자의 서비스 이용 약관, 개인정보 처리 방침, 그리고 본 사이트 구축에 사용된 소프트웨어의 라이선스에 대해 설명합니다.
 
 본 사이트의 운영자는 귀하의 개인정보를 매우 중요하게 생각하며, 투명하게 관련 정보를 제공하고자 합니다.
@@ -112,39 +110,39 @@ TailwindCSS, Autoprefixer, PostCSS, Bcrypt.js, Crypto-JS, Webpack/Browserify 등
 
 ##### **가. 플랫폼 (Platform)**
 
-* **Jekyll:** [Homepage](https://jekyllrb.com/) | [License (MIT)](https://github.com/jekyll/jekyll/blob/master/LICENSE)  
+* **Jekyll:** [Homepage](https://jekyllrb.com/) \| [License (MIT)](https://github.com/jekyll/jekyll/blob/master/LICENSE)  
 * **GitHub Pages:** [Homepage](https://pages.github.com/) | (Service provided by GitHub)
 
 ##### **나. 클라이언트 라이브러리 (Client-side)**
 
-* **giscus:** [Homepage](https://giscus.app/ko) | [License (MIT)](https://github.com/giscus/giscus/blob/main/LICENSE)  
-* **Prism.js:** [Homepage](https://prismjs.com/) | [License (MIT)](https://github.com/PrismJS/prism/blob/master/LICENSE)  
-* **localforage:** [Homepage](https://localforage.github.io/localForage/) | [License (Apache 2.0)](https://github.com/localForage/localForage/blob/master/LICENSE)
+* **giscus:** [Homepage](https://giscus.app/ko) \| [License (MIT)](https://github.com/giscus/giscus/blob/main/LICENSE)  
+* **Prism.js:** [Homepage](https://prismjs.com/) \| [License (MIT)](https://github.com/PrismJS/prism/blob/master/LICENSE)  
+* **localforage:** [Homepage](https://localforage.github.io/localForage/) \| [License (Apache 2.0)](https://github.com/localForage/localForage/blob/master/LICENSE)
 
 ##### **다. 빌드 라이브러리 (Build-time)**
 
-* **tailwindcss:** [Homepage](https://tailwindcss.com/) | [License (MIT)](https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE)  
-* **autoprefixer:** [Homepage](https://github.com/postcss/autoprefixer) | [License (MIT)](https://github.com/postcss/autoprefixer/blob/main/LICENSE)  
-* **bcryptjs:** [Homepage](https://github.com/dcodeIO/bcrypt.js) | [License (MIT)](https://github.com/dcodeIO/bcrypt.js/blob/master/LICENSE)  
-* **blakejs:** [Homepage](https://github.com/dcposch/blakejs) | [License (CC0-1.0)](https://github.com/dcposch/blakejs/blob/master/LICENSE)  
-* **browserify:** [Homepage](http://browserify.org/) | [License (MIT)](https://github.com/browserify/browserify/blob/master/LICENSE)  
-* **buffer:** [Homepage](https://github.com/feross/buffer) | [License (MIT)](https://github.com/feross/buffer/blob/master/LICENSE)  
-* **create-hash:** [Homepage](https://github.com/crypto-browserify/create-hash) | [License (MIT)](https://github.com/crypto-browserify/create-hash/blob/master/LICENSE)  
-* **crypto-js:** [Homepage](https://github.com/brix/crypto-js) | [License (MIT)](https://github.com/brix/crypto-js/blob/master/LICENSE)  
-* **cssnano:** [Homepage](https://cssnano.co/) | [License (MIT)](https://github.com/cssnano/cssnano/blob/master/LICENSE)  
-* **iconv-lite:** [Homepage](https://github.com/ashtuchkin/iconv-lite) | [License (MIT)](https://github.com/ashtuchkin/iconv-lite/blob/master/LICENSE)  
-* **js-sha3:** [Homepage](https://github.com/emn178/js-sha3) | [License (MIT)](https://github.com/emn178/js-sha3/blob/master/LICENSE)  
-* **postcss:** [Homepage](https://postcss.org/) | [License (MIT)](https://github.com/postcss/postcss/blob/main/LICENSE)  
-* **scrypt-js:** [Homepage](https://github.com/ricmoo/scrypt-js) | [License (MIT)](https://github.com/ricmoo/scrypt-js/blob/master/LICENSE)  
-* **xxhashjs:** [Homepage](https://github.com/pierrec/xxhash.js) | [License (BSD-2-Clause)](https://github.com/pierrec/xxhash.js/blob/master/LICENSE)
+* **tailwindcss:** [Homepage](https://tailwindcss.com/) \| [License (MIT)](https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE)  
+* **autoprefixer:** [Homepage](https://github.com/postcss/autoprefixer) \| [License (MIT)](https://github.com/postcss/autoprefixer/blob/main/LICENSE)  
+* **bcryptjs:** [Homepage](https://github.com/dcodeIO/bcrypt.js) \| [License (MIT)](https://github.com/dcodeIO/bcrypt.js/blob/master/LICENSE)  
+* **blakejs:** [Homepage](https://github.com/dcposch/blakejs) \| [License (CC0-1.0)](https://github.com/dcposch/blakejs/blob/master/LICENSE)  
+* **browserify:** [Homepage](http://browserify.org/) \| [License (MIT)](https://github.com/browserify/browserify/blob/master/LICENSE)  
+* **buffer:** [Homepage](https://github.com/feross/buffer) \| [License (MIT)](https://github.com/feross/buffer/blob/master/LICENSE)  
+* **create-hash:** [Homepage](https://github.com/crypto-browserify/create-hash) \| [License (MIT)](https://github.com/crypto-browserify/create-hash/blob/master/LICENSE)  
+* **crypto-js:** [Homepage](https://github.com/brix/crypto-js) \| [License (MIT)](https://github.com/brix/crypto-js/blob/master/LICENSE)  
+* **cssnano:** [Homepage](https://cssnano.co/) \| [License (MIT)](https://github.com/cssnano/cssnano/blob/master/LICENSE)  
+* **iconv-lite:** [Homepage](https://github.com/ashtuchkin/iconv-lite) \| [License (MIT)](https://github.com/ashtuchkin/iconv-lite/blob/master/LICENSE)  
+* **js-sha3:** [Homepage](https://github.com/emn178/js-sha3) \| [License (MIT)](https://github.com/emn178/js-sha3/blob/master/LICENSE)  
+* **postcss:** [Homepage](https://postcss.org/) \| [License (MIT)](https://github.com/postcss/postcss/blob/main/LICENSE)  
+* **scrypt-js:** [Homepage](https://github.com/ricmoo/scrypt-js) \| [License (MIT)](https://github.com/ricmoo/scrypt-js/blob/master/LICENSE)  
+* **xxhashjs:** [Homepage](https://github.com/pierrec/xxhash.js) \| [License (BSD-2-Clause)](https://github.com/pierrec/xxhash.js/blob/master/LICENSE)
 
 ##### **라. 폰트 (Fonts)**
 
-* **Material Symbols:** [Homepage](https://fonts.google.com/icons) | [License (Apache 2.0)](https://www.apache.org/licenses/LICENSE-2.0.html)  
-* **Paperlogy (PaperLog):** [Homepage](https://github.com/PaperLog/PaperLog) | [License (OFL-1.1)](https://github.com/PaperLog/PaperLog/blob/main/LICENSE)  
-* **tossface:** [Homepage](https://toss.im/tossface) | [License (OFL-1.1)](https://github.com/toss/tossface/blob/main/LICENSE)  
-* **Pretendard:** [Homepage](https://github.com/orioncactus/pretendard) | [License (OFL-1.1)](https://github.com/orioncactus/pretendard/blob/main/LICENSE.md)  
-* **JetBrains Mono:** [Homepage](https://www.jetbrains.com/lp/mono/) | [License (OFL-1.1)](https://github.com/JetBrains/JetBrainsMono/blob/master/LICENSE)
+* **Material Symbols:** [Homepage](https://fonts.google.com/icons) \| [License (Apache 2.0)](https://www.apache.org/licenses/LICENSE-2.0.html)  
+* **Paperlogy (PaperLog):** [Homepage](https://github.com/PaperLog/PaperLog) \| [License (OFL-1.1)](https://github.com/PaperLog/PaperLog/blob/main/LICENSE)  
+* **tossface:** [Homepage](https://toss.im/tossface) \| [License (OFL-1.1)](https://github.com/toss/tossface/blob/main/LICENSE)  
+* **Pretendard:** [Homepage](https://github.com/orioncactus/pretendard) \| [License (OFL-1.1)](https://github.com/orioncactus/pretendard/blob/main/LICENSE.md)  
+* **JetBrains Mono:** [Homepage](https://www.jetbrains.com/lp/mono/) \| [License (OFL-1.1)](https://github.com/JetBrains/JetBrainsMono/blob/master/LICENSE)
 
 ### **12\. 연락처**
 
