@@ -5,8 +5,8 @@ layout: default
 <article class="max-w-5xl mx-auto px-4 py-12 animate-fade-in-up">
     <!-- 글 헤더 -->
     <header class="mb-8">
-        <h1 class="text-4xl text-zinc-900 dark:text-zinc-200 font-bold mb-4 break-words">{{ page.title }}</h1>
-        <h3 class="text-2xl text-zinc-700 dark:text-zinc-400 mb-4 break-words">{{ page.description }}</h3>
+        <h1 class="text-4xl text-zinc-900 dark:text-zinc-200 font-bold mb-4 wrap-break-word">{{ page.title }}</h1>
+        <h3 class="text-2xl text-zinc-700 dark:text-zinc-400 mb-4 wrap-break-word">{{ page.description }}</h3>
         <div class="flex flex-wrap items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
             <time datetime="{{ page.date | date_to_xmlschema }}">
                 {{ page.date | date: "%Y년 %-m월 %-d일 %H:%M:%S" }}
