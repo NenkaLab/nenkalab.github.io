@@ -92,13 +92,16 @@ layout: default
 
             {% for url in site.urls %}
             <a href="{{ url.link | relative_url }}" {% if url.inline %}{%else%}target="_blank" rel="noopener noreferrer"{% endif %}
-               class="flex items-center gap-2 px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-sm">
+               class="relative inline-flex items-center gap-2 px-3 py-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-full cursor-pointer transition-all duration-200 hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5 max-w-[280px] group">
                 {% if url.favicon %}
-                <img class="inline-block text-lg max-w-20 w-full" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.favicon }}&size=64" alt="{{ url.label }} 아이콘" />
+                <img class="w-4 h-4 rounded shrink-0 m-0!" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.favicon }}&size=64" alt="{{ url.label }} 아이콘" />
                 {% else %}
-                <img class="inline-block text-lg max-w-20 w-full" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.link | relative_url }}&size=64" alt="{{ url.label }} 아이콘" />
+                <img class="w-4 h-4 rounded shrink-0 m-0!" draggable="false" src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url={{ url.link | relative_url }}&size=64" alt="{{ url.label }} 아이콘" />
                 {% endif %}
-                <span class="text-zinc-700 dark:text-zinc-300">{{ url.label }}</span>
+                <span class="text-sm font-medium text-zinc-900 dark:text-zinc-100 whitespace-nowrap overflow-hidden text-ellipsis flex-1 min-w-0">{{ url.label }}</span>
+                <svg class="w-3 h-3 text-zinc-500 dark:text-zinc-400 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
             </a>
             {% endfor %}
 
