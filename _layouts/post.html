@@ -51,7 +51,7 @@ layout: default
             
             {% if page.tags %}
             <div class="flex gap-2">
-                {% for tag in page.tags limit:3 %}
+                {% for tag in page.tags %}
                 <span class="px-2 py-1 bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded text-xs hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors">#{{ tag }}</span>
                 {% endfor %}
             </div>

@@ -6,6 +6,8 @@ permalink: /api/search.json
   {% for post in site.posts %}
   {
     "title": {{ post.title | jsonify }},
+    "description": {{ post.description | strip_html | truncate: 200 | jsonify }},
+    "content": {{ post.excerpt | strip_html | truncate: 200 | jsonify }},
     "categories": {{ post.categories | jsonify }},
     "tags": {{ post.tags | jsonify }},
     "url": {{ post.url | jsonify }},

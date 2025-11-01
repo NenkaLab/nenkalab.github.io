@@ -1,1 +1,11 @@
 Sitemap: https://zabocho.dev/sitemap.xml
+
+User-agent: *
+Disallow: /
+Allow: /$
+Allow: /article
+Allow: /article/
+Allow: /utils
+Allow: /utils/
+Allow: /favicon.ico
+Allow: /cdn-cgi/

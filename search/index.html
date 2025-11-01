@@ -34,6 +34,9 @@ layout: default
             <button data-filter="title" class="filter-btn px-4 py-2 rounded-lg border-2 transition-all duration-200">
                 제목
             </button>
+            <button data-filter="desc" class="filter-btn px-4 py-2 rounded-lg border-2 transition-all duration-200">
+                설명(+내용, 앞 200자)
+            </button>
             <button data-filter="date" class="filter-btn px-4 py-2 rounded-lg border-2 transition-all duration-200">
                 날짜
             </button>
@@ -156,6 +159,10 @@ layout: default
                 case 'title':
                     return post.title.toLowerCase().includes(lowerQuery);
                 
+                case 'desc':
+                    return post.description.includes(lowerQuery) ||
+                           post.content.toLowerCase().includes(lowerQuery);
+                
                 case 'date':
                     return post.date.includes(lowerQuery);
                 
@@ -172,6 +179,8 @@ layout: default
                 case 'all':
                 default:
                     return post.title.toLowerCase().includes(lowerQuery) ||
+                           post.description.includes(lowerQuery) ||
+                           post.content.toLowerCase().includes(lowerQuery) ||
                            post.date.includes(lowerQuery) ||
                            post.categories.some(cat => cat.toLowerCase().includes(lowerQuery)) ||
                            post.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
@@ -217,7 +226,7 @@ layout: default
                         ${highlightText(post.title, searchInput.value)}
                     </h3>
                     <p class="text-zinc-600 dark:text-zinc-400 mb-3 line-clamp-2">
-                        ${post.excerpt || ''}
+                        ${post.description ? highlightText(post.description, searchInput.value) : highlightText(post.excerpt, searchInput.value)}
                     </p>
                     <div class="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-500">
                         <time>${formattedDate}</time>
@@ -226,6 +235,14 @@ layout: default
                             <div class="flex gap-2">
                                 ${post.categories.slice(0, 2).map(cat => 
                                     `<span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-700 rounded text-xs">${highlightText(cat, searchInput.value)}</span>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                        ${post.tags && post.tags.length > 0 ? `
+                            <span>·</span>
+                            <div class="flex gap-2">
+                                ${post.tags.slice(0, 2).map(tag => 
+                                    `<span class="px-2 py-1 bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded text-xs hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors">#${highlightText(tag, searchInput.value)}</span>`
                                 ).join('')}
                             </div>
                         ` : ''}
@@ -245,7 +262,7 @@ layout: default
         if (!query.trim()) return text;
         
         const regex = new RegExp(`(${query.trim()})`, 'gi');
-        return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-700">$1</mark>');
+        return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-600">$1</mark>');
     }
     
     // 페이지네이션 렌더링

@@ -20,7 +20,11 @@ layout: default
                     {{ post.title }}
                 </h2>
                 <p class="text-zinc-600 dark:text-zinc-400 mb-3 line-clamp-3">
+                    {% if post.description %}
+                    {{ post.description | strip_html | truncate: 200 }}
+                    {% else %}
                     {{ post.excerpt | strip_html | truncate: 200 }}
+                    {% endif %}
                 </p>
                 <div class="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-500">
                     <time datetime="{{ post.date | date_to_xmlschema }}">
@@ -29,8 +33,16 @@ layout: default
                     {% if post.categories %}
                     <span>·</span>
                     <div class="flex gap-2">
-                        {% for category in post.categories %}
-                        <span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-700 rounded text-xs">{{ category }}</span>
+                        {% for category in post.categories limit:2 %}
+                        <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">{{ category }}</span>
+                    {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if post.tags %}
+                    <span>·</span>
+                    <div class="flex gap-2">
+                        {% for tag in post.tags limit:2 %}
+                        <span class="px-2 py-1 bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded text-xs hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors">#{{ tag }}</span>
                         {% endfor %}
                     </div>
                     {% endif %}
