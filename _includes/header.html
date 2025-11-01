@@ -1,4 +1,4 @@
-<header id="main-header" style="--header-height: 100px;--min-header-height: 48px;--font-size: 1.25rem;--bt-h: 100%;--bt-o:100%;" class="fixed w-full h-(--header-height) min-h-(--min-header-height) top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border-b border-zinc-200/50 dark:border-zinc-700/50">
+<header id="main-header" style="--header-height: 100px;--min-header-height: 48px;--font-size: 1.25rem;--bt-o: 100%;--bt-f: 1;" class="fixed w-full h-(--header-height) min-h-(--min-header-height) top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border-b border-zinc-200/50 dark:border-zinc-700/50">
     <div class="max-w-5xl mx-auto px-4 transition-all duration-300 ease-in-out h-full flex items-center" id="header-container">
         <nav class="flex items-center justify-between w-full">
             <div class="flex items-center gap-3">
@@ -11,7 +11,7 @@
                 
                 {% if page.title %}
                 <span class="flex flex-col">
-                    <a id="header-title-base" href="{{ site.baseurl }}/" class="text-xs max-h-(--bt-h) text-zinc-500/(--bt-o) dark:text-zinc-400/(--bt-o) overflow-hidden transition-opacity duration-300 ease-in-out" onclick="">
+                    <a id="header-title-base" href="{{ site.baseurl }}/" class="text-xs flex-(--bt-f) text-zinc-500/(--bt-o) dark:text-zinc-400/(--bt-o) overflow-hidden transition-opacity duration-300 ease-in-out" onclick="">
                         {{ site.title }}
                     </a>
                     <a id="header-title" href="{{ page.url }}" class="leading-[1.1] text-zinc-700 dark:text-zinc-300 font-bold hover:opacity-80 transition-[color,font-weight,opacity] duration-300 ease-in-out" style="font-size: var(--font-size);">
@@ -63,8 +63,8 @@
             
             header.style.setProperty('--header-height', `${newHeight}px`);
             header.style.setProperty('--font-size', `${newFontSize}rem`);
-            header.style.setProperty('--bt-h', `${Math.round(100*(1-progress))}%`);
             header.style.setProperty('--bt-o', `${Math.round(100*(1-progress))}%`);
+            header.style.setProperty('--bt-f', `${1-progress}`);
             
             ticking = false;
         }
