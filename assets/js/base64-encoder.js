@@ -239,8 +239,8 @@
         const timestamp = Date.now();
         const entry = {
             id: timestamp,
-            input: input.substring(0, 100),
-            output: output.substring(0, 100),
+            input: input,
+            output: output,
             timestamp: timestamp,
             hasPassword: usePassword.checked && password.value ? true : false
         };
@@ -269,10 +269,10 @@
                  data-output="${escapeHtml(entry.output)}">
                 <div class="flex items-start justify-between gap-4 mb-2">
                     <div class="flex-1 min-w-0">
-                        <div class="text-sm text-zinc-600 dark:text-zinc-400 truncate mb-1">
+                        <div class="text-sm text-zinc-600 dark:text-zinc-400 truncate mb-1 font-jetbrains-mono">
                             입력: ${escapeHtml(entry.input)}${entry.input.length > 100 ? '...' : ''}
                         </div>
-                        <div class="text-xs text-zinc-500 dark:text-zinc-500 truncate">
+                        <div class="text-xs text-zinc-500 dark:text-zinc-500 truncate font-jetbrains-mono">
                             출력: ${escapeHtml(entry.output)}${entry.output.length > 100 ? '...' : ''}
                         </div>
                     </div>
