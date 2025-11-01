@@ -10,7 +10,7 @@
                 </button>
                 
                 <a href="{{ site.baseurl }}/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <span id="header-title" class="text-zinc-700 dark:text-zinc-300 font-bold transition-all duration-300 ease-in-out" style="font-size: var(--font-size);">
+                    <span id="header-title" class="text-zinc-700 dark:text-zinc-300 font-bold transition-[color,font-weight] duration-300 ease-in-out" style="font-size: var(--font-size);">
                         {% if page.title %}<span class="truncate max-w-64 w-fit">{{ page.title }}</span>{% raw %} | {% endraw %}{% endif %}{{ site.title }}
                     </span>
                 </a>
@@ -35,7 +35,7 @@
         
         const MAX_HEIGHT = 100;
         const MIN_HEIGHT = 48;
-        const MAX_FONT_SIZE = 1.25;
+        const MAX_FONT_SIZE = 1.375;
         const MIN_FONT_SIZE = 1.125;
         const SCROLL_RANGE = 100;
         
