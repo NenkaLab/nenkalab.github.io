@@ -14,7 +14,7 @@
                     <a id="header-title-base" href="{{ site.baseurl }}/" class="text-xs flex-(--bt-f) text-zinc-500/(--bt-o) dark:text-zinc-400/(--bt-o) overflow-hidden transition-opacity duration-300 ease-in-out" onclick="">
                         {{ site.title }}
                     </a>
-                    <a id="header-title" href="{{ page.url }}" class="leading-[1.1] -translate-(--bt-t) text-zinc-700 dark:text-zinc-300 font-bold hover:opacity-80 transition-[color,font-weight,opacity] duration-300 ease-in-out" style="font-size: var(--font-size);">
+                    <a id="header-title" href="{{ page.url }}" class="leading-[1.1] -translate-y-(--bt-t) text-zinc-700 dark:text-zinc-300 font-bold hover:opacity-80 transition-[color,font-weight,opacity] duration-300 ease-in-out" style="font-size: var(--font-size);">
                         {{ page.title }}
                     </a>
                 </span>
@@ -60,7 +60,7 @@
             let progress = Math.min(scrollY / SCROLL_RANGE, 1);
             let newHeight = MAX_HEIGHT - (MAX_HEIGHT - MIN_HEIGHT) * progress;
             let newFontSize = MAX_FONT_SIZE - (MAX_FONT_SIZE - MIN_FONT_SIZE) * progress;
-            let translateY = 50 - 50 * progress;
+            let translateY = 50 * progress;
             
             header.style.setProperty('--header-height', `${newHeight}px`);
             header.style.setProperty('--font-size', `${newFontSize}rem`);
