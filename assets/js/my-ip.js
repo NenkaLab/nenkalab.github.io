@@ -260,7 +260,7 @@ function createAdditionalIPCard(ipDetail, data, highlightIP) {
     header.className = 'mb-3';
     header.innerHTML = `
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg mh-0 font-mono font-bold text-zinc-900 dark:text-zinc-100 break-all font-pretendard">
+            <h2 class="text-lg my-0 font-bold text-zinc-900 dark:text-zinc-100 break-all font-pretendard">
                 ${ipDetail.address}
             </h2>
             <span class="px-2 py-1 ${ipDetail.version === 'ipv4' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'} text-xs font-semibold rounded">
@@ -325,7 +325,7 @@ function createInfoCard(label, value) {
     card.className = 'bg-zinc-50 dark:bg-zinc-900 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700';
     card.innerHTML = `
         <p class="text-lg text-zinc-500 dark:text-zinc-400 mt-0 mb-2">${label}</p>
-        <p class="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 break-all my-0">${value}</p>
+        <p class="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 break-all my-0!">${value}</p>
     `;
     return card;
 }
