@@ -11,7 +11,7 @@
                 
                 {% if page.title %}
                 <span class="flex flex-col">
-                    <a id="header-title-base" href="{{ site.baseurl }}/" class="text-zinc-500/(--bt-o) dark:text-zinc-400/(--bt-o) overflow-hidden transition-opacity duration-300 ease-in-out"
+                    <a id="header-title-base" href="{{ site.baseurl }}/" class="leading-none text-zinc-500/(--bt-o) dark:text-zinc-400/(--bt-o) overflow-hidden transition-opacity duration-300 ease-in-out"
                        style="font-size: var(--bt-s);">
                         {{ site.title }}
                     </a>
@@ -49,7 +49,7 @@
         const MIN_HEIGHT = 48;
         const MAX_FONT_SIZE = 1.375;
         const MIN_FONT_SIZE = 1.125;
-        const BT_FONT_SIZE = 0.75;
+        const BT_FONT_SIZE = 0.875;
         const SCROLL_RANGE = 80;
         
         if (window.history.length > 1) {
