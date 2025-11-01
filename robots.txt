@@ -1,5 +1,3 @@
-Sitemap: https://zabocho.dev/sitemap.xml
-
 User-agent: *
 Disallow: /
 Allow: /$
@@ -9,3 +7,6 @@ Allow: /utils
 Allow: /utils/
 Allow: /favicon.ico
 Allow: /cdn-cgi/
+Allow: /sitemap.xml
+
+Sitemap: https://zabocho.dev/sitemap.xml
