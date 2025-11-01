@@ -1,8 +1,7 @@
-<header id="main-header" style="--header-height: 100px;--min-header-height: 48px;" class="fixed w-full h-(--header-height) min-h-(--min-header-height) top-0 z-50 transition-all duration-300 ease-in-out backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border-b border-zinc-200/50 dark:border-zinc-700/50">
+<header id="main-header" style="--header-height: 100px;--min-header-height: 48px;--font-size: 1.25rem;" class="fixed w-full h-(--header-height) min-h-(--min-header-height) top-0 z-50 transition-all duration-300 ease-in-out backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border-b border-zinc-200/50 dark:border-zinc-700/50">
     <div class="max-w-5xl mx-auto px-4 transition-all duration-300 ease-in-out h-full flex items-center" id="header-container">
         <nav class="flex items-center justify-between w-full">
             <div class="flex items-center gap-3">
-                <!-- 뒤로가기 버튼 (이전 페이지가 있을 때만 표시) -->
                 <button id="back-button" 
                         onclick="window.history.back()" 
                         class="hidden items-center justify-center w-10 h-10 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200"
@@ -10,21 +9,14 @@
                     <span class="material-symbols-outlined text-zinc-700 dark:text-zinc-300">arrow_back</span>
                 </button>
                 
-                <!-- 로고 -->
                 <a href="{{ site.baseurl }}/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <img id="profile-image" 
-                         src="{{ site.author.image }}" 
-                         alt="{{ site.author.name }}" 
-                         class="w-10 h-10 rounded-full border border-zinc-300 dark:border-zinc-600 transition-all duration-300 ease-in-out">
-                    <span class="header-title text-xl text-zinc-700 dark:text-zinc-300 font-bold transition-all duration-300 ease-in-out">
+                    <span id="header-title" class="text-zinc-700 dark:text-zinc-300 font-bold transition-all duration-300 ease-in-out" style="font-size: var(--font-size);">
                         {% if page.title %}<span class="truncate max-w-64 w-fit">{{ page.title }}</span>{% raw %} | {% endraw %}{% endif %}{{ site.title }}
                     </span>
                 </a>
             </div>
             
-            <!-- 네비게이션 링크 -->
             <div class="flex items-center gap-4">
-                <!-- 검색 버튼 -->
                 <a href="{{ site.baseurl }}/search/" 
                    class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200"
                    aria-label="검색">
@@ -35,21 +27,6 @@
     </div>
 </header>
 
-<style>
-    /* 스크롤시 적용될 스타일 */
-    #main-header.scrolled #profile-image {
-        width: 0;
-        height: 0;
-        opacity: 0;
-        margin: 0;
-        border-width: 0;
-    }
-    
-    #main-header.scrolled .header-title {
-        font-size: 1.125rem; /* text-lg */
-    }
-</style>
-
 <script>
     (function() {
         const header = document.getElementById('main-header');
@@ -58,7 +35,9 @@
         
         const MAX_HEIGHT = 100;
         const MIN_HEIGHT = 48;
-        const SCROLL_RANGE = 50;
+        const MAX_FONT_SIZE = 1.25;
+        const MIN_FONT_SIZE = 1.125;
+        const SCROLL_RANGE = 100;
         
         if (window.history.length > 1) {
             backButton.classList.remove('hidden');
@@ -67,17 +46,12 @@
         
         function updateHeader() {
             const scrollY = window.scrollY;
-            
             let progress = Math.min(scrollY / SCROLL_RANGE, 1);
             let newHeight = MAX_HEIGHT - (MAX_HEIGHT - MIN_HEIGHT) * progress;
+            let newFontSize = MAX_FONT_SIZE - (MAX_FONT_SIZE - MIN_FONT_SIZE) * progress;
             
             header.style.setProperty('--header-height', `${newHeight}px`);
-            
-            if (scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
+            header.style.setProperty('--font-size', `${newFontSize}rem`);
             
             ticking = false;
         }
