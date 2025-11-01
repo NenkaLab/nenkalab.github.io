@@ -5,21 +5,65 @@
 }
 
 .font-pretendard {
-    font-family: var(--font-body) !important;
+    font-family: var(--font-body);
+    font-feature-settings: 
+        "calt" 1, 
+        "case" 1, 
+        "comp" 1, 
+        "frac" 1, 
+        "sups" 1, 
+        "subs" 1, 
+        "ordn" 1, 
+        "salt" 1, 
+        "tnum" 1, 
+        "zero" 1, 
+        "ss01" 1, 
+        "ss02" 1, 
+        "ss03" 1, 
+        "ss04" 1, 
+        "ss05" 1, 
+        "ss06" 1, 
+        "ss07" 1, 
+        "ss08" 1, 
+        "ss09" 1, 
+        "ss10" 1;
 }
 .font-paperlogy {
-    font-family: var(--font-heading) !important;
+    font-family: var(--font-heading);
 }
 .font-jetbrains-mono {
-    font-family: var(--font-code) !important;
+    font-family: var(--font-code);
+    font-feature-settings: "liga" 1;
 }
 
 code {
     font-family: var(--font-code);
+    font-feature-settings: "liga" 1;
 }
 
 body {
     font-family: var(--font-body);
+    font-feature-settings: 
+        "calt" 1, 
+        "case" 1, 
+        "comp" 1, 
+        "frac" 1, 
+        "sups" 1, 
+        "subs" 1, 
+        "ordn" 1, 
+        "salt" 1, 
+        "tnum" 1, 
+        "zero" 1, 
+        "ss01" 1, 
+        "ss02" 1, 
+        "ss03" 1, 
+        "ss04" 1, 
+        "ss05" 1, 
+        "ss06" 1, 
+        "ss07" 1, 
+        "ss08" 1, 
+        "ss09" 1, 
+        "ss10" 1;
 }
 
 h1, h2, h3, h4, h5, h6 {
