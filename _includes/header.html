@@ -1,6 +1,6 @@
-<header id="main-header" class="fixed w-full top-0 z-50 transition-all duration-300 ease-in-out backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border-b border-zinc-200/50 dark:border-zinc-700/50">
-    <div class="max-w-5xl mx-auto px-4 transition-all duration-300 ease-in-out py-6" id="header-container">
-        <nav class="flex items-center justify-between">
+<header id="main-header" style="--header-height: 100px;--min-header-height: 48px;" class="fixed w-full h-(--header-height) min-h-(--min-header-height) top-0 z-50 transition-all duration-300 ease-in-out backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border-b border-zinc-200/50 dark:border-zinc-700/50">
+    <div class="max-w-5xl mx-auto px-4 transition-all duration-300 ease-in-out h-full flex items-center" id="header-container">
+        <nav class="flex items-center justify-between w-full">
             <div class="flex items-center gap-3">
                 <!-- 뒤로가기 버튼 (이전 페이지가 있을 때만 표시) -->
                 <button id="back-button" 
@@ -16,7 +16,7 @@
                          src="{{ site.author.image }}" 
                          alt="{{ site.author.name }}" 
                          class="w-10 h-10 rounded-full border border-zinc-300 dark:border-zinc-600 transition-all duration-300 ease-in-out">
-                    <span class="text-xl text-zinc-700 dark:text-zinc-300 font-bold transition-all duration-300 ease-in-out">
+                    <span class="header-title text-xl text-zinc-700 dark:text-zinc-300 font-bold transition-all duration-300 ease-in-out">
                         {% if page.title %}<span class="truncate max-w-64 w-fit">{{ page.title }}</span>{% raw %} | {% endraw %}{% endif %}{{ site.title }}
                     </span>
                 </a>
@@ -37,11 +37,6 @@
 
 <style>
     /* 스크롤시 적용될 스타일 */
-    #main-header.scrolled #header-container {
-        padding-top: 0.5rem; /* py-2 */
-        padding-bottom: 0.5rem;
-    }
-    
     #main-header.scrolled #profile-image {
         width: 0;
         height: 0;
@@ -50,7 +45,7 @@
         border-width: 0;
     }
     
-    #main-header.scrolled .text-xl {
+    #main-header.scrolled .header-title {
         font-size: 1.125rem; /* text-lg */
     }
 </style>
@@ -59,31 +54,34 @@
     (function() {
         const header = document.getElementById('main-header');
         const backButton = document.getElementById('back-button');
-        let lastScrollY = window.scrollY;
         let ticking = false;
         
-        // 뒤로가기 버튼 표시 로직
+        const MAX_HEIGHT = 100;
+        const MIN_HEIGHT = 48;
+        const SCROLL_RANGE = 50;
+        
         if (window.history.length > 1) {
             backButton.classList.remove('hidden');
             backButton.classList.add('flex');
         }
         
-        // 스크롤 이벤트 핸들러
         function updateHeader() {
             const scrollY = window.scrollY;
             
-            // 50px 이상 스크롤시 작아진 헤더 적용
-            if (lastScrollY > 50) {
+            let progress = Math.min(scrollY / SCROLL_RANGE, 1);
+            let newHeight = MAX_HEIGHT - (MAX_HEIGHT - MIN_HEIGHT) * progress;
+            
+            header.style.setProperty('--header-height', `${newHeight}px`);
+            
+            if (scrollY > 50) {
                 header.classList.add('scrolled');
             } else {
                 header.classList.remove('scrolled');
             }
             
-            lastScrollY = scrollY;
             ticking = false;
         }
         
-        // 스크롤 이벤트 리스너 (requestAnimationFrame으로 최적화)
         window.addEventListener('scroll', function() {
             if (!ticking) {
                 window.requestAnimationFrame(updateHeader);
@@ -91,7 +89,6 @@
             }
         });
         
-        // 초기 상태 설정
         updateHeader();
     })();
 </script>
