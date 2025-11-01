@@ -1,5 +1,3 @@
-// my-ip.js - IP 정보 표시 스크립트 (인터랙티브 버전)
-
 const API_URL = 'https://my-ip.zabocho.dev';
 
 // 전역 상태
@@ -61,8 +59,13 @@ async function loadIPInfo() {
         console.error('IP 정보 로드 실패:', error);
         loadingEl.classList.add('hidden');
         errorEl.classList.remove('hidden');
-        document.getElementById('errorMessage').textContent = 
-            error.message || '알 수 없는 오류가 발생했습니다.';
+        document.getElementById('errorMessage').innerHTML = `
+            오류 메시지:<br>
+            <pre>${error.message || '알 수 없는 오류가 발생했습니다.'}</pre>
+
+            잠시 후 다시 시도해 주세요.<br>
+            (다시 시도해도 안되는 경우 API요청 사용량을 다 채운것이니 다음날 다시 시도하거나 다른 아이피 확인 사이트를 이용해주세요)
+        `.split('\n').map(line => line.trim()).join('\n');
     }
 }
 
@@ -80,7 +83,6 @@ function findMainIPs(ipDetails) {
 
 // IP 교체 함수 (클릭 시 호출)
 function swapIP(clickedIP) {
-    const previousMainIP = currentMainIP;
     currentMainIP = clickedIP;
 
     // 메인 IP 다시 렌더링
@@ -88,14 +90,14 @@ function swapIP(clickedIP) {
     renderMainIP(clickedIP, apiData);
 
     // 그리드 다시 렌더링
-    const allIPs = apiData.ipDetails.filter(ip => ip !== clickedIP);
-    
-    // 이전 메인 IP를 맨 앞에 추가
-    if (previousMainIP) {
-        allIPs.unshift(previousMainIP);
-    }
+    const allIPs = apiData.ipDetails
+        .sort((a, b) => {
+            // 신뢰도 순서: high > medium > low
+            const trustOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+            return (trustOrder[b.trustLevel] || 0) - (trustOrder[a.trustLevel] || 0);
+        });
 
-    renderAdditionalIPs(allIPs, apiData);
+    renderAdditionalIPs(allIPs, apiData, clickedIP);
 
     // 스크롤을 맨 위로 부드럽게 이동
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -221,7 +223,7 @@ function createGoogleMapsButton(lat, lng) {
 }
 
 // 추가 IP 렌더링
-function renderAdditionalIPs(ipDetails, data) {
+function renderAdditionalIPs(ipDetails, data, highlightIP = null) {
     const section = document.getElementById('additionalIpsSection');
     const list = document.getElementById('additionalIpsList');
 
@@ -234,27 +236,33 @@ function renderAdditionalIPs(ipDetails, data) {
     list.innerHTML = '';
 
     ipDetails.forEach(ipDetail => {
-        const card = createAdditionalIPCard(ipDetail, data);
+        const card = createAdditionalIPCard(ipDetail, data, highlightIP);
         list.appendChild(card);
     });
 }
 
 // 추가 IP 카드 생성 (간결한 버전 + 클릭 가능)
-function createAdditionalIPCard(ipDetail, data) {
+function createAdditionalIPCard(ipDetail, data, highlightIP) {
     const card = document.createElement('div');
     card.className = 'bg-white dark:bg-zinc-800 rounded-lg shadow border-2 border-zinc-200 dark:border-zinc-700 p-4 hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-500 transition-all cursor-pointer transform hover:-translate-y-1';
     
-    // 클릭 이벤트 추가
-    card.onclick = () => swapIP(ipDetail);
+    if (highlightIP && ipDetail.address === highlightIP.address) {
+        card.classList.add('border-amber-400', 'dark:border-amber-500', 'shadow-xl', '-translate-y-1');
+    }
+
+    // 클릭 이벤트 추가 (선택된 IP가 아니면)
+    if (!highlightIP) {
+        card.onclick = () => swapIP(ipDetail);
+    }
 
     // IP 주소 헤더
     const header = document.createElement('div');
     header.className = 'mb-3';
     header.innerHTML = `
-        <div class="flex items-center justify-between mb-2">
-            <h3 class="text-lg font-mono font-bold text-zinc-900 dark:text-zinc-100 break-all">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg mh-0 font-mono font-bold text-zinc-900 dark:text-zinc-100 break-all font-pretendard">
                 ${ipDetail.address}
-            </h3>
+            </h2>
             <span class="px-2 py-1 ${ipDetail.version === 'ipv4' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'} text-xs font-semibold rounded">
                 ${ipDetail.version.toUpperCase()}
             </span>
@@ -316,8 +324,8 @@ function createInfoCard(label, value) {
     const card = document.createElement('div');
     card.className = 'bg-zinc-50 dark:bg-zinc-900 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700';
     card.innerHTML = `
-        <p class="text-lg text-zinc-500 dark:text-zinc-400 mb-1">${label}</p>
-        <p class="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 break-all mb-0">${value}</p>
+        <p class="text-lg text-zinc-500 dark:text-zinc-400 mt-0 mb-2">${label}</p>
+        <p class="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 break-all my-0">${value}</p>
     `;
     return card;
 }

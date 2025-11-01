@@ -1,6 +1,21 @@
 :root {
     --font-body: "Pretendard", Tossface, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-heading: "Paperlogy", Tossface, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-code: "JetBrains Mono", Tossface, "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.font-pretendard {
+    font-family: var(--font-body) !important;
+}
+.font-paperlogy {
+    font-family: var(--font-heading) !important;
+}
+.font-jetbrains-mono {
+    font-family: var(--font-code) !important;
+}
+
+code {
+    font-family: var(--font-code);
 }
 
 body {
