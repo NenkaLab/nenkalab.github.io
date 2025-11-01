@@ -163,7 +163,7 @@ function renderMainIP(ipDetail, data) {
             infoContainer.appendChild(createInfoCard('🔢 ASN', `AS${data.network.asn}`));
         }
         if (data.network.colo) {
-            infoContainer.appendChild(createInfoCard('🖥️ 데이터센터', data.network.colo));
+            infoContainer.appendChild(createInfoCard('🖥️ 데이터센터 (Cloudflare)', data.network.colo));
         }
     }
 
@@ -316,8 +316,8 @@ function createInfoCard(label, value) {
     const card = document.createElement('div');
     card.className = 'bg-zinc-50 dark:bg-zinc-900 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700';
     card.innerHTML = `
-        <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-1">${label}</p>
-        <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 break-all">${value}</p>
+        <p class="text-lg text-zinc-500 dark:text-zinc-400 mb-1">${label}</p>
+        <p class="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 break-all mb-0">${value}</p>
     `;
     return card;
 }
@@ -326,7 +326,9 @@ function createInfoCard(label, value) {
 function getOpenStreetMapEmbedUrl(lat, lng) {
     const zoom = 13;
     const delta = 0.01;
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${lng-delta},${lat-delta},${lng+delta},${lat+delta}&layer=mapnik&marker=${lat},${lng}`;
+    lat = parseFloat(lat);
+    lng = parseFloat(lng);
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${lng-delta},${lat-delta},${lng+delta},${lat+delta}&layer=mapnik&marker=${lat},${lng}&zoom=${zoom}`;
 }
 
 // OpenStreetMap 링크 URL 생성
