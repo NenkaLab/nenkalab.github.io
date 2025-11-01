@@ -236,6 +236,10 @@ function renderAdditionalIPs(ipDetails, data, highlightIP = null) {
     list.innerHTML = '';
 
     ipDetails.forEach(ipDetail => {
+        if (highlightIP && ipDetail.address === highlightIP.address) {
+            return; // 현재 메인 IP는 건너뜀
+        }
+        
         const card = createAdditionalIPCard(ipDetail, data, highlightIP);
         list.appendChild(card);
     });
@@ -245,15 +249,9 @@ function renderAdditionalIPs(ipDetails, data, highlightIP = null) {
 function createAdditionalIPCard(ipDetail, data, highlightIP) {
     const card = document.createElement('div');
     card.className = 'bg-white dark:bg-zinc-800 rounded-lg shadow border-2 border-zinc-200 dark:border-zinc-700 p-4 hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-500 transition-all cursor-pointer transform hover:-translate-y-1';
-    
-    if (highlightIP && ipDetail.address === highlightIP) {
-        card.classList.add('border-amber-400', 'dark:border-amber-500', 'shadow-xl', '-translate-y-1');
-    }
 
-    // 클릭 이벤트 추가 (선택된 IP가 아니면)
-    if (!highlightIP) {
-        card.onclick = () => swapIP(ipDetail);
-    }
+    // 클릭 이벤트 추가
+    card.onclick = () => swapIP(ipDetail);
 
     // IP 주소 헤더
     const header = document.createElement('div');
@@ -304,29 +302,16 @@ function createAdditionalIPCard(ipDetail, data, highlightIP) {
 
     card.appendChild(infoPreview);
 
-    // "클릭하여 자세히 보기" 힌트
-    if (!highlightIP) {
-        const clickHint = document.createElement('div');
-        clickHint.className = 'flex items-center justify-center gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-700 text-xs font-medium text-blue-600 dark:text-blue-400';
-        clickHint.innerHTML = `
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-            </svg>
-            클릭하여 자세히 보기
-        `;
-        card.appendChild(clickHint);
-    } else {
-        const currentTag = document.createElement('div');
-        currentTag.className = 'flex items-center justify-center gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-700 text-xs font-medium text-amber-600 dark:text-amber-400';
-        currentTag.innerHTML = `
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            현재 표시중인 아이피
-        `;
-        card.appendChild(currentTag);
-    }
+    const clickHint = document.createElement('div');
+    clickHint.className = 'flex items-center justify-center gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-700 text-xs font-medium text-blue-600 dark:text-blue-400';
+    clickHint.innerHTML = `
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        클릭하여 자세히 보기
+    `;
+    card.appendChild(clickHint);
 
     return card;
 }
