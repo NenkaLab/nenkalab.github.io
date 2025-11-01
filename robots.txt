@@ -8,5 +8,6 @@ Allow: /utils/
 Allow: /favicon.ico
 Allow: /cdn-cgi/
 Allow: /sitemap.xml
+Allow: /manifest.webmanifest
 
 Sitemap: https://zabocho.dev/sitemap.xml
