@@ -1,4 +1,4 @@
-<header id="main-header" style="--header-height: 100px;--min-header-height: 48px;--font-size: 1.25rem;--bt-o: 100%;--bt-f: 1;" class="fixed w-full h-(--header-height) min-h-(--min-header-height) top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border-b border-zinc-200/50 dark:border-zinc-700/50">
+<header id="main-header" style="--header-height: 100px;--min-header-height: 48px;--font-size: 1.25rem;--bt-o: 100%;--bt-f: 1;--bt-t: 0%;" class="fixed w-full h-(--header-height) min-h-(--min-header-height) top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-900/80 border-b border-zinc-200/50 dark:border-zinc-700/50">
     <div class="max-w-5xl mx-auto px-4 transition-all duration-300 ease-in-out h-full flex items-center" id="header-container">
         <nav class="flex items-center justify-between w-full">
             <div class="flex items-center gap-3">
@@ -14,7 +14,7 @@
                     <a id="header-title-base" href="{{ site.baseurl }}/" class="text-xs flex-(--bt-f) text-zinc-500/(--bt-o) dark:text-zinc-400/(--bt-o) overflow-hidden transition-opacity duration-300 ease-in-out" onclick="">
                         {{ site.title }}
                     </a>
-                    <a id="header-title" href="{{ page.url }}" class="leading-[1.1] text-zinc-700 dark:text-zinc-300 font-bold hover:opacity-80 transition-[color,font-weight,opacity] duration-300 ease-in-out" style="font-size: var(--font-size);">
+                    <a id="header-title" href="{{ page.url }}" class="leading-[1.1] -translate-(--bt-t) text-zinc-700 dark:text-zinc-300 font-bold hover:opacity-80 transition-[color,font-weight,opacity] duration-300 ease-in-out" style="font-size: var(--font-size);">
                         {{ page.title }}
                     </a>
                 </span>
@@ -48,7 +48,7 @@
         const MIN_HEIGHT = 48;
         const MAX_FONT_SIZE = 1.375;
         const MIN_FONT_SIZE = 1.125;
-        const SCROLL_RANGE = 100;
+        const SCROLL_RANGE = 80;
         
         if (window.history.length > 1) {
             backButton.classList.remove('hidden');
@@ -60,11 +60,13 @@
             let progress = Math.min(scrollY / SCROLL_RANGE, 1);
             let newHeight = MAX_HEIGHT - (MAX_HEIGHT - MIN_HEIGHT) * progress;
             let newFontSize = MAX_FONT_SIZE - (MAX_FONT_SIZE - MIN_FONT_SIZE) * progress;
+            let translateY = 50 - 50 * progress;
             
             header.style.setProperty('--header-height', `${newHeight}px`);
             header.style.setProperty('--font-size', `${newFontSize}rem`);
             header.style.setProperty('--bt-o', `${Math.round(100*(1-progress))}%`);
             header.style.setProperty('--bt-f', `${1-progress}`);
+            header.style.setProperty('--bt-t', `${translateY}%`);
             
             ticking = false;
         }
