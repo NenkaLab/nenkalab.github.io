@@ -17,7 +17,7 @@
                          alt="{{ site.author.name }}" 
                          class="w-10 h-10 rounded-full border border-zinc-300 dark:border-zinc-600 transition-all duration-300 ease-in-out">
                     <span class="text-xl text-zinc-700 dark:text-zinc-300 font-bold transition-all duration-300 ease-in-out">
-                        {{ site.title }}{% if page.title %} {% raw %}|{% endraw %} {{ page.title }}{% endif %}
+                        {{ site.title }}{% if page.title %} {% raw %}|{% endraw %} <span class="truncate max-w-64 w-fit">{{ page.title }}</span>{% endif %}
                     </span>
                 </a>
             </div>
