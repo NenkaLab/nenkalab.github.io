@@ -248,7 +248,7 @@ function renderAdditionalIPs(ipDetails, data, highlightIP = null) {
 // 추가 IP 카드 생성 (간결한 버전 + 클릭 가능)
 function createAdditionalIPCard(ipDetail, data, highlightIP) {
     const card = document.createElement('div');
-    card.className = 'bg-white dark:bg-zinc-800 rounded-lg shadow border-2 border-zinc-200 dark:border-zinc-700 p-4 hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-500 transition-all cursor-pointer transform hover:-translate-y-1';
+    card.className = 'bg-white dark:bg-zinc-800 rounded-lg border-2 border-zinc-200 dark:border-zinc-700 p-4 hover:shadow-lg hover:border-blue-400 dark:hover:border-blue-500 transition-all cursor-pointer transform hover:-translate-y-1';
 
     // 클릭 이벤트 추가
     card.onclick = () => swapIP(ipDetail);
